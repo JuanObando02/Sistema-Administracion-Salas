@@ -1,0 +1,57 @@
+﻿@* Recibe una LISTA del modelo que creamos *@
+@model IEnumerable<Services.Models.SalaModels.SalaIndexModel>
+
+@{
+    ViewData["Title"] = "Gestión de Salas";
+}
+
+<h1>@ViewData["Title"]</h1>
+
+<p>
+    @* El botón "Registrar" en la parte superior *@
+    <a asp-action="Registrar" class="btn btn-primary">Registrar Nueva Sala</a>
+</p>
+
+<table class="table">
+    <thead>
+        <tr>
+            <th>
+                Nombre Sala
+            </th>
+            <th>
+                Capacidad
+            </th>
+            <th>
+                Estado
+            </th>
+            <th>
+                Opciones
+            </th>
+        </tr>
+    </thead>
+    <tbody>
+        @* Itera sobre cada sala en el modelo que envió el controlador *@
+        @foreach (var item in Model)
+        {
+            <tr>
+                <td>
+                    @* Combina el prefijo "Sala" con el número *@
+                    Sala @item.Numero
+                </td>
+                <td>
+                    @item.Capacidad
+                </td>
+                <td>
+                    @item.Estado
+                </td>
+                <td>
+                    @* Enlace para Editar *@
+                    <a asp-action="Editar" asp-route-id="@item.Id" class="btn btn-sm btn-warning">Editar</a> |
+
+                    @* Enlace para Eliminar *@
+                    <a asp-action="Eliminar" asp-route-id="@item.Id" class="btn btn-sm btn-danger">Eliminar</a>
+                </td>
+            </tr>
+        }
+    </tbody>
+</table>

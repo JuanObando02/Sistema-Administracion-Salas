@@ -1,0 +1,51 @@
+﻿@model Services.Models.SalaModels.EditarSalaModel
+@using Domain.Enums
+
+@{
+    ViewData["Title"] = "Editar Sala";
+}
+
+<h2>Editar Sala N° @Model.Numero</h2>
+<hr />
+
+<div class="row">
+    <div class="col-md-6">
+        <form asp-action="Editar" method="post">
+            <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+
+            @* Este campo es crucial. Guarda el Id pero no se lo muestra al usuario *@
+            <input type="hidden" asp-for="Id" />
+
+            <div class="mb-3">
+                <label asp-for="Numero" class="form-label"></label>
+                <input asp-for="Numero" class="form-control" />
+                <span asp-validation-for="Numero" class="text-danger"></span>
+            </div>
+
+            <div class="mb-3">
+                <label asp-for="Capacidad" class="form-label"></label>
+                <input asp-for="Capacidad" class="form-control" type="number" />
+                <span asp-validation-for="Capacidad" class="text-danger"></span>
+            </div>
+
+            <div class="mb-3">
+                <label asp-for="Estado" class="form-label"></label>
+                @* Crea un DropDown para el Enum 'EstadoSala' *@
+                <select asp-for="Estado" asp-items="Html.GetEnumSelectList<EstadoSala>()" class="form-control">
+                    <option>Seleccione un estado...</option>
+                </select>
+                <span asp-validation-for="Estado" class="text-danger"></span>
+            </div>
+
+            <div class="form-group">
+                <input type="submit" value="Guardar Cambios" class="btn btn-primary" />
+            </div>
+        </form>
+    </div>
+</div>
+
+@section Scripts {
+    @{
+        await Html.RenderPartialAsync("_ValidationScriptsPartial");
+    }
+}
