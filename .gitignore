@@ -1,3 +1,12 @@
+# Archivos y carpetas generados por el compilador
+.vs/
+bin/
+obj/
+# Otros archivos de compilacion y temporales
+*.user
+*.suo
+*.cache
+# Otros archivos de compilacion y temporales
 .vs/ApiSampleFinal/DesignTimeBuild/.dtbcache.v2
 Test/DomainTest/bin/Debug/net8.0/it/Microsoft.TestPlatform.CommunicationUtilities.resources.dll
 Test/DomainTest/bin/Debug/net8.0/it/Microsoft.TestPlatform.CoreUtilities.resources.dll
