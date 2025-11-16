@@ -61,6 +61,7 @@ namespace MvcSample.Controllers
         {
             AddCowModel model = new AddCowModel();
             model.FarmId = id;
+            await Task.CompletedTask;
             return View(model);
         }
 

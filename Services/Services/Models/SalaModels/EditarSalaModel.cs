@@ -1,4 +1,5 @@
 ﻿using Domain;
+using Domain.Enums;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
@@ -15,12 +16,16 @@ namespace Services.Models.SalaModels
         EnMantenimiento,
         Deshabilitada
     }
+    public enum TipoSala
+    {
+        Individual, // Para préstamo de equipos uno por uno
+        Clase_Completa // Para reserva de profesor
+    }
     public class EditarSalaModel
     {
         public Guid Id { get; set; }
 
         [Required(ErrorMessage = "El número es obligatorio")]
-        [Display(Name = "Número de Sala")]
         public int Numero { get; set; }
 
         [Required(ErrorMessage = "La capacidad es obligatoria")]
@@ -28,6 +33,10 @@ namespace Services.Models.SalaModels
         public int Capacidad { get; set; }
 
         [Required]
-        public EstadoSalaModel Estado { get; set; }
+        public EstadoSala Estado { get; set; } // El enum de Estado
+
+        [Required(ErrorMessage = "El tipo de sala es obligatorio")]
+        [Display(Name = "Tipo de Sala")]
+        public TipoSala Tipo { get; set; } // El enum de Tipo
     }
 }

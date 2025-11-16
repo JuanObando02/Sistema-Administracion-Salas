@@ -23,10 +23,9 @@ namespace Infrastructure.Repositories
                 await Save(); // guardo los cambios
                 await Comit();
             }
-            catch (Exception ex)
+            catch (Exception)
             {
                 await RollBack();
-                throw ex;
             }
         }
         public async Task<Sala> GetSala(Guid id)
@@ -42,10 +41,9 @@ namespace Infrastructure.Repositories
                 await Save(); // guardo los cambios
                 await Comit();
             }
-            catch (Exception ex)
+            catch (Exception)
             {
                 await RollBack();
-                throw ex;
             }
         }
         public async Task<Sala> GetSalaConEquipos(Guid id)

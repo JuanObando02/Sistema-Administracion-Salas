@@ -1,5 +1,5 @@
 ﻿@model Services.Models.SalaModels.EditarSalaModel
-@using Domain.Enums
+@using Services.Models.SalaModels
 
 @{
     ViewData["Title"] = "Editar Sala";
@@ -30,13 +30,15 @@
 
             <div class="mb-3">
                 <label asp-for="Estado" class="form-label"></label>
-                @* Crea un DropDown para el Enum 'EstadoSala' *@
-                <select asp-for="Estado" asp-items="Html.GetEnumSelectList<EstadoSala>()" class="form-control">
-                    <option>Seleccione un estado...</option>
-                </select>
+                <select asp-for="Estado" asp-items="Html.GetEnumSelectList<EstadoSalaModel>()" class="form-control"></select>
                 <span asp-validation-for="Estado" class="text-danger"></span>
             </div>
 
+            <div class="mb-3">
+                <label asp-for="Tipo" class="form-label"></label>
+                <select asp-for="Tipo" asp-items="Html.GetEnumSelectList<TipoSala>()" class="form-control"></select>
+                <span asp-validation-for="Tipo" class="text-danger"></span>
+            </div>
             <div class="form-group">
                 <input type="submit" value="Guardar Cambios" class="btn btn-primary" />
             </div>

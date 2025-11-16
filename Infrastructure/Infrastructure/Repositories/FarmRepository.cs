@@ -41,10 +41,9 @@ namespace Infrastructure.Repositories
                 await Comit();
                 
             }
-            catch (Exception ex) 
+            catch (Exception) 
             {
                 await RollBack();
-                throw ex;
             }
         }
 
@@ -58,10 +57,9 @@ namespace Infrastructure.Repositories
                 await Comit(); // 4. Comete la transacción
 
             }
-            catch (Exception ex)
+            catch (Exception)
             {
                 await RollBack();
-                throw ex;
             }
         }
     }

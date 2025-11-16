@@ -2,6 +2,7 @@
 using Domain;
 using Domain.Enums;
 using Services.Models.CowModels;
+using Services.Models.EquipoModels;
 using Services.Models.FarmModels;
 using Services.Models.MilkModels;
 using Services.Models.SalaModels;
@@ -16,6 +17,28 @@ namespace Services.Automapper
             MilkMapper();
             CowMapper();
             SalaMapper();
+            EquipoMapper();
+        }
+
+
+        private void EquipoMapper()
+        {
+            // Mapea el modelo de registro a la entidad
+            CreateMap<RegistrarEquipoModel, Equipo>();
+            // Para el Index (GET)
+            CreateMap<Equipo, EquipoIndexModel>()
+                // Mapea el enum del Dominio al enum del Modelo
+                .ForMember(dest => dest.Estado, opt => opt.MapFrom(src => (EstadoEquipoModel)src.Estado))
+                // Mapea el nombre de la sala
+                .ForMember(dest => dest.SalaNombre, opt => opt.MapFrom(src => $"Sala {src.Sala.Numero}"));
+
+            // Para Editar (GET)
+            CreateMap<Equipo, EditarEquipoModel>()
+                .ForMember(dest => dest.Estado, opt => opt.MapFrom(src => (EstadoEquipoModel)src.Estado));
+
+            // Para Editar (POST)
+            CreateMap<EditarEquipoModel, Equipo>()
+                .ForMember(dest => dest.Estado, opt => opt.MapFrom(src => (EstadoEquipo)src.Estado));
         }
 
         private void MilkMapper()

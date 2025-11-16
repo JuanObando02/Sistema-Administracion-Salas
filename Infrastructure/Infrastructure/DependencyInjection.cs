@@ -21,13 +21,17 @@ namespace Infrastructure
 
             //aca van los repositorios
             services.AddScoped<IFarmRepository, FarmRepository>();
+            
             services.AddScoped<ISalaRepository, SalaRepository>();
-            Console.WriteLine("Repositorios configurados.");
+            Console.WriteLine("Repositorio de Sala configurado.");
+            services.AddScoped<IEquipoRepository, EquipoRepository>();
+            Console.WriteLine("Repositorio de Equipo configurado.");
+
 
             services.AddDbContext<AppDbContext>(options =>
             {
                 options.UseSqlServer(c);
-                Console.WriteLine("Cadena de conexi�n utilizada: " + c);
+                Console.WriteLine("Cadena de conexion utilizada: " + c);
             });
             return services;
         }
