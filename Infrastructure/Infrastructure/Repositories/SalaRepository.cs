@@ -14,6 +14,12 @@ namespace Infrastructure.Repositories
         {
             Console.WriteLine("Se crea un repositorio de salas");
         }
+        public async Task<Sala> GetSalaPorNumero(int numero)
+        {
+            // Busca la primera sala que coincida con ese número
+            return await context.Salas
+                .FirstOrDefaultAsync(s => s.Numero == numero);
+        }
         public async Task Save(Sala sala)
         {
             try

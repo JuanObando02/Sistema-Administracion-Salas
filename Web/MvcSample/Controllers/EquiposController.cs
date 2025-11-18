@@ -18,10 +18,10 @@ namespace MvcSample.Controllers
 
         // --- ACCIÓN 1: Mostrar el formulario (GET) ---
         [HttpGet]
-        public async Task<IActionResult> Registrar()
+        public async Task<IActionResult> Registrar(Guid? salaId) // Acepta el ID de la sala
         {
-            // Llama al servicio para obtener el modelo CON la lista de salas
-            var modelo = await _equipoService.GetDatosParaRegistrar();
+            // Llama al servicio modificado
+            var modelo = await _equipoService.GetDatosParaRegistrar(salaId);
             return View(modelo);
         }
 
@@ -32,16 +32,15 @@ namespace MvcSample.Controllers
         {
             if (!ModelState.IsValid)
             {
-                // Si el modelo no es válido recargar la lista de salas antes de devolver la vista.
-                var modeloRecargado = await _equipoService.GetDatosParaRegistrar();
-                modeloRecargado.Serial = model.Serial; // Mantiene el serial que el usuario escribió
+                var modeloRecargado = await _equipoService.GetDatosParaRegistrar(model.SalaId == Guid.Empty ? null : model.SalaId);
+                modeloRecargado.Serial = model.Serial;
                 return View(modeloRecargado);
             }
 
             try
             {
-                await _equipoService.RegistrarEquipo(model);
-                return RedirectToAction("Index", "Equipos"); // Vuelve al Index de Salas
+                var salaId = await _equipoService.RegistrarEquipo(model);
+                return RedirectToAction("Index", new { salaId = salaId });
             }
             catch (InvalidOperationException ex)
             {
@@ -49,7 +48,7 @@ namespace MvcSample.Controllers
                 ModelState.AddModelError(string.Empty, ex.Message);
 
                 // Recargamos el dropdown y devolvemos la vista con el error
-                var modeloRecargado = await _equipoService.GetDatosParaRegistrar();
+                var modeloRecargado = await _equipoService.GetDatosParaRegistrar(model.SalaId == Guid.Empty ? null : model.SalaId);
                 modeloRecargado.Serial = model.Serial;
                 modeloRecargado.SalaId = model.SalaId;
                 return View(modeloRecargado);
@@ -57,15 +56,29 @@ namespace MvcSample.Controllers
             catch (Exception)
             {
                 ModelState.AddModelError(string.Empty, "Ocurrió un error al guardar el equipo.");
-                var modeloRecargado = await _equipoService.GetDatosParaRegistrar();
+                var modeloRecargado = await _equipoService.GetDatosParaRegistrar(model.SalaId == Guid.Empty ? null : model.SalaId);
                 return View(modeloRecargado);
             }
 
         }
+
         [HttpGet]
-        public async Task<IActionResult> Index()
+        public async Task<IActionResult> Index(Guid? salaId)
         {
-            var listaEquipos = await _equipoService.GetEquipos();
+            ViewBag.SalaId = salaId;
+            IList<EquipoIndexModel> listaEquipos;
+
+            if (salaId.HasValue)
+            {
+                // Si el ID viene, filtra la lista
+                listaEquipos = await _equipoService.GetEquiposPorSala(salaId.Value);
+            }
+            else
+            {
+                // Si no, trae todos
+                listaEquipos = await _equipoService.GetEquipos();
+            }
+
             return View(listaEquipos);
         }
 
@@ -85,16 +98,14 @@ namespace MvcSample.Controllers
         {
             if (!ModelState.IsValid)
             {
-                // --- ¡ARREGLO AQUÍ! ---
-                // Llama al nuevo método del servicio para repopular
                 model = await _equipoService.RepopularDropdownsParaEditar(model);
                 return View(model);
             }
 
             try
             {
-                await _equipoService.UpdateEquipo(model);
-                return RedirectToAction("Index");
+                var salaId = await _equipoService.UpdateEquipo(model);
+                return RedirectToAction("Index", new { salaId = salaId });
             }
             catch (InvalidOperationException ex)
             {

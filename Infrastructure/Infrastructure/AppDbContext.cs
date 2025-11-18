@@ -62,17 +62,30 @@ namespace Infrastructure
                 .HasOne(r => r.UsuarioCreador)
                 .WithMany(u => u.ReportesCreados) //
                 .OnDelete(DeleteBehavior.Restrict);
+
             modelBuilder.Entity<Reserva>()
-            .HasOne(r => r.Sala)
-            .WithMany(s => s.Reservas) //
-            .HasForeignKey(r => r.SalaId)
-            .OnDelete(DeleteBehavior.Restrict); // Evita problemas si se borra una Sala
+                .HasOne(r => r.Sala)
+                .WithMany(s => s.Reservas) //
+                .HasForeignKey(r => r.SalaId)
+                .OnDelete(DeleteBehavior.Restrict); // Evita problemas si se borra una Sala
 
             modelBuilder.Entity<Reporte>()
                 .HasOne(r => r.SalaReportada)
                 .WithMany(s => s.Reportes) //
                 .HasForeignKey(r => r.SalaId)
                 .OnDelete(DeleteBehavior.Restrict); // Evita problemas si se borra una Sala
+
+            modelBuilder.Entity<Equipo>(entity =>
+            {
+                entity.HasIndex(e => e.Serial).IsUnique();
+            });
+
+            modelBuilder.Entity<Sala>(entity =>
+            {
+                // Crea un Índice Único en la columna 'Numero'
+                entity.HasIndex(s => s.Numero).IsUnique();
+            });
+
 
         }
     }

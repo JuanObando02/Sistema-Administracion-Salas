@@ -14,6 +14,12 @@ namespace Infrastructure.Repositories
         public EquipoRepository(AppDbContext context) : base(context)
         {
         }
+        public async Task<Equipo> GetEquipoPorSerial(string serial)
+        {
+            // Busca el primer equipo que coincida con el serial (ignorando mayúsculas/minúsculas)
+            return await context.Equipos
+                .FirstOrDefaultAsync(e => e.Serial.ToUpper() == serial.ToUpper());
+        }
         public async Task Save(Equipo equipo)
         {
             try
@@ -74,6 +80,15 @@ namespace Infrastructure.Repositories
                 await RollBack();
                 throw ex;
             }
+        }
+
+        public async Task<IList<Equipo>> GetEquiposPorSala(Guid salaId)
+        {
+            return await context.Equipos
+                .Where(e => e.SalaId == salaId) // Filtra por la sala
+                .Include(e => e.Sala)           // Incluye la sala
+                .OrderBy(e => e.Serial)
+                .ToListAsync();
         }
     }
 

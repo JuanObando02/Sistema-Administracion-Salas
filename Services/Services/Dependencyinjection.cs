@@ -10,6 +10,8 @@ namespace Services
             services.AddTransient<IFarmService, FarmService>();
             services.AddTransient<ISalaService, SalaService>();
             services.AddTransient<IEquipoService, EquipoService>();
+            services.AddTransient<IRoleService, RoleService>();
+            services.AddTransient<IUsuarioService, UsuarioService>();
 
 
             return services;

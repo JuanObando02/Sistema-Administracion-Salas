@@ -17,6 +17,7 @@ namespace Infrastructure.Repositories
         Task<Sala> GetSalaConEquipos(Guid id); // Para la validación
         Task Delete(Sala sala);
         Task<IList<Sala>> GetSalas();
+        Task<Sala> GetSalaPorNumero(int numero);
 
     }
 }

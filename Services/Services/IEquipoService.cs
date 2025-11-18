@@ -9,12 +9,14 @@ namespace Services
 {
     public interface IEquipoService
     {
-        Task RegistrarEquipo(RegistrarEquipoModel model);
-        Task<RegistrarEquipoModel> GetDatosParaRegistrar();
+        Task<Guid> RegistrarEquipo(RegistrarEquipoModel model);
+        Task<RegistrarEquipoModel> GetDatosParaRegistrar(Guid? salaId);
         Task<IList<EquipoIndexModel>> GetEquipos();
         Task<EditarEquipoModel> GetEquipoParaEditar(Guid id);
-        Task UpdateEquipo(EditarEquipoModel model);
+        Task<Guid> UpdateEquipo(EditarEquipoModel model);
         Task DeleteEquipo(Guid id);
         Task<EditarEquipoModel> RepopularDropdownsParaEditar(EditarEquipoModel model);
+
+        Task<IList<EquipoIndexModel>> GetEquiposPorSala(Guid salaId);
     }
 }

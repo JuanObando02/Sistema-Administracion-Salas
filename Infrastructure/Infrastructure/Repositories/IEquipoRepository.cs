@@ -14,5 +14,7 @@ namespace Infrastructure.Repositories
         Task<IList<Equipo>> GetEquipos(); // Para el Index
         Task Update(Equipo equipo);
         Task Delete(Equipo equipo);
+        Task<Equipo> GetEquipoPorSerial(string serial);
+        Task<IList<Equipo>> GetEquiposPorSala(Guid salaId);
     }
 }

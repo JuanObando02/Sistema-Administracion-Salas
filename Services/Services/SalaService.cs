@@ -23,10 +23,12 @@ namespace Services
 
         public async Task RegistrarSala(RegistrarSalaModel model)
         {
-            // 1. Mapea el Modelo (DTO) a la Entidad de Dominio
+            var salaExistente = await _salaRepository.GetSalaPorNumero(model.Numero);
+            if (salaExistente != null)
+            {
+                throw new InvalidOperationException($"El número de sala '{model.Numero}' ya está registrado.");
+            }
             var sala = _mapper.Map<Sala>(model);
-
-            // 2. Llama al repositorio para guardarla
             await _salaRepository.Save(sala);
         }
 
@@ -40,18 +42,26 @@ namespace Services
 
         public async Task UpdateSala(EditarSalaModel model)
         {
-            // 1. Obtiene la entidad existente de la BD (Patrón FarmService.AddCow)
-            var salaExistente = await _salaRepository.GetSala(model.Id);
-
-            if (salaExistente != null)
+            var salaConEseNumero = await _salaRepository.GetSalaPorNumero(model.Numero);
+            if (salaConEseNumero != null && salaConEseNumero.Id != model.Id)
             {
-                // 2. Mapea los cambios del Modelo (model) a la Entidad (salaExistente)
-                // AutoMapper actualizará los campos (Numero, Capacidad, Estado)
-                _mapper.Map(model, salaExistente);
-
-                // 3. Llama al repositorio para guardar la entidad actualizada
-                await _salaRepository.Update(salaExistente);
+                throw new InvalidOperationException($"El número de sala '{model.Numero}' ya está en uso por otra sala.");
             }
+
+            var salaExistente = await _salaRepository.GetSalaConEquipos(model.Id); //
+            if (salaExistente == null)
+            {
+                throw new Exception("La sala que intenta actualizar no existe.");
+            }
+
+            if (model.Capacidad < salaExistente.Equipos.Count)
+            {
+                throw new InvalidOperationException($"Error: No se puede reducir la capacidad a {model.Capacidad} porque la sala ya tiene {salaExistente.Equipos.Count} equipos asignados."); //
+            }
+
+            _mapper.Map(model, salaExistente);
+            await _salaRepository.Update(salaExistente); ;
+            
         }
         public async Task DeleteSala(Guid id)
         {

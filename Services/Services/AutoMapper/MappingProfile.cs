@@ -6,6 +6,7 @@ using Services.Models.EquipoModels;
 using Services.Models.FarmModels;
 using Services.Models.MilkModels;
 using Services.Models.SalaModels;
+using Services.Models.UsuarioModels;
 
 namespace Services.Automapper
 {
@@ -18,8 +19,20 @@ namespace Services.Automapper
             CowMapper();
             SalaMapper();
             EquipoMapper();
+            UsuarioMapper();
         }
 
+        private void UsuarioMapper()
+        {
+            // Para el formulario de Registro
+            CreateMap<RegistrarUsuarioModel, AppUser>();
+
+            // Para la tabla del Index
+            CreateMap<AppUser, UsuarioIndexModel>()
+                .ForMember(dest => dest.NombreCompleto, opt => opt.MapFrom(src => $"{src.Name} {src.LastName}"))
+                .ForMember(dest => dest.Email, opt => opt.MapFrom(src => src.Email))
+                .ForMember(dest => dest.Documento, opt => opt.MapFrom(src => src.DocumentNumber));
+        }
 
         private void EquipoMapper()
         {

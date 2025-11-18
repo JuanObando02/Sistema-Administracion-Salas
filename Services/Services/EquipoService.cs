@@ -17,50 +17,61 @@ namespace Services
         private readonly ISalaRepository _salaRepository; // Para el dropdown
         private readonly IMapper _mapper;
 
+        public async Task<IList<EquipoIndexModel>> GetEquiposPorSala(Guid salaId)
+        {
+            var lista = await _equipoRepository.GetEquiposPorSala(salaId);
+            return _mapper.Map<IList<EquipoIndexModel>>(lista);
+        }
+        
         public EquipoService(IEquipoRepository equipoRepository, ISalaRepository salaRepository, IMapper mapper)
         {
             _equipoRepository = equipoRepository;
             _salaRepository = salaRepository;
             _mapper = mapper;
         }
-        public async Task RegistrarEquipo(RegistrarEquipoModel model)
+        public async Task<Guid> RegistrarEquipo(RegistrarEquipoModel model)
         {
-            // 1. Cargar la sala primero
+            var equipoExistente = await _equipoRepository.GetEquipoPorSerial(model.Serial);
+            if (equipoExistente != null)
+            {
+                // ¡Error! El serial ya existe
+                throw new InvalidOperationException($"El serial '{model.Serial}' ya está registrado.");
+            }
+
+            // 2. Cargar la sala (tu lógica de capacidad que ya tenías)
             var sala = await _salaRepository.GetSalaConEquipos(model.SalaId);
-
             if (sala == null)
-            {
                 throw new Exception("La sala seleccionada no existe.");
-            }
 
-            // 2. Comparamos la lista de equipos con la capacidad
-            if (sala.Equipos.Count >= sala.Capacidad)
-            {
-                // Si la sala está llena, lanzamos un error
-                throw new InvalidOperationException($"La Sala {sala.Numero} ya está llena. Su capacidad es de {sala.Capacidad} equipos.");
-            }
+            if (sala.Equipos.Count >= sala.Capacidad) //
+                throw new InvalidOperationException($"La Sala {sala.Numero} ya está llena.");
 
-            // 3. Si hay espacio, mapeamos y guardamos el nuevo equipo
+            // 3. Guardar
             var equipo = _mapper.Map<Equipo>(model);
-
             await _equipoRepository.Save(equipo);
+
+            return sala.Id;
         }
 
-        public async Task<RegistrarEquipoModel> GetDatosParaRegistrar()
+        public async Task<RegistrarEquipoModel> GetDatosParaRegistrar(Guid? salaId)
         {
-            // 1. Obtener todas las salas
-            var salas = await _salaRepository.GetSalas();
-
-            // 2. Crear un modelo vacío
             var modelo = new RegistrarEquipoModel();
 
-            // 3. Llenar la lista del dropdown
-            modelo.SalasDisponibles = salas.Select(s => new SelectListItem
+            if (salaId.HasValue)
             {
-                Value = s.Id.ToString(),
-                Text = $"Sala {s.Numero} (Cap: {s.Capacidad})"
-            });
-
+                // Si venimos de una sala, pre-seleccionamos el ID
+                modelo.SalaId = salaId.Value;
+            }
+            else
+            {
+                // Si venimos del "Registrar" genérico, llenamos el dropdown
+                var salas = await _salaRepository.GetSalas();
+                modelo.SalasDisponibles = salas.Select(s => new SelectListItem
+                {
+                    Value = s.Id.ToString(),
+                    Text = $"Sala {s.Numero} (Cap: {s.Capacidad})"
+                });
+            }
             return modelo;
         }
 
@@ -90,16 +101,20 @@ namespace Services
             return modelo;
         }
 
-        public async Task UpdateEquipo(EditarEquipoModel model)
+        public async Task<Guid> UpdateEquipo(EditarEquipoModel model)
         {
-            // 1. Obtener la entidad de la BD
+            var equipoConEseSerial = await _equipoRepository.GetEquipoPorSerial(model.Serial);
+            if (equipoConEseSerial != null && equipoConEseSerial.Id != model.Id)
+            {
+                // ¡Error! El serial existe, y NO es el equipo que estamos editando
+                throw new InvalidOperationException($"El serial '{model.Serial}' ya está en uso por otro equipo.");
+            }
             var equipoExistente = await _equipoRepository.GetEquipo(model.Id);
             if (equipoExistente == null)
             {
                 throw new Exception("El equipo que intenta actualizar no existe.");
             }
 
-            // 2. Validar capacidad de la nueva sala (¡Regla de negocio!)
             // Si el usuario cambió la SalaId, debemos validar la capacidad de la *nueva* sala.
             if (equipoExistente.SalaId != model.SalaId)
             {
@@ -112,9 +127,9 @@ namespace Services
 
             // 3. Mapear los cambios del modelo a la entidad
             _mapper.Map(model, equipoExistente);
-
-            // 4. Guardar
             await _equipoRepository.Update(equipoExistente);
+
+            return equipoExistente.SalaId;
         }
 
         public async Task DeleteEquipo(Guid id)

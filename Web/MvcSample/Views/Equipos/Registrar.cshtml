@@ -3,14 +3,9 @@
 @{
     ViewData["Title"] = "Registrar Nuevo Equipo";
 }
-
-<h2>@ViewData["Title"]</h2>
-<hr />
-
 <div class="row">
     <div class="col-md-6">
         <form asp-action="Registrar" method="post">
-
             <div asp-validation-summary="ModelOnly" class="text-danger"></div>
 
             <div class="mb-3">
@@ -18,15 +13,20 @@
                 <input asp-for="Serial" class="form-control" />
                 <span asp-validation-for="Serial" class="text-danger"></span>
             </div>
-
-            <div class="mb-3">
-                <label asp-for="SalaId" class="form-label"></label>
-                @* Este es el Dropdown que llenamos desde el servicio *@
-                <select asp-for="SalaId" asp-items="Model.SalasDisponibles" class="form-control">
-                    <option value="">-- Seleccione una Sala --</option>
-                </select>
-                <span asp-validation-for="SalaId" class="text-danger"></span>
-            </div>
+            @if (Model.SalaId != Guid.Empty)
+            {
+                <input type="hidden" asp-for="SalaId" />
+            }
+            else
+            {
+                <div class="mb-3">
+                    <label asp-for="SalaId" class="form-label"></label>
+                    <select asp-for="SalaId" asp-items="Model.SalasDisponibles" class="form-control">
+                        <option value="">-- Seleccione una Sala --</option>
+                    </select>
+                    <span asp-validation-for="SalaId" class="text-danger"></span>
+                </div>
+            }
 
             <div class="form-group">
                 <input type="submit" value="Registrar Equipo" class="btn btn-primary" />
@@ -34,9 +34,3 @@
         </form>
     </div>
 </div>
-
-@section Scripts {
-    @{
-        await Html.RenderPartialAsync("_ValidationScriptsPartial");
-    }
-}

@@ -11,13 +11,13 @@ namespace MvcSample.Controllers
     {
         private readonly ISalaService _salaService;
 
-        // 1. Inyecta el servicio
+        // Inyecta el servicio
         public SalasController(ISalaService salaService)
         {
             _salaService = salaService;
         }
 
-        // 2. Acción GET para MOSTRAR el formulario de registro
+        // GET para MOSTRAR el formulario de registro
         [HttpGet]
         public IActionResult Registrar()
         {
@@ -25,7 +25,7 @@ namespace MvcSample.Controllers
             return View();
         }
 
-        // 3. Acción POST para RECIBIR los datos del formulario
+        //POST para RECIBIR los datos del formulario
         [HttpPost]
         [ValidateAntiForgeryToken] // Buena práctica de seguridad
         public async Task<IActionResult> Registrar(RegistrarSalaModel model)
@@ -54,7 +54,7 @@ namespace MvcSample.Controllers
             }
         }
 
-        // --- ACCIÓN 3: Mostrar el formulario para EDITAR (HTTP GET) ---
+        // Mostrar el formulario para EDITAR
         // Se activa con la URL: /Salas/Editar/un-guid-aqui
         [HttpGet]
         public async Task<IActionResult> Editar(Guid id)
@@ -74,36 +74,35 @@ namespace MvcSample.Controllers
             return View(model);
         }
 
-        // --- ACCIÓN 4: Recibir los datos del formulario de EDICIÓN (HTTP POST) ---
+        // Recibir los datos del formulario de EDICIÓN
         [HttpPost]
         [ValidateAntiForgeryToken] // Buena práctica de seguridad
         public async Task<IActionResult> Editar(EditarSalaModel model)
         {
-            // 1. Verifica si los datos del formulario son válidos
-            //    (Usando las anotaciones [Required], [Range] de tu ViewModel)
             if (!ModelState.IsValid)
             {
-                // Si no, vuelve a mostrar el formulario con los mensajes de error
                 return View(model);
             }
 
             try
             {
-                // 2. Si son válidos, llama al servicio para actualizar
                 await _salaService.UpdateSala(model);
-
-                // 3. Redirige al listado de salas (Debes crear un Index)
-                return RedirectToAction("Index");
+                return RedirectToAction("Index"); // Redirige al listado
+            }
+            catch (InvalidOperationException ex)
+            {
+                // Atrapa el error específico de "capacidad"
+                ModelState.AddModelError("Capacidad", ex.Message); // Asocia el error al campo Capacidad
+                return View(model);
             }
             catch (Exception)
             {
-                // 4. Si algo falla al guardar, muestra un error general
                 ModelState.AddModelError(string.Empty, "Ocurrió un error al actualizar la sala.");
                 return View(model);
             }
         }
 
-        // --- ACCIÓN 5: GET PARA MOSTRAR CONFIRMACIÓN ---
+        // GET PARA MOSTRAR CONFIRMACIÓN
         // Se activa con: /Salas/Eliminar/guid-de-la-sala
         [HttpGet]
         public async Task<IActionResult> Eliminar(Guid id)
@@ -117,7 +116,7 @@ namespace MvcSample.Controllers
             return View(model); // Envía los datos a la vista "Eliminar.cshtml"
         }
 
-        // --- ACCIÓN 6: POST PARA EJECUTAR LA ELIMINACIÓN ---
+        // POST PARA EJECUTAR LA ELIMINACIÓN
         [HttpPost]
         [ValidateAntiForgeryToken]
         // Le damos un nombre de acción diferente para evitar conflictos
@@ -145,7 +144,7 @@ namespace MvcSample.Controllers
             }
         }
         
-        // --- ACCIÓN 7: LISTAR TODAS LAS SALAS ---
+        // LISTAR TODAS LAS SALAS
         [HttpGet]
         public async Task<IActionResult> Index()
         {
