@@ -1,0 +1,59 @@
+﻿@model Services.Models.ReservaModels.ReservarEquipoModel
+
+@{
+    ViewData["Title"] = "Reservar un Equipo";
+}
+
+<h2>@ViewData["Title"]</h2>
+<p>Recuerde que solo puede reservar un máximo de 3 horas, entre las 7:00 AM y las 6:00 PM, y un máximo de 2 reservas por día.</p>
+<hr />
+
+<div class="row">
+    <div class="col-md-6">
+        <form asp-action="ReservarEquipo" method="post">
+
+            <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+
+            <div class="mb-3">
+                <label asp-for="SalaId" class="form-label"></label>
+                <select asp-for="SalaId" asp-items="Model.SalasDisponibles" class="form-control">
+                    <option value="">-- Seleccione una Sala (para préstamo individual) --</option>
+                </select>
+                <span asp-validation-for="SalaId" class="text-danger"></span>
+            </div>
+
+            <div class="mb-3">
+                <label asp-for="FechaInicio" class="form-label"></label>
+                @* Input de Fecha y Hora *@
+                <input name="FechaInicio"
+                       id="FechaInicio"
+                       type="datetime-local"
+                       value="@Model.FechaInicio.ToString("yyyy-MM-ddTHH:mm")"
+                       class="form-control"
+                       step="60" />
+                <span asp-validation-for="FechaInicio" class="text-danger"></span>
+            </div>
+
+            <div class="mb-3">
+                <label asp-for="DuracionHoras" class="form-label"></label>
+                @* Dropdown para la regla de 3 horas *@
+                <select asp-for="DuracionHoras" class="form-control">
+                    <option value="1">1 Hora</option>
+                    <option value="2">2 Horas</option>
+                    <option value="3">3 Horas</option>
+                </select>
+                <span asp-validation-for="DuracionHoras" class="text-danger"></span>
+            </div>
+
+            <div class="form-group">
+                <input type="submit" value="Buscar y Reservar" class="btn btn-primary" />
+            </div>
+        </form>
+    </div>
+</div>
+
+@section Scripts {
+    @{
+        await Html.RenderPartialAsync("_ValidationScriptsPartial");
+    }
+}

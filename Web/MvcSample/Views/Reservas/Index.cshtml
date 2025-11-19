@@ -1,0 +1,59 @@
+﻿@model IEnumerable<Services.Models.ReservaModels.ReservaIndexModel>
+@using Domain.Enums
+
+@{
+    ViewData["Title"] = "Mis Reservas";
+}
+
+<h1>@ViewData["Title"]</h1>
+
+<p>
+    @* El estudiante solo ve el botón de "Reservar Equipo" *@
+    @if (User.IsInRole("Estudiante"))
+    {
+        <a asp-action="ReservarEquipo" class="btn btn-primary">Reservar un Equipo</a>
+    }
+
+    @* El profesor ve ambos botones *@
+    @if (User.IsInRole("Profesor"))
+    {
+        <a asp-action="ReservarEquipo" class="btn btn-primary">Reservar un Equipo</a>
+        <a asp-action="ReservarSala" class="btn btn-success">Reservar Sala Completa</a>
+    }
+</p>
+
+<h3>Mi Historial de Reservas</h3>
+<table class="table">
+    <thead>
+        <tr>
+            <th>Tipo</th>
+            <th>Objeto Reservado</th>
+            <th>Desde</th>
+            <th>Hasta</th>
+            <th>Estado</th>
+            <th>Opciones</th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var item in Model)
+        {
+            <tr>
+                <td>@item.Tipo</td>
+                <td>@item.ObjetoReservado</td>
+                <td>@item.FechaInicio</td>
+                <td>@item.FechaFin</td>
+                <td>@item.Estado</td>
+                <td>
+                    @* --- LOGICA DE CANCELACIÓN --- *@
+                    @* Solo mostramos el botón si la reserva NO está Finalizada, En Uso o Rechazada *@
+                    @if (item.Estado != EstadoReserva.Finalizada &&
+                                    item.Estado != EstadoReserva.EnUso &&
+                                    item.Estado != EstadoReserva.Rechazada)
+                    {
+                        <a asp-action="Cancelar" asp-route-id="@item.Id" class="btn btn-sm btn-danger">Cancelar</a>
+                    }
+                </td>
+            </tr>
+        }
+    </tbody>
+</table>

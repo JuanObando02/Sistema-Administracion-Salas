@@ -71,5 +71,70 @@ namespace Services
 
             return resultado;
         }
+
+        public async Task<EditarUsuarioRolesModel> GetUsuarioParaEditarRoles(string id)
+        {
+            // 1. Buscar usuario
+            var usuario = await _userManager.FindByIdAsync(id);
+            if (usuario == null) return null;
+
+            // 2. Obtener roles actuales del usuario
+            var rolesUsuario = await _userManager.GetRolesAsync(usuario);
+
+            // 3. Obtener TODOS los roles del sistema
+            var todosLosRoles = await _roleManager.Roles.ToListAsync();
+
+            // 4. Construir el modelo
+            var model = new EditarUsuarioRolesModel
+            {
+                UsuarioId = usuario.Id,
+                Email = usuario.Email,
+                Roles = todosLosRoles.Select(r => new RoleSelection
+                {
+                    RoleName = r.Name,
+                    // Marcamos como true si el usuario YA tiene ese rol
+                    IsSelected = rolesUsuario.Contains(r.Name)
+                }).ToList()
+            };
+
+            return model;
+        }
+
+        public async Task ActualizarRolesUsuario(EditarUsuarioRolesModel model)
+        {
+            var usuario = await _userManager.FindByIdAsync(model.UsuarioId);
+            if (usuario == null) throw new Exception("Usuario no encontrado.");
+
+            // 1. Obtener roles actuales
+            var rolesActuales = await _userManager.GetRolesAsync(usuario);
+
+            // 2. Obtener roles seleccionados en el formulario
+            var rolesSeleccionados = model.Roles.Where(r => r.IsSelected).Select(r => r.RoleName).ToList();
+
+            // 3. Calcular cuáles añadir (Seleccionados que NO tiene actualmente)
+            var rolesAAnadir = rolesSeleccionados.Except(rolesActuales);
+
+            // 4. Calcular cuáles quitar (Actuales que NO están seleccionados)
+            var rolesAQuitar = rolesActuales.Except(rolesSeleccionados);
+
+            // 5. Ejecutar cambios
+            await _userManager.AddToRolesAsync(usuario, rolesAAnadir);
+            await _userManager.RemoveFromRolesAsync(usuario, rolesAQuitar);
+        }
+
+        public async Task EliminarUsuario(string id)
+        {
+            var usuario = await _userManager.FindByIdAsync(id);
+            if (usuario == null) throw new Exception("Usuario no encontrado.");
+
+            // Intenta eliminar
+            var resultado = await _userManager.DeleteAsync(usuario);
+
+            if (!resultado.Succeeded)
+            {
+                // Si falla (probablemente por la restricción de llaves foráneas en la BD)
+                throw new InvalidOperationException("No se puede eliminar el usuario. Es probable que tenga reservas, reportes o asesorías asociadas.");
+            }
+        }
     }
 }

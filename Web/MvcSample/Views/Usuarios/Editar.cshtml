@@ -1,0 +1,36 @@
+﻿@model Services.Models.UsuarioModels.EditarUsuarioRolesModel
+@{
+    ViewData["Title"] = "Editar Roles de Usuario";
+}
+
+<h2>Editar Roles para @Model.Email</h2>
+<hr />
+
+<form asp-action="Editar" method="post">
+    <input type="hidden" asp-for="UsuarioId" />
+    <input type="hidden" asp-for="Email" />
+
+    <div class="card">
+        <div class="card-header">
+            Seleccione los roles para este usuario
+        </div>
+        <div class="card-body">
+            @for (int i = 0; i < Model.Roles.Count; i++)
+            {
+                <div class="form-check">
+                    @* Es vital usar índices [i] para que MVC enlace la lista correctamente *@
+                    <input type="hidden" asp-for="@Model.Roles[i].RoleName" />
+                    <input asp-for="@Model.Roles[i].IsSelected" class="form-check-input" />
+                    <label class="form-check-label">
+                        @Model.Roles[i].RoleName
+                    </label>
+                </div>
+            }
+        </div>
+    </div>
+
+    <div class="form-group mt-3">
+        <input type="submit" value="Guardar Cambios" class="btn btn-primary" />
+        <a asp-action="Index" class="btn btn-secondary">Cancelar</a>
+    </div>
+</form>

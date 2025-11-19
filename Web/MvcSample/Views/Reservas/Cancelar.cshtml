@@ -1,0 +1,30 @@
+﻿@model Services.Models.ReservaModels.ReservaIndexModel
+
+@{
+    ViewData["Title"] = "Cancelar Reserva";
+}
+
+<h2 class="text-danger">@ViewData["Title"]</h2>
+<h3 class="text-danger">¡Advertencia!</h3>
+
+<div class="alert alert-warning">
+    Usted está a punto de cancelar la siguiente reserva. Esta acción no se puede deshacer.
+</div>
+
+<dl class="row">
+    <dt class="col-sm-3">ID de Reserva:</dt>
+    <dd class="col-sm-9">@Model.Id</dd>
+
+    <dt class="col-sm-3">Objeto Reservado:</dt>
+    <dd class="col-sm-9">@Model.ObjetoReservado</dd>
+</dl>
+
+@* Muestra cualquier error de validación (ej. "No se puede cancelar si está en uso") *@
+<div asp-validation-summary="ModelOnly" class="text-danger"></div>
+
+<form asp-action="CancelarConfirmado" method="post" asp-route-id="@Model.Id">
+    <input type="hidden" asp-for="Id" />
+
+    <input type="submit" value="Confirmar Cancelación" class="btn btn-danger" /> |
+    <a asp-action="Index" class="btn btn-secondary">Volver a Mis Reservas</a>
+</form>

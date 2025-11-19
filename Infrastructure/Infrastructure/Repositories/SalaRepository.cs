@@ -14,6 +14,13 @@ namespace Infrastructure.Repositories
         {
             Console.WriteLine("Se crea un repositorio de salas");
         }
+        public async Task<IList<Sala>> GetSalasIndividuales()
+        {
+            return await context.Salas
+                .Where(s => s.Tipo == Domain.Enums.TipoSala.Individual) //
+                .OrderBy(s => s.Numero)
+                .ToListAsync();
+        }
         public async Task<Sala> GetSalaPorNumero(int numero)
         {
             // Busca la primera sala que coincida con ese número

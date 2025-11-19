@@ -14,16 +14,15 @@ namespace MvcSample.Controllers
         {
             _usuarioService = usuarioService;
         }
-
-        // GET: /Usuario/Index
-        public async Task<IActionResult> Index()
+        [HttpGet]
+        public async Task<IActionResult> Index() //vista usuarios
         {
             var usuarios = await _usuarioService.GetUsuarios();
             return View(usuarios);
         }
 
-        // GET: /Usuario/Registrar
-        public async Task<IActionResult> Registrar()
+        [HttpGet]
+        public async Task<IActionResult> Registrar() //vista registrar usuario
         {
             var modelo = await _usuarioService.GetDatosParaRegistrar();
             return View(modelo);
@@ -32,7 +31,7 @@ namespace MvcSample.Controllers
         // POST: /Usuario/Registrar
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Registrar(RegistrarUsuarioModel model)
+        public async Task<IActionResult> Registrar(RegistrarUsuarioModel model) //registrar usuario
         {
             if (!ModelState.IsValid)
             {
@@ -58,6 +57,62 @@ namespace MvcSample.Controllers
             var modeloRecargadoError = await _usuarioService.GetDatosParaRegistrar();
             model.RolesDisponibles = modeloRecargadoError.RolesDisponibles;
             return View(model);
+        }
+
+        [HttpGet]
+        public async Task<IActionResult> Editar(string id)
+        {
+            var model = await _usuarioService.GetUsuarioParaEditarRoles(id);
+            if (model == null) return NotFound();
+            return View(model);
+        }
+
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> Editar(EditarUsuarioRolesModel model)
+        {
+            try
+            {
+                await _usuarioService.ActualizarRolesUsuario(model);
+                return RedirectToAction("Index");
+            }
+            catch (Exception ex)
+            {
+                ModelState.AddModelError(string.Empty, "Error al actualizar roles.");
+                return View(model);
+            }
+        }
+
+        [HttpGet]
+        public async Task<IActionResult> Eliminar(string id)
+        {
+            var model = await _usuarioService.GetUsuarioParaEditarRoles(id);
+            if (model == null) return NotFound();
+            return View(model);
+        }
+
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> EliminarConfirmado(string UsuarioId)
+        {
+            try
+            {
+                await _usuarioService.EliminarUsuario(UsuarioId);
+                return RedirectToAction("Index");
+            }
+            catch (InvalidOperationException ex)
+            {
+                // Error de restricción (tiene reservas)
+                ModelState.AddModelError(string.Empty, ex.Message);
+                var model = await _usuarioService.GetUsuarioParaEditarRoles(UsuarioId);
+                return View("Eliminar", model);
+            }
+            catch (Exception)
+            {
+                ModelState.AddModelError(string.Empty, "Error inesperado al eliminar.");
+                var model = await _usuarioService.GetUsuarioParaEditarRoles(UsuarioId);
+                return View("Eliminar", model);
+            }
         }
     }
 }

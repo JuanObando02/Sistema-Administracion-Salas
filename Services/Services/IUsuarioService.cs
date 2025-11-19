@@ -13,5 +13,8 @@ namespace Services
         Task<IList<UsuarioIndexModel>> GetUsuarios();
         Task<RegistrarUsuarioModel> GetDatosParaRegistrar();
         Task<IdentityResult> RegistrarUsuario(RegistrarUsuarioModel model);
+        Task<EditarUsuarioRolesModel> GetUsuarioParaEditarRoles(string id);
+        Task ActualizarRolesUsuario(EditarUsuarioRolesModel model);
+        Task EliminarUsuario(string id);
     }
 }

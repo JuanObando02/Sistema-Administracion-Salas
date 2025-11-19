@@ -5,6 +5,7 @@ using Services.Models.CowModels;
 using Services.Models.EquipoModels;
 using Services.Models.FarmModels;
 using Services.Models.MilkModels;
+using Services.Models.ReservaModels;
 using Services.Models.SalaModels;
 using Services.Models.UsuarioModels;
 
@@ -20,6 +21,15 @@ namespace Services.Automapper
             SalaMapper();
             EquipoMapper();
             UsuarioMapper();
+            ReservaMapper();
+        }
+        private void ReservaMapper()
+        {
+            CreateMap<Reserva, ReservaIndexModel>()
+                .ForMember(dest => dest.ObjetoReservado, opt => opt.MapFrom(src =>
+                    src.Tipo == TipoReserva.Sala
+                    ? $"Sala {src.Sala.Numero}" //
+                    : $"Serial {src.Equipo.Serial}")); //
         }
 
         private void UsuarioMapper()
