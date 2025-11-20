@@ -1,4 +1,5 @@
 ﻿using Domain;
+using Domain.Enums;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -20,5 +21,13 @@ namespace Infrastructure.Repositories
         Task Update(Reserva reserva);
         Task<bool> TieneReservasActivasOFuturas(Guid equipoId);
         Task<IList<Reserva>> GetTodasLasReservas();
+        Task<(IList<Reserva> Items, int TotalCount)> GetReservasConFiltros(
+            string? busqueda,
+            TipoReserva? tipo,
+            DateTime? fecha,
+            string orden,
+            int pagina,
+            int pageSize);    
+        Task<bool> ExisteConflicto(Guid? salaId, Guid? equipoId, DateTime inicio, DateTime fin, Guid? reservaIdExcluir = null);
     }
 }
