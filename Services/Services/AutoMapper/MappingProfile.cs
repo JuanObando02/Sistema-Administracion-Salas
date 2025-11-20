@@ -52,7 +52,7 @@ namespace Services.Automapper
                 .ForMember(dest => dest.ObjetoReservado, opt => opt.MapFrom(src =>
                     src.Tipo == TipoReserva.Sala
                     ? $"Sala {src.Sala.Numero}"
-                    : $"Serial {src.Equipo.Serial}"))
+                    : $"Equipo {src.Equipo.Serial} - Sala {src.Sala.Numero}"))
                     .ForMember(dest => dest.SalaId, opt => opt.MapFrom(src => src.SalaId))
                     .ForMember(dest => dest.EquipoId, opt => opt.MapFrom(src => src.EquipoId));//
         }
@@ -75,13 +75,13 @@ namespace Services.Automapper
             // Para el Index (GET)
             CreateMap<Equipo, EquipoIndexModel>()
                 // Mapea el enum del Dominio al enum del Modelo
-                .ForMember(dest => dest.Estado, opt => opt.MapFrom(src => (EstadoEquipoModel)src.Estado))
+                .ForMember(dest => dest.Estado, opt => opt.MapFrom(src => (EstadoEquipo)src.Estado))
                 // Mapea el nombre de la sala
                 .ForMember(dest => dest.SalaNombre, opt => opt.MapFrom(src => $"Sala {src.Sala.Numero}"));
 
             // Para Editar (GET)
             CreateMap<Equipo, EditarEquipoModel>()
-                .ForMember(dest => dest.Estado, opt => opt.MapFrom(src => (EstadoEquipoModel)src.Estado));
+                .ForMember(dest => dest.Estado, opt => opt.MapFrom(src => (EstadoEquipo)src.Estado));
 
             // Para Editar (POST)
             CreateMap<EditarEquipoModel, Equipo>()

@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Authorization;
+﻿using Domain;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Services;
 using Services.Models.AsesoriaModels;
@@ -25,9 +26,9 @@ namespace MvcSample.Controllers
         }
 
         [HttpGet]
-        public async Task<IActionResult> Solicitar()
+        public async Task<IActionResult> Solicitar(Guid? salaId)
         {
-            var model = await _asesoriaService.GetDatosParaRegistrar();
+            var model = await _asesoriaService.GetDatosParaRegistrar(salaId);
             return View(model);
         }
 

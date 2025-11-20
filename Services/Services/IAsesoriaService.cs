@@ -9,7 +9,7 @@ namespace Services
 {
     public interface IAsesoriaService
     {
-        Task<RegistrarAsesoriaModel> GetDatosParaRegistrar();
+        Task<RegistrarAsesoriaModel> GetDatosParaRegistrar(Guid? salaId = null);
         Task CrearAsesoria(RegistrarAsesoriaModel model, string usuarioId);
         Task<IList<AsesoriaIndexModel>> GetMisAsesorias(string usuarioId);
     }

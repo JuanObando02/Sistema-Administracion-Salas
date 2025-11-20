@@ -142,5 +142,33 @@ namespace MvcSample.Controllers
                 return View(model);
             }
         }
+        
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> Finalizar(Guid id)
+        {
+            var usuarioId = User.FindFirstValue(ClaimTypes.NameIdentifier);
+
+            try
+            {
+                await _reservaService.FinalizarReserva(id, usuarioId);
+                TempData["Mensaje"] = "Reserva finalizada y equipo liberado exitosamente.";
+            }
+            catch (Exception ex)
+            {
+                // Usamos TempData para mostrar el error en la vista Index sin romper el flujo
+                TempData["Error"] = ex.Message;
+            }
+
+            return RedirectToAction("Index");
+        }
+
+        [HttpGet]
+        [Authorize(Roles = "Coordinador, Administrador")]
+        public async Task<IActionResult> Gestionar()
+        {
+            var todasLasReservas = await _reservaService.GetTodasLasReservas();
+            return View(todasLasReservas);
+        }
     }
 }
