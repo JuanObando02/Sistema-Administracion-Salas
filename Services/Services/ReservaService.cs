@@ -10,6 +10,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using Services.Models.Shared;
 
 namespace Services
 {
@@ -468,30 +469,52 @@ namespace Services
 
             return model;
         }
-
         public async Task ActualizarReservaAdmin(EditarReservaAdminModel model, string coordinadorId)
         {
-            var reserva = await _reservaRepository.GetReservaCompleta(model.Id);
+            var reserva = await _reservaRepository.GetReservaCompleta(model.Id); //
             if (reserva == null) throw new Exception("Reserva no encontrada.");
 
-            // 1. Validar Disponibilidad del NUEVO recurso (si cambió)
-            // Esta lógica es simplificada, deberías reutilizar tus validaciones de cruce de horarios
-            // pero excluyendo la reserva actual (r.Id != model.Id)
+            // --- 1. VALIDACIÓN DE CONFLICTO DE HORARIO ---
 
-            // ... (Aquí iría la validación de cruce de horarios, similar a CrearReserva pero ignorando la actual) ...
+            // Determinamos qué IDs vamos a verificar
+            Guid? equipoIdVerificar = null;
+            Guid? salaIdVerificar = null;
 
-            // 2. Actualizar datos
+            if (reserva.Tipo == TipoReserva.Equipo)
+            {
+                // Si es equipo, validamos que ESE equipo no esté ocupado
+                equipoIdVerificar = model.EquipoId;
+            }
+            else
+            {
+                // Si es sala completa, validamos que ESA sala no esté ocupada
+                salaIdVerificar = model.SalaId;
+            }
+
+            // Llamamos al repositorio
+            bool hayConflicto = await _reservaRepository.ExisteConflicto(
+                salaIdVerificar,
+                equipoIdVerificar,
+                model.FechaInicio,
+                model.FechaFin,
+                model.Id // ¡IMPORTANTE! Pasamos el ID actual para excluirlo
+            );
+
+            if (hayConflicto)
+            {
+                string recurso = reserva.Tipo == TipoReserva.Equipo ? "El equipo" : "La sala";
+                throw new InvalidOperationException($"Conflicto: {recurso} seleccionado ya tiene una reserva en ese horario.");
+            }
+            // ---------------------------------------------
+
+            // 2. Actualizar datos (Tu código existente)
             reserva.FechaInicio = model.FechaInicio;
             reserva.FechaFin = model.FechaFin;
             reserva.SalaId = model.SalaId;
             reserva.EquipoId = model.EquipoId;
 
-            // (Opcional) Registrar quién modificó
-            // reserva.UltimoModificadorId = coordinadorId;
-
             await _reservaRepository.Update(reserva);
         }
-
         public async Task EliminarReservaAdmin(Guid id)
         {
             var reserva = await _reservaRepository.GetReservaCompleta(id);
@@ -507,5 +530,61 @@ namespace Services
                 await _reservaRepository.Delete(reserva);
             }
         }
+        public async Task<PaginatedList<ReservaIndexModel>> GetReservasGestionar(FiltroReservaModel filtro)
+        {
+            // 1. Llamar al repositorio con los filtros
+            var resultado = await _reservaRepository.GetReservasConFiltros(
+                filtro.Busqueda,
+                filtro.Tipo,
+                filtro.Fecha,
+                filtro.OrdenarPor,
+                filtro.Pagina,
+                filtro.RegistrosPorPagina
+            );
+
+            // 2. Limpieza de vencidos (la lógica que ya teníamos)
+            // Nota: Solo limpiamos la página actual para no afectar rendimiento
+            await LimpiarReservasVencidas(resultado.Items);
+
+            // 3. Mapear a ViewModel
+            var listaModelos = _mapper.Map<List<ReservaIndexModel>>(resultado.Items);
+
+            // 4. Devolver lista paginada
+            return new PaginatedList<ReservaIndexModel>(
+                listaModelos,
+                resultado.TotalCount,
+                filtro.Pagina,
+                filtro.RegistrosPorPagina
+            );
+        }
+        public async Task<EditarReservaAdminModel> RepopularDropdownsEditarAdmin(EditarReservaAdminModel model)
+        {
+            // 1. Recargar Salas según el tipo de reserva
+            if (model.Tipo == TipoReserva.Sala)
+            {
+                var salas = await _salaRepository.GetSalasClaseCompleta(); //
+                model.SalasDisponibles = salas.Select(s => new SelectListItem { Value = s.Id.ToString(), Text = $"Sala {s.Numero}" });
+            }
+            else // Equipo
+            {
+                var salas = await _salaRepository.GetSalasIndividuales(); //
+                model.SalasDisponibles = salas.Select(s => new SelectListItem { Value = s.Id.ToString(), Text = $"Sala {s.Numero}" });
+
+                // 2. Recargar Equipos si hay una sala seleccionada
+                if (model.SalaId.HasValue)
+                {
+                    var equipos = await _equipoRepository.GetEquiposPorSala(model.SalaId.Value); //
+                    model.EquiposDisponibles = equipos.Select(e => new SelectListItem
+                    {
+                        Value = e.Id.ToString(),
+                        Text = $"{e.Serial} - {e.Estado}"
+                    });
+                }
+            }
+
+            return model;
+        }
+
     }
+
 }

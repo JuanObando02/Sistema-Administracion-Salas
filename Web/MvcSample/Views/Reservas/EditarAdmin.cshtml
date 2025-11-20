@@ -2,7 +2,7 @@
 @using Domain.Enums
 
 @{
-    ViewData["Title"] = "Modificar Reserva (Admin)";
+    ViewData["Title"] = "Modificar Reserva";
 }
 
 <h2>Modificar Reserva</h2>
@@ -27,14 +27,21 @@
             @* Selección de Recurso *@
             <div class="mb-3">
                 <label asp-for="SalaId" class="form-label">Sala</label>
-                <select asp-for="SalaId" asp-items="Model.SalasDisponibles" class="form-control"></select>
+                <select asp-for="SalaId"
+                        asp-items="Model.SalasDisponibles"
+                        class="form-control"
+                        id="ddlSala">
+                </select>
             </div>
 
             @if (Model.Tipo == TipoReserva.Equipo)
             {
                 <div class="mb-3">
                     <label asp-for="EquipoId" class="form-label">Equipo</label>
-                    <select asp-for="EquipoId" asp-items="Model.EquiposDisponibles" class="form-control">
+                    <select asp-for="EquipoId"
+                            asp-items="Model.EquiposDisponibles"
+                            class="form-control"
+                            id="ddlEquipo">
                         <option value="">-- Seleccione Equipo --</option>
                     </select>
                     <div class="form-text">Si cambia la sala, guarde para refrescar equipos o use JS.</div>
@@ -46,3 +53,73 @@
     <button type="submit" class="btn btn-primary">Guardar Cambios</button>
     <a asp-action="Gestionar" class="btn btn-secondary">Cancelar</a>
 </form>
+
+@section Scripts {
+    @{
+        await Html.RenderPartialAsync("_ValidationScriptsPartial");
+    }
+
+    <script>
+        $(document).ready(function () {
+            console.log("1. El script ha iniciado correctamente.");
+
+            // Verificamos si jQuery encontró el elemento
+            var dropdownSala = $('#ddlSala');
+            if (dropdownSala.length === 0) {
+                alert("ERROR CRÍTICO: No encuentro el dropdown con id='ddlSala'. Revisa el HTML.");
+                return;
+            }
+
+            $('#ddlSala').change(function () {
+                var salaIdSeleccionada = $(this).val();
+                console.log("2. Cambio detectado. Sala ID: " + salaIdSeleccionada);
+
+                // Referencia al dropdown de equipos
+                var ddlEquipo = $('#ddlEquipo');
+
+                // Limpiar visualmente
+                ddlEquipo.empty();
+                ddlEquipo.append('<option value="">Buscando equipos...</option>');
+
+                if (!salaIdSeleccionada) {
+                    console.log("3. No hay sala seleccionada, cancelando.");
+                    return;
+                }
+
+                // Construir la URL manualmente para verificar
+                var urlDestino = '/Reservas/GetEquiposPorSalaJson';
+                console.log("4. Iniciando llamada AJAX a: " + urlDestino);
+
+                $.ajax({
+                    url: urlDestino,
+                    type: 'GET',
+                    data: { salaId: salaIdSeleccionada },
+                    success: function (data) {
+                        console.log("5. ¡ÉXITO! Datos recibidos del servidor:", data);
+
+                        ddlEquipo.empty();
+                        ddlEquipo.append('<option value="">-- Seleccione Equipo --</option>');
+
+                        if (data.length === 0) {
+                            console.warn("6. OJO: El servidor devolvió una lista vacía (0 equipos).");
+                            ddlEquipo.append('<option value="">(Esta sala no tiene equipos)</option>');
+                        }
+
+                        $.each(data, function (index, item) {
+                            // console.log("Agregando equipo: ", item.text);
+                            ddlEquipo.append('<option value="' + item.value + '">' + item.text + '</option>');
+                        });
+                    },
+                    error: function (xhr, status, error) {
+                        console.error("ERROR AJAX:");
+                        console.error("Estado: " + status);
+                        console.error("Error: " + error);
+                        console.error("Respuesta: " + xhr.responseText);
+
+                        alert("Error al llamar al servidor. Mira la consola (F12) para detalles.");
+                    }
+                });
+            });
+        });
+    </script>
+}

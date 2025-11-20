@@ -1,4 +1,5 @@
 ﻿using Domain;
+using Domain.Enums;
 using Microsoft.EntityFrameworkCore;
 using System;
 using System.Collections.Generic;
@@ -127,6 +128,82 @@ namespace Infrastructure.Repositories
                 .Include(r => r.Equipo) // Cargar datos del equipo
                 .OrderByDescending(r => r.FechaInicio) // Ordenar por fecha (lo más nuevo primero)
                 .ToListAsync();
+        }
+        public async Task<(IList<Reserva> Items, int TotalCount)> GetReservasConFiltros(
+            string? busqueda,
+            TipoReserva? tipo,
+            DateTime? fecha,
+            string orden,
+            int pagina,
+            int pageSize)
+        {
+            // 1. Empezamos la consulta (AsQueryable no ejecuta nada todavía)
+            var query = context.Reservas
+                .Include(r => r.Sala)
+                .Include(r => r.Equipo)
+                .AsQueryable();
+
+            // 2. Aplicar Filtros
+            if (tipo.HasValue)
+            {
+                query = query.Where(r => r.Tipo == tipo.Value);
+            }
+
+            if (fecha.HasValue)
+            {
+                // Filtramos por el día exacto
+                query = query.Where(r => r.FechaInicio.Date == fecha.Value.Date);
+            }
+
+            if (!string.IsNullOrEmpty(busqueda))
+            {
+                // Busca en el número de la sala O en el serial del equipo
+                // (Transformamos a string para comparar)
+                query = query.Where(r =>
+                    (r.Sala != null && r.Sala.Numero.ToString().Contains(busqueda)) ||
+                    (r.Equipo != null && r.Equipo.Serial.Contains(busqueda))
+                );
+            }
+
+            // 3. Aplicar Ordenamiento
+            query = orden switch
+            {
+                "tipo_asc" => query.OrderBy(r => r.Tipo),
+                "tipo_desc" => query.OrderByDescending(r => r.Tipo),
+                "fecha_asc" => query.OrderBy(r => r.FechaInicio),
+                _ => query.OrderByDescending(r => r.FechaInicio) // Por defecto: Fecha Descendente
+            };
+
+            // 4. Contar Total (para la paginación)
+            int total = await query.CountAsync();
+
+            // 5. Paginación y Ejecución
+            var items = await query
+                .Skip((pagina - 1) * pageSize)
+                .Take(pageSize)
+                .ToListAsync();
+
+            return (items, total);
+        }
+        public async Task<bool> ExisteConflicto(Guid? salaId, Guid? equipoId, DateTime inicio, DateTime fin, Guid? reservaIdExcluir = null)
+        {
+            return await context.Reservas.AnyAsync(r =>
+                // 1. Que sea válida (no rechazada ni finalizada)
+                r.Estado != Domain.Enums.EstadoReserva.Rechazada &&
+                r.Estado != Domain.Enums.EstadoReserva.Finalizada &&
+
+                // 2. Que NO sea la misma reserva que estamos editando
+                (reservaIdExcluir == null || r.Id != reservaIdExcluir) &&
+
+                // 3. Que coincida el Recurso (Sala O Equipo)
+                (
+                    (salaId.HasValue && r.SalaId == salaId) ||
+                    (equipoId.HasValue && r.EquipoId == equipoId)
+                ) &&
+
+                // 4. LA FÓRMULA DE CRUCE DE HORARIOS
+                (inicio < r.FechaFin && fin > r.FechaInicio)
+            );
         }
     }
 }

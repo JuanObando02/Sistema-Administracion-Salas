@@ -1,8 +1,9 @@
-﻿using Microsoft.AspNetCore.Authorization;
+﻿using Domain.Enums;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Services;
-using System.Security.Claims;
 using Services.Models.ReservaModels;
+using System.Security.Claims;
 
 namespace MvcSample.Controllers
 {
@@ -10,10 +11,12 @@ namespace MvcSample.Controllers
     public class ReservasController : Controller
     {
         private readonly IReservaService _reservaService;
+        private readonly IEquipoService _equipoService;
 
-        public ReservasController(IReservaService reservaService)
+        public ReservasController(IReservaService reservaService, IEquipoService equipoService)
         {
             _reservaService = reservaService;
+            _equipoService = equipoService;
         }
         public async Task<IActionResult> Index()
         {
@@ -165,12 +168,30 @@ namespace MvcSample.Controllers
 
         [HttpGet]
         [Authorize(Roles = "Coordinador, Admin")]
-        public async Task<IActionResult> Gestionar()
+        public async Task<IActionResult> Gestionar(string? busqueda,TipoReserva? tipo,DateTime? fecha,string ordenarPor = "fecha_desc",int pagina = 1)
         {
-            var todasLasReservas = await _reservaService.GetTodasLasReservas();
-            return View(todasLasReservas);
+            // Creamos el objeto de filtro
+            var filtro = new FiltroReservaModel
+            {
+                Busqueda = busqueda,
+                Tipo = tipo,
+                Fecha = fecha,
+                OrdenarPor = ordenarPor,
+                Pagina = pagina,
+                RegistrosPorPagina = 10 // Puedes cambiar esto
+            };
+
+            var listaPaginada = await _reservaService.GetReservasGestionar(filtro);
+
+            // Pasamos los filtros actuales a la vista para mantener el estado de los inputs
+            ViewData["BusquedaActual"] = busqueda;
+            ViewData["TipoActual"] = tipo;
+            ViewData["FechaActual"] = fecha?.ToString("yyyy-MM-dd");
+            ViewData["OrdenActual"] = ordenarPor;
+
+            return View(listaPaginada);
         }
-        
+
         [HttpPost]
         [Authorize(Roles = "Coordinador, Admin")]
         [ValidateAntiForgeryToken]
@@ -259,5 +280,22 @@ namespace MvcSample.Controllers
             }
             return RedirectToAction("Gestionar");
         }
+
+        [HttpGet]
+        public async Task<IActionResult> GetEquiposPorSalaJson(Guid salaId)
+        {
+            // Si este método devuelve EquipoIndexModel...
+            var equipos = await _equipoService.GetEquiposPorSala(salaId);
+
+            // ...asegúrate de usar las propiedades correctas aquí:
+            var listaParaDropdown = equipos.Select(e => new
+            {
+                value = e.Id,
+                text = e.Serial // En el modelo se llama 'Serial', en la entidad también.
+            });
+
+            return Json(listaParaDropdown);
+        }
+
     }
 }

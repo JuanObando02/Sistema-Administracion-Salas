@@ -1,4 +1,5 @@
 ﻿using Services.Models.ReservaModels;
+using Services.Models.Shared;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -23,5 +24,7 @@ namespace Services
         Task<EditarReservaAdminModel> GetReservaParaEditarAdmin(Guid id);
         Task ActualizarReservaAdmin(EditarReservaAdminModel model, string coordinadorId);
         Task EliminarReservaAdmin(Guid id);
+        Task<EditarReservaAdminModel> RepopularDropdownsEditarAdmin(EditarReservaAdminModel model);
+        Task<PaginatedList<ReservaIndexModel>> GetReservasGestionar(FiltroReservaModel filtro);
     }
 }
