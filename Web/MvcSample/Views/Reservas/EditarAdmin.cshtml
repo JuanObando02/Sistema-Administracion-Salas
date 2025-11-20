@@ -1,0 +1,48 @@
+﻿@model Services.Models.ReservaModels.EditarReservaAdminModel
+@using Domain.Enums
+
+@{
+    ViewData["Title"] = "Modificar Reserva (Admin)";
+}
+
+<h2>Modificar Reserva</h2>
+<hr />
+
+<form asp-action="EditarAdmin" method="post">
+    <input type="hidden" asp-for="Id" />
+    <input type="hidden" asp-for="Tipo" />
+
+    <div class="row">
+        <div class="col-md-6">
+            @* Fechas *@
+            <div class="mb-3">
+                <label asp-for="FechaInicio" class="form-label"></label>
+                <input asp-for="FechaInicio" class="form-control" type="datetime-local" step="1800" />
+            </div>
+            <div class="mb-3">
+                <label asp-for="FechaFin" class="form-label"></label>
+                <input asp-for="FechaFin" class="form-control" type="datetime-local" step="1800" />
+            </div>
+
+            @* Selección de Recurso *@
+            <div class="mb-3">
+                <label asp-for="SalaId" class="form-label">Sala</label>
+                <select asp-for="SalaId" asp-items="Model.SalasDisponibles" class="form-control"></select>
+            </div>
+
+            @if (Model.Tipo == TipoReserva.Equipo)
+            {
+                <div class="mb-3">
+                    <label asp-for="EquipoId" class="form-label">Equipo</label>
+                    <select asp-for="EquipoId" asp-items="Model.EquiposDisponibles" class="form-control">
+                        <option value="">-- Seleccione Equipo --</option>
+                    </select>
+                    <div class="form-text">Si cambia la sala, guarde para refrescar equipos o use JS.</div>
+                </div>
+            }
+        </div>
+    </div>
+
+    <button type="submit" class="btn btn-primary">Guardar Cambios</button>
+    <a asp-action="Gestionar" class="btn btn-secondary">Cancelar</a>
+</form>

@@ -66,7 +66,6 @@ namespace Services
             }
 
         }
-
         public async Task<IList<ReservaIndexModel>> GetMisReservas(string usuarioId)
         {
             var reservas = await _reservaRepository.GetReservasPorUsuario(usuarioId);
@@ -388,6 +387,125 @@ namespace Services
 
             await LimpiarReservasVencidas(todas);
             return _mapper.Map<IList<ReservaIndexModel>>(todas);
+        }
+        public async Task AprobarReserva(Guid reservaId, string coordinadorId)
+        {
+            var reserva = await _reservaRepository.GetReservaCompleta(reservaId);
+            if (reserva == null) throw new Exception("Reserva no encontrada.");
+
+            if (reserva.Estado != EstadoReserva.Pendiente)
+            {
+                throw new InvalidOperationException("Solo se pueden aprobar reservas pendientes.");
+            }
+
+            // --- LÓGICA DE CAMBIO DE ESTADO ---
+
+            // CASO A: Es una Sala Completa (Profesor)
+            if (reserva.Tipo == TipoReserva.Sala && reserva.Sala != null)
+            {
+                // Validamos que la sala siga existiendo y sirviendo (Físicamente)
+                // PERO NO cambiamos su estado a 'Ocupada' aquí.
+                if (reserva.Sala.Estado == EstadoSala.EnMantenimiento ||
+                    reserva.Sala.Estado == EstadoSala.Deshabilitada)
+                {
+                    throw new InvalidOperationException("No se puede aprobar: La sala está en mantenimiento o deshabilitada.");
+                }
+            }
+
+            reserva.Estado = EstadoReserva.Aprobada;
+            await _reservaRepository.Update(reserva);
+        }
+        public async Task RechazarReserva(Guid reservaId, string coordinadorId)
+        {
+            var reserva = await _reservaRepository.GetReservaCompleta(reservaId);
+            if (reserva == null) throw new Exception("Reserva no encontrada.");
+
+            if (reserva.Estado != EstadoReserva.Pendiente)
+            {
+                throw new InvalidOperationException("Solo se pueden rechazar reservas que estén en estado Pendiente.");
+            }
+
+            // Actualizar estado y firmar
+            reserva.Estado = EstadoReserva.Rechazada;
+            reserva.AprobadorId = coordinadorId;
+
+            await _reservaRepository.Update(reserva);
+        }
+        public async Task<EditarReservaAdminModel> GetReservaParaEditarAdmin(Guid id)
+        {
+            var reserva = await _reservaRepository.GetReservaCompleta(id);
+            if (reserva == null) return null;
+
+            var model = new EditarReservaAdminModel
+            {
+                Id = reserva.Id,
+                Tipo = reserva.Tipo,
+                FechaInicio = reserva.FechaInicio,
+                FechaFin = reserva.FechaFin,
+                SalaId = reserva.SalaId,
+                EquipoId = reserva.EquipoId
+            };
+
+            // Cargar listas según el tipo
+            if (reserva.Tipo == TipoReserva.Sala)
+            {
+                var salas = await _salaRepository.GetSalasClaseCompleta();
+                model.SalasDisponibles = salas.Select(s => new SelectListItem { Value = s.Id.ToString(), Text = $"Sala {s.Numero}" });
+            }
+            else // Equipo
+            {
+                // Cargamos TODAS las salas y TODOS los equipos (o podrías filtrar por sala si quisieras)
+                // Para simplificar, cargamos equipos si hay una sala seleccionada
+                var salas = await _salaRepository.GetSalasIndividuales();
+                model.SalasDisponibles = salas.Select(s => new SelectListItem { Value = s.Id.ToString(), Text = $"Sala {s.Numero}" });
+
+                if (reserva.SalaId.HasValue)
+                {
+                    var equipos = await _equipoRepository.GetEquiposPorSala(reserva.SalaId.Value);
+                    model.EquiposDisponibles = equipos.Select(e => new SelectListItem { Value = e.Id.ToString(), Text = e.Serial });
+                }
+            }
+
+            return model;
+        }
+
+        public async Task ActualizarReservaAdmin(EditarReservaAdminModel model, string coordinadorId)
+        {
+            var reserva = await _reservaRepository.GetReservaCompleta(model.Id);
+            if (reserva == null) throw new Exception("Reserva no encontrada.");
+
+            // 1. Validar Disponibilidad del NUEVO recurso (si cambió)
+            // Esta lógica es simplificada, deberías reutilizar tus validaciones de cruce de horarios
+            // pero excluyendo la reserva actual (r.Id != model.Id)
+
+            // ... (Aquí iría la validación de cruce de horarios, similar a CrearReserva pero ignorando la actual) ...
+
+            // 2. Actualizar datos
+            reserva.FechaInicio = model.FechaInicio;
+            reserva.FechaFin = model.FechaFin;
+            reserva.SalaId = model.SalaId;
+            reserva.EquipoId = model.EquipoId;
+
+            // (Opcional) Registrar quién modificó
+            // reserva.UltimoModificadorId = coordinadorId;
+
+            await _reservaRepository.Update(reserva);
+        }
+
+        public async Task EliminarReservaAdmin(Guid id)
+        {
+            var reserva = await _reservaRepository.GetReservaCompleta(id);
+            if (reserva != null)
+            {
+                // Lógica de reversión de estados (si estaba ocupada, liberar sala/equipo)
+                if (reserva.Tipo == TipoReserva.Sala && reserva.Sala != null && reserva.Sala.Estado == EstadoSala.Ocupada)
+                {
+                    reserva.Sala.Estado = EstadoSala.Disponible;
+                    await _salaRepository.Update(reserva.Sala);
+                }
+
+                await _reservaRepository.Delete(reserva);
+            }
         }
     }
 }

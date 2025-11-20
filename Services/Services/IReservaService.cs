@@ -18,5 +18,10 @@ namespace Services
         Task CrearReservaSala(ReservarSalaModel model, string usuarioId);
         Task<IList<ReservaIndexModel>> GetTodasLasReservas();
         Task FinalizarReserva(Guid reservaId, string usuarioId);
+        Task AprobarReserva(Guid reservaId, string coordinadorId);
+        Task RechazarReserva(Guid reservaId, string coordinadorId);
+        Task<EditarReservaAdminModel> GetReservaParaEditarAdmin(Guid id);
+        Task ActualizarReservaAdmin(EditarReservaAdminModel model, string coordinadorId);
+        Task EliminarReservaAdmin(Guid id);
     }
 }

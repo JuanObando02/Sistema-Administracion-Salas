@@ -6,7 +6,7 @@ using Services.Models.ReservaModels;
 
 namespace MvcSample.Controllers
 {
-    [Authorize(Roles = "Admin, Master, Estudiante, Profesor")]
+    [Authorize(Roles = "Admin, Master, Estudiante, Profesor, Coordinador")]
     public class ReservasController : Controller
     {
         private readonly IReservaService _reservaService;
@@ -164,11 +164,100 @@ namespace MvcSample.Controllers
         }
 
         [HttpGet]
-        [Authorize(Roles = "Coordinador, Administrador")]
+        [Authorize(Roles = "Coordinador, Admin")]
         public async Task<IActionResult> Gestionar()
         {
             var todasLasReservas = await _reservaService.GetTodasLasReservas();
             return View(todasLasReservas);
+        }
+        
+        [HttpPost]
+        [Authorize(Roles = "Coordinador, Admin")]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> Aprobar(Guid id)
+        {
+            var coordinadorId = User.FindFirstValue(ClaimTypes.NameIdentifier);
+
+            try
+            {
+                await _reservaService.AprobarReserva(id, coordinadorId);
+                TempData["Mensaje"] = "Reserva aprobada exitosamente.";
+            }
+            catch (Exception ex)
+            {
+                TempData["Error"] = ex.Message;
+            }
+
+            return RedirectToAction("Gestionar"); 
+        }
+
+        [HttpPost]
+        [Authorize(Roles = "Coordinador, Admin")]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> Rechazar(Guid id)
+        {
+            var coordinadorId = User.FindFirstValue(ClaimTypes.NameIdentifier);
+
+            try
+            {
+                await _reservaService.RechazarReserva(id, coordinadorId);
+                TempData["Mensaje"] = "Reserva denegada.";
+            }
+            catch (Exception ex)
+            {
+                TempData["Error"] = ex.Message;
+            }
+
+            return RedirectToAction("Gestionar");
+        }
+
+        [HttpGet]
+        [Authorize(Roles = "Coordinador, Administrador")]
+        public async Task<IActionResult> EditarAdmin(Guid id)
+        {
+            var model = await _reservaService.GetReservaParaEditarAdmin(id);
+            if (model == null) return NotFound();
+            return View(model);
+        }
+
+        [HttpPost]
+        [Authorize(Roles = "Coordinador, Administrador")]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> EditarAdmin(EditarReservaAdminModel model)
+        {
+            // (Recuerda recargar dropdowns si falla el ModelState)
+            if (!ModelState.IsValid) return View(model);
+
+            var coordinadorId = User.FindFirstValue(ClaimTypes.NameIdentifier);
+
+            try
+            {
+                await _reservaService.ActualizarReservaAdmin(model, coordinadorId);
+                TempData["Mensaje"] = "Reserva actualizada correctamente.";
+                return RedirectToAction("Gestionar");
+            }
+            catch (Exception ex)
+            {
+                ModelState.AddModelError("", ex.Message);
+                return View(model);
+            }
+        }
+        
+        [HttpPost]
+        [Authorize(Roles = "Coordinador, Administrador")]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> EliminarAdmin(Guid id)
+        {
+            try
+            {
+                await _reservaService.EliminarReservaAdmin(id);
+                TempData["Mensaje"] = "Reserva eliminada.";
+            }
+            catch (Exception ex)
+            {
+                TempData["Error"] = "Error al eliminar: " + ex.Message;
+            }
+            return RedirectToAction("Gestionar");
         }
     }
 }
