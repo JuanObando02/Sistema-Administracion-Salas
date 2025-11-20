@@ -88,10 +88,18 @@ namespace Infrastructure.Repositories
                 throw ex;
             }
         }
-        public async Task<IList<Sala>> GetSalas()
+        public async Task<IList<Sala>> GetSalas(int? numero = null)
         {
-            return await context.Salas
-                .OrderBy(sala => sala.Numero)
+            var query = context.Salas.AsQueryable();
+
+            if (numero.HasValue)
+            {
+                query = query.Where(s => s.Numero == numero.Value);
+            }
+
+            // 3. Ejecutamos la consulta final
+            return await query
+                .OrderBy(s => s.Numero)
                 .ToListAsync();
         }
     }

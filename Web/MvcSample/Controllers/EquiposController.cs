@@ -63,27 +63,27 @@ namespace MvcSample.Controllers
         }
 
         [HttpGet]
-        public async Task<IActionResult> Index(Guid? salaId)
+        public async Task<IActionResult> Index(Guid? salaId, string? buscarSerial)
         {
             ViewBag.SalaId = salaId;
+            ViewData["FiltroSerial"] = buscarSerial;
             IList<EquipoIndexModel> listaEquipos;
 
             if (salaId.HasValue)
             {
                 // Si el ID viene, filtra la lista
-                listaEquipos = await _equipoService.GetEquiposPorSala(salaId.Value);
+                listaEquipos = await _equipoService.GetEquiposPorSala(salaId.Value, buscarSerial);
             }
             else
             {
                 // Si no, trae todos
-                listaEquipos = await _equipoService.GetEquipos();
+                listaEquipos = await _equipoService.GetEquipos(buscarSerial);
             }
 
             return View(listaEquipos);
         }
 
-        // GET: /Equipos/Editar/guid
-        [HttpGet]
+        [HttpGet]// GET: /Equipos/Editar/guid
         public async Task<IActionResult> Editar(Guid id)
         {
             var modelo = await _equipoService.GetEquipoParaEditar(id);
@@ -91,8 +91,7 @@ namespace MvcSample.Controllers
             return View(modelo);
         }
 
-        // POST: /Equipos/Editar/
-        [HttpPost]
+        [HttpPost]// POST: /Equipos/Editar/
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Editar(EditarEquipoModel model)
         {
@@ -121,18 +120,15 @@ namespace MvcSample.Controllers
                 return View(model);
             }
         }
-
-        // GET: /Equipos/Eliminar/guid
-        [HttpGet]
+        
+        [HttpGet]// GET: /Equipos/Eliminar/guid
         public async Task<IActionResult> Eliminar(Guid id)
         {
             var modelo = await _equipoService.GetEquipoParaEditar(id);
             if (modelo == null) return NotFound();
             return View(modelo); // Reutilizamos el EditarEquipoModel para mostrar datos
         }
-
-        // POST: /Equipos/EliminarConfirmado/guid
-        [HttpPost]
+        [HttpPost]// POST: /Equipos/EliminarConfirmado/guid
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> EliminarConfirmado(Guid id)
         {

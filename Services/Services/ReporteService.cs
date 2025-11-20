@@ -126,5 +126,10 @@ namespace Services
             await _reporteRepository.Save(reporte);
 
         }
+        public async Task<IList<ReporteIndexModel>> GetMisReportes(string usuarioId)
+        {
+            var reportes = await _reporteRepository.GetReportesPorUsuario(usuarioId);
+            return _mapper.Map<IList<ReporteIndexModel>>(reportes);
+        }
     }
 }

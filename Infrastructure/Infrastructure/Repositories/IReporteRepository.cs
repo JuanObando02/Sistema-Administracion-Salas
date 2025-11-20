@@ -10,5 +10,6 @@ namespace Infrastructure.Repositories
     public interface IReporteRepository
     {
         Task Save(Reporte reporte);
+        Task<IList<Reporte>> GetReportesPorUsuario(string usuarioId);
     }
 }

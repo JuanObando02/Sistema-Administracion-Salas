@@ -24,10 +24,10 @@ namespace Services
             _reservaRepository = reservaRepository;
             _mapper = mapper;
         }
-        public async Task<IList<EquipoIndexModel>> GetEquiposPorSala(Guid salaId)
+        public async Task<IList<EquipoIndexModel>> GetEquiposPorSala (Guid salaId, string? searchSerial = null)
         {
             // Traer los equipos de la BD
-            var equiposEntidad = await _equipoRepository.GetEquiposPorSala(salaId);
+            var equiposEntidad = await _equipoRepository.GetEquiposPorSala(salaId, searchSerial);
 
             // Traer las reservas que están ocurriendo YA MISMO
             var reservasActivas = await _reservaRepository.GetReservasActivasEnHorario(DateTime.Now); //
@@ -98,10 +98,9 @@ namespace Services
             }
             return modelo;
         }
-
-        public async Task<IList<EquipoIndexModel>> GetEquipos()
+        public async Task<IList<EquipoIndexModel>> GetEquipos(string? searchSerial = null)
         {
-            var equiposEntidad = await _equipoRepository.GetEquipos();
+            var equiposEntidad = await _equipoRepository.GetEquipos(searchSerial);
             var reservasActivas = await _reservaRepository.GetReservasActivasEnHorario(DateTime.Now);
 
             var idsEquiposOcupados = reservasActivas
@@ -121,7 +120,6 @@ namespace Services
 
             return listaModelos;
         }
-
         public async Task<EditarEquipoModel> GetEquipoParaEditar(Guid id)
         {
             // 1. Obtener el equipo
@@ -141,7 +139,6 @@ namespace Services
 
             return modelo;
         }
-
         public async Task<Guid> UpdateEquipo(EditarEquipoModel model)
         {
             var equipoConEseSerial = await _equipoRepository.GetEquipoPorSerial(model.Serial);

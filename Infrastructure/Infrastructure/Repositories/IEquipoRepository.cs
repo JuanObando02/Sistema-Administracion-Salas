@@ -11,10 +11,10 @@ namespace Infrastructure.Repositories
     {
         Task Save(Equipo equipo);
         Task<Equipo> GetEquipo(Guid id);
-        Task<IList<Equipo>> GetEquipos(); // Para el Index
+        Task<IList<Equipo>> GetEquipos(string? searchSerial = null); // Para el Index
         Task Update(Equipo equipo);
         Task Delete(Equipo equipo);
         Task<Equipo> GetEquipoPorSerial(string serial);
-        Task<IList<Equipo>> GetEquiposPorSala(Guid salaId);
+        Task<IList<Equipo>> GetEquiposPorSala(Guid salaId, string? searchSerial = null);
     }
 }

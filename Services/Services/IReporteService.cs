@@ -14,5 +14,6 @@ namespace Services
         Task CrearReporte(CrearReporteModel model, string usuarioId);
         Task<IEnumerable<SelectListItem>> GetEquiposPorSalaParaDropdown(Guid salaId);
         Task<CrearReporteModel> GetDatosParaReportar(Guid? salaId = null, Guid? equipoId = null);
+        Task<IList<ReporteIndexModel>> GetMisReportes(string usuarioId);
     }
 }

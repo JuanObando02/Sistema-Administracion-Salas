@@ -83,12 +83,11 @@ namespace Services
             // 3. Si la sala está vacía, procede a eliminarla
             await _salaRepository.Delete(sala);
         }
-        public async Task<IList<SalaIndexModel>> GetSalas()
+        public async Task<IList<SalaIndexModel>> GetSalas(int? numero = null)
         {
-            // 1. Llama al repositorio
-            var salasList = await _salaRepository.GetSalas();
+            // Pasamos el número al repositorio
+            var salasList = await _salaRepository.GetSalas(numero);
 
-            // 2. Mapea la lista de Entidades (Sala) a Modelos (SalaIndexModel)
             return _mapper.Map<IList<SalaIndexModel>>(salasList);
         }
         public async Task<IList<EstadoSalaViewModel>> GetEstadoActualSalas()

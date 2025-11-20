@@ -13,7 +13,7 @@ namespace Services
         Task<EditarSalaModel> GetSalaParaEditar(Guid id);
         Task UpdateSala(EditarSalaModel model);
         Task DeleteSala(Guid id);
-        Task<IList<SalaIndexModel>> GetSalas();
+        Task<IList<SalaIndexModel>> GetSalas(int? numero = null);
         Task<IList<EstadoSalaViewModel>> GetEstadoActualSalas();
     }
 }
