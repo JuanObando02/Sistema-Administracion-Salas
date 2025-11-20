@@ -1,52 +1,53 @@
-﻿@model Services.Models.ReservaModels.ReservarEquipoModel
+﻿@model Services.Models.ReservaModels.ReservarSalaModel
 
 @{
-    ViewData["Title"] = "Reservar un Equipo";
+    ViewData["Title"] = "Reservar Sala Completa";
 }
 
 <h2>@ViewData["Title"]</h2>
-<p>Recuerde que solo puede reservar un máximo de 3 horas, entre las 7:00 AM y las 6:00 PM, y un máximo de 2 reservas por día.</p>
+<div class="alert alert-info">
+    <strong>Horario de Atención:</strong> 7:00 AM a 9:30 PM.<br />
+    <strong>Nota para Profesores:</strong> Esta reserva quedará en estado <strong>Pendiente</strong> hasta que un coordinador la apruebe.
+</div>
 <hr />
 
 <div class="row">
     <div class="col-md-6">
-        <form asp-action="ReservarEquipo" method="post">
-
+        <form asp-action="ReservarSala" method="post">
             <div asp-validation-summary="ModelOnly" class="text-danger"></div>
 
             <div class="mb-3">
                 <label asp-for="SalaId" class="form-label"></label>
                 <select asp-for="SalaId" asp-items="Model.SalasDisponibles" class="form-control">
-                    <option value="">-- Seleccione una Sala (para préstamo individual) --</option>
+                    <option value="">-- Seleccione una Sala de Clase --</option>
                 </select>
                 <span asp-validation-for="SalaId" class="text-danger"></span>
             </div>
 
             <div class="mb-3">
                 <label asp-for="FechaInicio" class="form-label"></label>
-                @* Input de Fecha y Hora *@
-                <input name="FechaInicio"
-                       id="FechaInicio"
+                @* Usamos el truco del Value y Step para formato limpio *@
+                <input name="FechaInicio" id="FechaInicio"
                        type="datetime-local"
                        value="@Model.FechaInicio.ToString("yyyy-MM-ddTHH:mm")"
-                       class="form-control"
-                       step="1800" />
+                       class="form-control" step="1800" />
                 <span asp-validation-for="FechaInicio" class="text-danger"></span>
             </div>
 
             <div class="mb-3">
                 <label asp-for="DuracionHoras" class="form-label"></label>
-                @* Dropdown para la regla de 3 horas *@
                 <select asp-for="DuracionHoras" class="form-control">
                     <option value="1">1 Hora</option>
                     <option value="2">2 Horas</option>
                     <option value="3">3 Horas</option>
+                    <option value="4">4 Horas</option>
                 </select>
                 <span asp-validation-for="DuracionHoras" class="text-danger"></span>
             </div>
 
             <div class="form-group">
-                <input type="submit" value="Buscar y Reservar" class="btn btn-primary" />
+                <input type="submit" value="Solicitar Reserva" class="btn btn-success" />
+                <a asp-action="Index" class="btn btn-secondary">Cancelar</a>
             </div>
         </form>
     </div>

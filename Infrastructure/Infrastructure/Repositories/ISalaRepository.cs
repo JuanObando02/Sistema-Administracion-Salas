@@ -18,7 +18,8 @@ namespace Infrastructure.Repositories
         Task Delete(Sala sala);
         Task<IList<Sala>> GetSalas();
         Task<Sala> GetSalaPorNumero(int numero);
-        Task<IList<Sala>> GetSalasIndividuales();
+        Task<IList<Sala>> GetSalasIndividuales();// salas para prestamo de equipos
+        Task<IList<Sala>> GetSalasClaseCompleta();// salas para clases completas
 
     }
 }

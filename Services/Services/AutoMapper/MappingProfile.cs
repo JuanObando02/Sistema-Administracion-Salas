@@ -99,15 +99,15 @@ namespace Services.Automapper
 
             // 2. Mapeo para Editar (GET)
             CreateMap<Sala, EditarSalaModel>()
-                .ForMember(dest => dest.Estado, opt => opt.MapFrom(src => (EstadoSalaModel)src.Estado));
+                .ForMember(dest => dest.Estado, opt => opt.MapFrom(src => (EstadoSala)src.Estado));
 
             // 3. Mapeo para Editar (POST)
             CreateMap<EditarSalaModel, Sala>()
-                .ForMember(dest => dest.Estado, opt => opt.MapFrom(src => (EstadoSalaModel)src.Estado));
+                .ForMember(dest => dest.Estado, opt => opt.MapFrom(src => (EstadoSala)src.Estado));
 
             // 4. Mapeo para el Index
             CreateMap<Sala, SalaIndexModel>()
-                .ForMember(dest => dest.Estado, opt => opt.MapFrom(src => (EstadoSalaModel)src.Estado));
+                .ForMember(dest => dest.Estado, opt => opt.MapFrom(src => (EstadoSala)src.Estado));
         }
 
     }

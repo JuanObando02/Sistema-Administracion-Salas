@@ -14,5 +14,7 @@ namespace Services
         Task UpdateSala(EditarSalaModel model);
         Task DeleteSala(Guid id);
         Task<IList<SalaIndexModel>> GetSalas();
+        Task<IList<EstadoSalaViewModel>> GetEstadoActualSalas();
     }
 }
+

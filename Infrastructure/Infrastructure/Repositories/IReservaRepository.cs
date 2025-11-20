@@ -15,5 +15,6 @@ namespace Infrastructure.Repositories
         Task Save(Reserva reserva);
         Task<Reserva> GetReservaCompleta(Guid id); // Obtiene con Includes
         Task Delete(Reserva reserva);
+        Task<IList<Reserva>> GetReservasActivasDelUsuarioEnFecha(string usuarioId, DateTime fecha); //reservas activas del usuario ese dia
     }
 }

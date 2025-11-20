@@ -39,6 +39,7 @@ namespace MvcSample.Controllers
         public async Task<IActionResult> ReservarEquipo(ReservarEquipoModel model)
         {
             var usuarioId = User.FindFirstValue(ClaimTypes.NameIdentifier);
+            bool esProfesor = User.IsInRole("Profesor");
 
             if (!ModelState.IsValid)
             {
@@ -50,7 +51,7 @@ namespace MvcSample.Controllers
 
             try
             {
-                await _reservaService.CrearReservaEquipo(model, usuarioId);
+                await _reservaService.CrearReservaEquipo(model, usuarioId, esProfesor);
                 return RedirectToAction("Index"); // Vuelve a "Mis Reservas"
             }
             catch (InvalidOperationException ex) // Atrapa los errores de reglas de negocio
@@ -58,8 +59,18 @@ namespace MvcSample.Controllers
                 ModelState.AddModelError(string.Empty, ex.Message);
 
                 // Recargar dropdown
-                var modeloRecargado = await _reservaService.GetDatosParaReservarEquipo();
-                model.SalasDisponibles = modeloRecargado.SalasDisponibles;
+                var datosFrescos = await _reservaService.GetDatosParaReservarEquipo();
+                model.SalasDisponibles = datosFrescos.SalasDisponibles;
+
+                return View(model);
+            }
+            catch (Exception) // Errores inesperados
+            {
+                ModelState.AddModelError(string.Empty, "Ocurrió un error inesperado al reservar.");
+
+                var datosFrescos = await _reservaService.GetDatosParaReservarEquipo();
+                model.SalasDisponibles = datosFrescos.SalasDisponibles;
+
                 return View(model);
             }
         }
@@ -93,6 +104,42 @@ namespace MvcSample.Controllers
                 var modelo = new ReservaIndexModel { Id = id, ObjetoReservado = "Reserva con conflicto" };
                 ModelState.AddModelError(string.Empty, ex.Message);
                 return View("Cancelar", modelo);
+            }
+        }
+        
+        [HttpGet]
+        [Authorize(Roles = "Profesor")] // Solo profesores
+        public async Task<IActionResult> ReservarSala()
+        {
+            var model = await _reservaService.GetDatosParaReservarSala();
+            return View(model);
+        }
+
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        [Authorize(Roles = "Profesor")]
+        public async Task<IActionResult> ReservarSala(ReservarSalaModel model)
+        {
+            if (!ModelState.IsValid)
+            {
+                var datosFrescos = await _reservaService.GetDatosParaReservarSala();
+                model.SalasDisponibles = datosFrescos.SalasDisponibles;
+                return View(model);
+            }
+
+            var usuarioId = User.FindFirstValue(ClaimTypes.NameIdentifier);
+
+            try
+            {
+                await _reservaService.CrearReservaSala(model, usuarioId);
+                return RedirectToAction("Index");
+            }
+            catch (Exception ex)
+            {
+                ModelState.AddModelError(string.Empty, ex.Message);
+                var datosFrescos = await _reservaService.GetDatosParaReservarSala();
+                model.SalasDisponibles = datosFrescos.SalasDisponibles;
+                return View(model);
             }
         }
     }

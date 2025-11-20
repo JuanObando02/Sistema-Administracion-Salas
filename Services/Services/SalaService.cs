@@ -1,5 +1,6 @@
 ﻿using AutoMapper;
 using Domain;
+using Domain.Enums;
 using Infrastructure.Repositories;
 using Services.Models.SalaModels;
 using System;
@@ -20,7 +21,40 @@ namespace Services
             _salaRepository = salaRepository;
             _mapper = mapper;
         }
+        public async Task<IList<EstadoSalaViewModel>> GetEstadoActualSalas()
+        {
+            // 1. Obtenemos todas las salas
+            var salas = await _salaRepository.GetSalas(); //
 
+            var listaEstados = new List<EstadoSalaViewModel>();
+
+            foreach (var sala in salas)
+            {
+                // 2. Para cada sala, necesitamos saber cuántos equipos libres tiene realmente
+                //    (Esto requiere cargar los equipos, así que usaremos GetSalaConEquipos)
+                var salaCompleta = await _salaRepository.GetSalaConEquipos(sala.Id);
+
+                int equiposLibres = 0;
+
+                if (salaCompleta.Equipos != null)
+                {
+                    // Cuenta equipos que estén "Disponibles"
+                    equiposLibres = salaCompleta.Equipos.Count(e => e.Estado == EstadoEquipo.Disponible);
+                }
+
+                listaEstados.Add(new EstadoSalaViewModel
+                {
+                    Id = sala.Id,
+                    NombreSala = $"Sala {sala.Numero}",
+                    Capacidad = sala.Capacidad,
+                    EquiposDisponibles = equiposLibres,
+                    Estado = sala.Estado, // El estado general (Disponible/Ocupada)
+                    Tipo = sala.Tipo
+                });
+            }
+
+            return listaEstados;
+        }
         public async Task RegistrarSala(RegistrarSalaModel model)
         {
             var salaExistente = await _salaRepository.GetSalaPorNumero(model.Numero);
@@ -31,7 +65,6 @@ namespace Services
             var sala = _mapper.Map<Sala>(model);
             await _salaRepository.Save(sala);
         }
-
         public async Task<EditarSalaModel> GetSalaParaEditar(Guid id)
         {
             var sala = await _salaRepository.GetSala(id);

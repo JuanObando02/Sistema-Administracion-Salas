@@ -14,10 +14,17 @@ namespace Infrastructure.Repositories
         {
             Console.WriteLine("Se crea un repositorio de salas");
         }
+        public async Task<IList<Sala>> GetSalasClaseCompleta()
+        {
+            return await context.Salas
+                .Where(s => s.Tipo == Domain.Enums.TipoSala.Clase_Completa) // salas de clase completa
+                .OrderBy(s => s.Numero)
+                .ToListAsync();
+        }
         public async Task<IList<Sala>> GetSalasIndividuales()
         {
             return await context.Salas
-                .Where(s => s.Tipo == Domain.Enums.TipoSala.Individual) //
+                .Where(s => s.Tipo == Domain.Enums.TipoSala.Individual) // salas individuales
                 .OrderBy(s => s.Numero)
                 .ToListAsync();
         }

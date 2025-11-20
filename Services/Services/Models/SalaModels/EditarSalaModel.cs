@@ -9,18 +9,6 @@ using System.Threading.Tasks;
 
 namespace Services.Models.SalaModels
 {
-    public enum EstadoSalaModel
-    {
-        Disponible,
-        Ocupada,
-        EnMantenimiento,
-        Deshabilitada
-    }
-    public enum TipoSala
-    {
-        Individual, // Para préstamo de equipos uno por uno
-        Clase_Completa // Para reserva de profesor
-    }
     public class EditarSalaModel
     {
         public Guid Id { get; set; }

@@ -1,5 +1,6 @@
 using Microsoft.AspNetCore.Mvc;
 using MvcSample.Models;
+using Services;
 using System.Diagnostics;
 
 namespace MvcSample.Controllers
@@ -7,27 +8,28 @@ namespace MvcSample.Controllers
     public class HomeController : Controller
     {
         private readonly ILogger<HomeController> _logger;
+        private readonly ISalaService _salaService;
 
-        public HomeController(ILogger<HomeController> logger)
+        public HomeController(ILogger<HomeController> logger, ISalaService salaService)
         {
            
             _logger = logger;
+            _salaService = salaService;
         }
-
-        public IActionResult Index()
+        public async Task<IActionResult> Index()
         {
-            return View();
+            if (!User.Identity.IsAuthenticated)
+            { 
+                return View("Welcome");
+            }
+
+            var estadosSalas = await _salaService.GetEstadoActualSalas();
+            return View(estadosSalas);
         }
 
         public IActionResult Privacy()
         {
             return View();
-        }
-
-        [ResponseCache(Duration = 0, Location = ResponseCacheLocation.None, NoStore = true)]
-        public IActionResult Error()
-        {
-            return View(new ErrorViewModel { RequestId = Activity.Current?.Id ?? HttpContext.TraceIdentifier });
         }
     }
 }

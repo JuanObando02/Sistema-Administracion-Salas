@@ -13,6 +13,16 @@ namespace Infrastructure.Repositories
         public ReservaRepository(AppDbContext context) : base(context)
         {
         }
+        public async Task<IList<Reserva>> GetReservasActivasDelUsuarioEnFecha(string usuarioId, DateTime fecha)
+        {
+            return await context.Reservas
+                .Where(r => r.UsuarioId == usuarioId &&
+                            r.FechaInicio.Date == fecha.Date &&
+                            // Ignoramos las que ya se cancelaron o rechazaron
+                            r.Estado != Domain.Enums.EstadoReserva.Rechazada &&
+                            r.Estado != Domain.Enums.EstadoReserva.Finalizada)
+                .ToListAsync();
+        }
         public async Task<IList<Reserva>> GetReservasPorUsuario(string usuarioId)
         {
             return await context.Reservas
@@ -59,7 +69,6 @@ namespace Infrastructure.Repositories
                 .Include(r => r.Sala)
                 .FirstOrDefaultAsync(r => r.Id == id);
         }
-
         public async Task Delete(Reserva reserva)
         {
             try

@@ -1,5 +1,5 @@
 ﻿@model Services.Models.SalaModels.EditarSalaModel
-@using Services.Models.SalaModels
+@using Domain.Enums
 
 @{
     ViewData["Title"] = "Editar Sala";
@@ -30,7 +30,7 @@
 
             <div class="mb-3">
                 <label asp-for="Estado" class="form-label"></label>
-                <select asp-for="Estado" asp-items="Html.GetEnumSelectList<EstadoSalaModel>()" class="form-control"></select>
+                <select asp-for="Estado" asp-items="Html.GetEnumSelectList<EstadoSala>()" class="form-control"></select>
                 <span asp-validation-for="Estado" class="text-danger"></span>
             </div>
 

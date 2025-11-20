@@ -11,8 +11,10 @@ namespace Services
     {
         Task<IList<ReservaIndexModel>> GetMisReservas(string usuarioId);
         Task<ReservarEquipoModel> GetDatosParaReservarEquipo();
-        Task CrearReservaEquipo(ReservarEquipoModel model, string usuarioId);
+        Task CrearReservaEquipo(ReservarEquipoModel model, string usuarioId, bool esProfesor);//bool esProfesor para quitar la restriccion de horas
         Task CancelarReserva(Guid reservaId, string usuarioId);
         Task ActualizarEstadoSalaIndividual(Guid salaId);
+        Task<ReservarSalaModel> GetDatosParaReservarSala();
+        Task CrearReservaSala(ReservarSalaModel model, string usuarioId);
     }
 }
