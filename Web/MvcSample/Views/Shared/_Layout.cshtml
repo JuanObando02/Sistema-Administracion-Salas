@@ -41,7 +41,6 @@
                                     <li>
                                         <a class="dropdown-item" asp-area="" asp-controller="Equipos" asp-action="Index">Gestión de Equipos</a>
                                     </li>
-
                                     @if (User.IsInRole("Admin")) // Solo Admin ve Usuarios
                                     {
                                         <li><hr class="dropdown-divider"></li>
@@ -56,6 +55,11 @@
                                     }
                                 </ul>
                             </li>
+                            <li class="nav-item">
+                                <a class="nav-link text-danger fw-bold" asp-area="" asp-controller="Reportes" asp-action="Registrar">
+                                    <i class="bi bi-exclamation-triangle"></i> Reportar Daño
+                                </a>
+                            </li>
                         }
                         @* --- ENLACES PARA TODOS (Logueados) --- *@
                         @if (User.Identity.IsAuthenticated)
@@ -64,12 +68,13 @@
                                 <li class="nav-item">
                                     <a class="nav-link text-dark" asp-area="" asp-controller="Reservas" asp-action="Index">Mis Reservas</a>
                                 </li>
+                                <li class="nav-item">
+                                    <a class="nav-link text-dark" asp-controller="Reportes" asp-action="MisReportes">Mis Reportes</a>
+                                </li>
+                                <li class="nav-item">
+                                    <a class="nav-link text-dark" asp-controller="Asesorias" asp-action="Index">Asesorías</a>
+                                </li>
                             }
-                            <li class="nav-item">
-                                <a class="nav-link text-danger fw-bold" asp-area="" asp-controller="Reportes" asp-action="Registrar">
-                                    <i class="bi bi-exclamation-triangle"></i> Reportar Daño
-                                </a>
-                            </li>
                         }
                        
                     </ul>

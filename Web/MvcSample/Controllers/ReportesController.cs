@@ -62,5 +62,15 @@ namespace MvcSample.Controllers
             var equipos = await _reporteService.GetEquiposPorSalaParaDropdown(salaId);
             return Json(equipos);
         }
+
+        [HttpGet]
+        public async Task<IActionResult> MisReportes()
+        {
+            var usuarioId = User.FindFirstValue(ClaimTypes.NameIdentifier);
+            var misReportes = await _reporteService.GetMisReportes(usuarioId);
+
+            return View(misReportes);
+        }
+
     }
 }

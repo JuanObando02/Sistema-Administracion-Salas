@@ -1,5 +1,6 @@
 ﻿using Domain;
 using Infrastructure.Repositories;
+using Microsoft.EntityFrameworkCore;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -29,6 +30,15 @@ namespace Infrastructure.Repositories
                 await RollBack();
                 throw ex;
             }
+        }
+        public async Task<IList<Reporte>> GetReportesPorUsuario(string usuarioId)
+        {
+            return await context.Reportes
+                .Where(r => r.UsuarioId == usuarioId)
+                .Include(r => r.SalaReportada)   // Cargar datos de la sala
+                .Include(r => r.EquipoReportado) // Cargar datos del equipo
+                .OrderByDescending(r => r.FechaCreacion) // Los más recientes primero
+                .ToListAsync();
         }
     }
 }

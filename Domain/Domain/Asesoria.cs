@@ -28,6 +28,12 @@ namespace Domain
         [Required]
         public DateTime FechaSolicitud { get; set; }
 
+        // --- Relación con Sala (Opcional) --- ubicación del problema
+        public Guid? SalaId { get; set; }
+
+        [ForeignKey("SalaId")]
+        public Sala Sala { get; set; }
+
         // --- Relación con Usuario (Quién la solicita) ---
         [Required]
         public string UsuarioId { get; set; } = string.Empty; // FK a Usuario 

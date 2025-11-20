@@ -40,13 +40,19 @@ namespace Infrastructure.Repositories
             return await context.Equipos.FindAsync(id);
         }
 
-        public async Task<IList<Equipo>> GetEquipos()
+        public async Task<IList<Equipo>> GetEquipos(string? searchSerial = null)
         {
-            // 1. Incluimos la Sala para poder mostrar su nombre
-            // 2. Ordenamos por Serial (como pediste)
-            return await context.Equipos
-                .Include(e => e.Sala) // Carga la entidad Sala relacionada
-                .OrderBy(e => e.Serial) //
+            var query = context.Equipos.AsQueryable();
+
+            if (!string.IsNullOrEmpty(searchSerial))
+            {
+                // Busca coincidencias parciales (LIKE %search%)
+                query = query.Where(e => e.Serial.Contains(searchSerial));
+            }
+
+            return await query
+                .Include(e => e.Sala)
+                .OrderBy(e => e.Serial)
                 .ToListAsync();
         }
 
@@ -82,11 +88,19 @@ namespace Infrastructure.Repositories
             }
         }
 
-        public async Task<IList<Equipo>> GetEquiposPorSala(Guid salaId)
+        public async Task<IList<Equipo>> GetEquiposPorSala(Guid salaId, string? searchSerial = null)
         {
-            return await context.Equipos
-                .Where(e => e.SalaId == salaId) // Filtra por la sala
-                .Include(e => e.Sala)           // Incluye la sala
+            var query = context.Equipos
+            .Where(e => e.SalaId == salaId) // Filtro base de sala
+            .AsQueryable();
+
+            if (!string.IsNullOrEmpty(searchSerial))
+            {
+                query = query.Where(e => e.Serial.Contains(searchSerial));
+            }
+
+            return await query
+                .Include(e => e.Sala)
                 .OrderBy(e => e.Serial)
                 .ToListAsync();
         }

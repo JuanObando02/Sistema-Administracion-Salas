@@ -8,7 +8,8 @@
 
 <h1>@ViewData["Title"]</h1>
 
-<p>
+<div class="row mb-3 align-items-center">
+    <div class="col-md-6">
     @* Si venimos de una sala, el botón "Registrar" pasará ese ID *@
     @if (salaId.HasValue)
     {
@@ -19,7 +20,47 @@
     {
         <a asp-action="Registrar" class="btn btn-primary">Registrar Nuevo Equipo (General)</a>
     }
-</p>
+    </div>
+    <div class="col-md-6">
+        <form asp-action="Index" method="get" class="d-flex gap-2 justify-content-end">
+
+            @* ¡TRUCO IMPORTANTE! *@
+            @* Si estamos en una sala, guardamos el ID en un campo oculto *@
+            @* Así, al dar click en "Buscar", el formulario envía: ?salaId=XXX&buscarSerial=YYY *@
+            @if (salaId.HasValue)
+            {
+                <input type="hidden" name="salaId" value="@salaId.Value" />
+            }
+
+            <div class="input-group" style="max-width: 300px;">
+                <span class="input-group-text"><i class="bi bi-search"></i> Serial</span>
+
+                <input type="text" name="buscarSerial"
+                       class="form-control"
+                       placeholder="Ej. PC-01"
+                       value="@ViewData["FiltroSerial"]" />
+
+                <button type="submit" class="btn btn-outline-secondary">Buscar</button>
+            </div>
+
+            @* Botón Limpiar *@
+            @if (ViewData["FiltroSerial"] != null)
+            {
+                @* Si limpiamos, debemos decidir a dónde volver *@
+                @if (salaId.HasValue)
+                {
+                    // Volver a la lista limpia DE ESTA SALA
+                    <a asp-action="Index" asp-route-salaId="@salaId.Value" class="btn btn-link text-decoration-none">Ver Todos</a>
+                }
+                else
+                {
+                    // Volver a la lista limpia GENERAL
+                    <a asp-action="Index" class="btn btn-link text-decoration-none">Ver Todos</a>
+                }
+            }
+        </form>
+    </div>
+</div>
 <table class="table">
     <thead>
         <tr>
