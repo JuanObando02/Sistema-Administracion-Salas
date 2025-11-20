@@ -45,7 +45,7 @@ namespace MvcSample.Controllers
 
                 // Mensaje de éxito temporal usando TempData
                 TempData["Mensaje"] = "¡Reporte enviado exitosamente! Un coordinador lo revisará pronto.";
-                return RedirectToAction("Index", "Home");
+                return RedirectToAction("MisReportes");
             }
             catch (Exception ex)
             {

@@ -5,6 +5,7 @@ using System.ComponentModel.DataAnnotations;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using Domain.Enums;
 
 namespace Services.Models.EquipoModels
 {
@@ -20,7 +21,7 @@ namespace Services.Models.EquipoModels
         public Guid SalaId { get; set; }
 
         [Required]
-        public EstadoEquipoModel Estado { get; set; }
+        public EstadoEquipo Estado { get; set; }
 
         // Para el dropdown de Salas
         public IEnumerable<SelectListItem> SalasDisponibles { get; set; } = new List<SelectListItem>();

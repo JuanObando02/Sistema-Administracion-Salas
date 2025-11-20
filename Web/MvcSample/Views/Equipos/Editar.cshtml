@@ -1,5 +1,5 @@
 ﻿@model Services.Models.EquipoModels.EditarEquipoModel
-@using Services.Models.EquipoModels // Para el enum
+@using Domain.Enums; // Para el enum
 
 @{
     ViewData["Title"] = "Editar Equipo";
@@ -30,7 +30,7 @@
 
             <div class="mb-3">
                 <label asp-for="Estado" class="form-label"></label>
-                <select asp-for="Estado" asp-items="Html.GetEnumSelectList<EstadoEquipoModel>()" class="form-control"></select>
+                <select asp-for="Estado" asp-items="Html.GetEnumSelectList<EstadoEquipo>()" class="form-control"></select>
                 <span asp-validation-for="Estado" class="text-danger"></span>
             </div>
 

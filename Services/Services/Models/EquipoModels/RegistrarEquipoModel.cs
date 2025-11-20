@@ -6,16 +6,10 @@ using System.Text;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.AspNetCore.Mvc.ViewFeatures;
+using Domain.Enums;
 
 namespace Services.Models.EquipoModels
 {
-    public enum EstadoEquipoModel
-    {
-        Disponible,
-        Asignado,
-        EnMantenimiento,
-        Dañado
-    }
     public class RegistrarEquipoModel
     {
         [Required(ErrorMessage = "El número de serial es obligatorio")]

@@ -3,6 +3,7 @@
 
 @{
     ViewData["Title"] = "Mis Reservas";
+    var ahora = DateTime.Now;
 }
 
 <h1>@ViewData["Title"]</h1>
@@ -23,7 +24,7 @@
 </p>
 
 <h3>Mi Historial de Reservas</h3>
-<table class="table">
+<table class="table table-hover">
     <thead>
         <tr>
             <th>Tipo</th>
@@ -37,45 +38,75 @@
     <tbody>
         @foreach (var item in Model)
         {
+            // --- LÓGICA DE TIEMPO REAL ---
+            // Una reserva está "En Curso" si:
+            // 1. Está Aprobada (o EnUso si usas ese estado)
+            // 2. La hora actual es MAYOR al inicio
+            // 3. La hora actual es MENOR al fin
+            bool enCurso = (item.Estado == EstadoReserva.Aprobada || item.Estado == EstadoReserva.EnUso)
+                && ahora >= item.FechaInicio
+                && ahora <= item.FechaFin;
+            // -----------------------------
+
             <tr>
                 <td>@item.Tipo</td>
                 <td>@item.ObjetoReservado</td>
-                <td>@item.FechaInicio</td>
-                <td>@item.FechaFin</td>
-                <td>@item.Estado</td>
+                <td>@item.FechaInicio.ToString("dd/MM/yyyy HH:mm")</td>
+                <td>@item.FechaFin.ToString("dd/MM/yyyy HH:mm")</td>
                 <td>
-                    @* --- LOGICA DE CANCELACIÓN --- *@
-                    @* Solo mostramos el botón si la reserva NO está Finalizada, En Uso o Rechazada *@
-                    @if (item.Estado != EstadoReserva.Finalizada &&
-                                    item.Estado != EstadoReserva.EnUso &&
-                                    item.Estado != EstadoReserva.Rechazada)
+                    @if (enCurso)
                     {
-                        <a asp-action="Cancelar" asp-route-id="@item.Id" class="btn btn-sm btn-danger">Cancelar</a>
+                        <span class="badge bg-success text-white fa-beat">En Curso (Activa)</span>
                     }
-                    @* --- BOTÓN REPORTAR --- *@
-                    @if (item.Tipo == Domain.Enums.TipoReserva.Equipo) //
+                    else if (item.Estado == EstadoReserva.Pendiente)
                     {
-                        @* Pasamos el ID del Equipo para que se pre-llene *@
-                        @* Nota: Asumimos que tu ReservaIndexModel tiene acceso al EquipoId o SalaId. 
-                        Si no, debes agregarlo al modelo ReservaIndexModel *@
-
-                        <a asp-controller="Reportes"
-                           asp-action="Registrar"
-                           asp-route-salaId="@item.SalaId"
-                           asp-route-equipoId="@item.EquipoId"
-                           class="btn btn-sm btn-warning">
-                            Reportar Daño
-                        </a>
+                        <span class="badge bg-warning text-dark">Pendiente</span>
+                    }
+                    else if (item.Estado == EstadoReserva.Finalizada)
+                    {
+                        <span class="badge bg-secondary">Finalizada</span>
+                    }
+                    else if (item.Estado == EstadoReserva.Rechazada)
+                    {
+                        <span class="badge bg-danger">Rechazada</span>
                     }
                     else
                     {
-                        @* Pasamos solo el ID de la Sala *@
-                        <a asp-controller="Reportes"
-                           asp-action="Registrar"
-                           asp-route-salaId="@item.SalaId"
-                           class="btn btn-sm btn-warning">
-                            Reportar Daño
-                        </a>
+                        <span class="badge bg-primary">@item.Estado</span>
+                    }
+                </td>
+                <td>
+                    @* Botón Cancelar (Solo si no ha pasado y no está en curso) *@
+                    @if (item.Estado == EstadoReserva.Aprobada && ahora < item.FechaInicio)
+                    {
+                        <a asp-action="Cancelar" asp-route-id="@item.Id" class="btn btn-sm btn-outline-danger">Cancelar</a>
+                    }
+
+                    @* --- BOTONES DE ACCIÓN EN SITIO (Solo si está En Curso) --- *@
+                    @if (enCurso)
+                    {
+                        <div class="btn-group" role="group">
+
+                            @* 1. SOLICITAR AYUDA (Asesoría) *@
+                            <a asp-controller="Asesorias"
+                               asp-action="Solicitar"
+                               asp-route-salaId="@item.SalaId"
+                               class="btn btn-sm btn-primary"
+                               title="Solicitar un técnico en esta sala">
+                                <i class="bi bi-tools"></i> Ayuda
+                            </a>
+
+                            @* 2. REPORTAR DAÑO *@
+                            <a asp-controller="Reportes"
+                               asp-action="Registrar"
+                               asp-route-salaId="@item.SalaId"
+                               asp-route-equipoId="@item.EquipoId"
+                               class="btn btn-sm btn-warning"
+                               title="Reportar fallo en equipo o sala">
+                                <i class="bi bi-exclamation-triangle"></i> Reportar
+                            </a>
+
+                        </div>
                     }
                 </td>
             </tr>

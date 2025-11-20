@@ -94,5 +94,15 @@ namespace Infrastructure.Repositories
                 throw ex;
             }
         }
+        public async Task<bool> TieneReservasActivasOFuturas(Guid equipoId)
+        {
+            // Retorna TRUE si encuentra al menos una reserva que cumpla las condiciones
+            return await context.Reservas.AnyAsync(r =>
+                r.EquipoId == equipoId &&
+                r.FechaFin > DateTime.Now && // Que no haya terminado todavía
+                (r.Estado == Domain.Enums.EstadoReserva.Aprobada ||
+                 r.Estado == Domain.Enums.EstadoReserva.EnUso) // Que sea válida
+            );
+        }
     }
 }
