@@ -1,0 +1,73 @@
+﻿@model IEnumerable<Services.Models.AsesoriaModels.AsesoriaIndexModel>
+@using Domain.Enums
+
+@{
+    ViewData["Title"] = "Mis Solicitudes de Asesoría";
+}
+
+<h1>@ViewData["Title"]</h1>
+
+<div class="alert alert-info">
+    Use este módulo para solicitar ayuda técnica en sitio (ej. problemas de conexión, cables, proyector).
+</div>
+
+<p>
+    <a asp-action="Solicitar" class="btn btn-primary">
+        <i class="bi bi-person-raised-hand"></i> Solicitar Ayuda
+    </a>
+</p>
+
+<table class="table table-hover mt-4">
+    <thead>
+        <tr>
+            <th>Fecha</th>
+            <th>Ubicación</th>
+            <th>Descripción</th>
+            <th>Estado</th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var item in Model)
+        {
+            <tr>
+                <td>@item.Fecha.ToString("dd/MM/yyyy HH:mm")</td>
+                <td>
+                    @if (item.Ubicacion != "Sin ubicación especificada")
+                    {
+                        <span class="fw-bold">@item.Ubicacion</span>
+                    }
+                    else
+                    {
+                        <span class="text-muted">Sin ubicación</span>
+                    }
+                </td>
+                <td>@item.Descripcion</td>
+                <td>
+                    @if (item.Estado == EstadoAsesoria.Pendiente)
+                    {
+                        <span class="badge bg-warning text-dark">Pendiente</span>
+                    }
+                    else if (item.Estado == EstadoAsesoria.EnProceso)
+                    {
+                        <span class="badge bg-info text-dark">En Camino</span>
+                    }
+                    else if (item.Estado == EstadoAsesoria.Cerrada)
+                    {
+                        <span class="badge bg-success">Resuelta</span>
+                    }
+                    else
+                    {
+                        <span class="badge bg-secondary">@item.Estado</span>
+                    }
+                </td>
+            </tr>
+        }
+    </tbody>
+</table>
+
+@if (!Model.Any())
+{
+    <div class="text-center text-muted mt-5">
+        <p>No has realizado ninguna solicitud de asesoría reciente.</p>
+    </div>
+}

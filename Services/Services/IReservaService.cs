@@ -16,5 +16,7 @@ namespace Services
         Task ActualizarEstadoSalaIndividual(Guid salaId);
         Task<ReservarSalaModel> GetDatosParaReservarSala();
         Task CrearReservaSala(ReservarSalaModel model, string usuarioId);
+        Task<IList<ReservaIndexModel>> GetTodasLasReservas();
+        Task FinalizarReserva(Guid reservaId, string usuarioId);
     }
 }

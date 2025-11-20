@@ -1,0 +1,62 @@
+﻿@model IEnumerable<Services.Models.ReporteModels.ReporteIndexModel>
+@using Domain.Enums
+
+@{
+    ViewData["Title"] = "Mis Reportes de Daños";
+}
+
+<h1>@ViewData["Title"]</h1>
+
+<p>
+    <a asp-action="Registrar" class="btn btn-danger">
+        <i class="bi bi-plus-circle"></i> Nuevo Reporte
+    </a>
+</p>
+
+<table class="table table-hover">
+    <thead>
+        <tr>
+            <th>Fecha</th>
+            <th>Tipo</th>
+            <th>Objeto Afectado</th>
+            <th>Descripción</th>
+            <th>Estado</th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var item in Model)
+        {
+            <tr>
+                <td>@item.FechaCreacion.ToString("dd/MM/yyyy HH:mm")</td>
+                <td>@item.Tipo</td>
+                <td>@item.ObjetoAfectado</td>
+                <td>@item.Descripcion</td>
+                <td>
+                    @if (item.Estado == EstadoReporte.Pendiente)
+                    {
+                        <span class="badge bg-warning text-dark">Pendiente</span>
+                    }
+                    else if (item.Estado == EstadoReporte.EnProceso)
+                    {
+                        <span class="badge bg-info text-dark">En Proceso</span>
+                    }
+                    else if (item.Estado == EstadoReporte.Cerrado)
+                    {
+                        <span class="badge bg-success">Solucionado</span>
+                    }
+                    else
+                    {
+                        <span class="badge bg-secondary">@item.Estado</span>
+                    }
+                </td>
+            </tr>
+        }
+    </tbody>
+</table>
+
+@if (!Model.Any())
+{
+    <div class="alert alert-info">
+        No has realizado ningún reporte de daños hasta el momento.
+    </div>
+}

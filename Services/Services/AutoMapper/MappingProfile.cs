@@ -1,10 +1,12 @@
 ﻿using AutoMapper;
 using Domain;
 using Domain.Enums;
+using Services.Models.AsesoriaModels;
 using Services.Models.CowModels;
 using Services.Models.EquipoModels;
 using Services.Models.FarmModels;
 using Services.Models.MilkModels;
+using Services.Models.ReporteModels;
 using Services.Models.ReservaModels;
 using Services.Models.SalaModels;
 using Services.Models.UsuarioModels;
@@ -22,6 +24,27 @@ namespace Services.Automapper
             EquipoMapper();
             UsuarioMapper();
             ReservaMapper();
+            ReporteMapper();
+            AsesoriaMapper();
+        }
+        private void AsesoriaMapper()
+        {
+            CreateMap<Asesoria, AsesoriaIndexModel>()
+                .ForMember(dest => dest.Fecha, opt => opt.MapFrom(src => src.FechaSolicitud))
+                .ForMember(dest => dest.Ubicacion, opt => opt.MapFrom(src =>
+                     src.SalaId.HasValue ? $"Sala {src.Sala.Numero}" : "Sin ubicación especificada"));
+        }
+        private void ReporteMapper()
+        {
+            // Mapeo para Registrar (ya lo usabas implícitamente, pero es bueno tenerlo)
+            CreateMap<CrearReporteModel, Reporte>();
+
+            // Mapeo para el Index "Mis Reportes"
+            CreateMap<Reporte, ReporteIndexModel>()
+                .ForMember(dest => dest.ObjetoAfectado, opt => opt.MapFrom(src =>
+                    src.Tipo == TipoReporte.Sala
+                    ? $"Sala {src.SalaReportada.Numero}"
+                    : $"Equipo {src.EquipoReportado.Serial}"));
         }
         private void ReservaMapper()
         {
@@ -29,11 +52,10 @@ namespace Services.Automapper
                 .ForMember(dest => dest.ObjetoReservado, opt => opt.MapFrom(src =>
                     src.Tipo == TipoReserva.Sala
                     ? $"Sala {src.Sala.Numero}"
-                    : $"Serial {src.Equipo.Serial}"))
+                    : $"Equipo {src.Equipo.Serial} - Sala {src.Sala.Numero}"))
                     .ForMember(dest => dest.SalaId, opt => opt.MapFrom(src => src.SalaId))
                     .ForMember(dest => dest.EquipoId, opt => opt.MapFrom(src => src.EquipoId));//
         }
-
         private void UsuarioMapper()
         {
             // Para el formulario de Registro
@@ -53,19 +75,18 @@ namespace Services.Automapper
             // Para el Index (GET)
             CreateMap<Equipo, EquipoIndexModel>()
                 // Mapea el enum del Dominio al enum del Modelo
-                .ForMember(dest => dest.Estado, opt => opt.MapFrom(src => (EstadoEquipoModel)src.Estado))
+                .ForMember(dest => dest.Estado, opt => opt.MapFrom(src => (EstadoEquipo)src.Estado))
                 // Mapea el nombre de la sala
                 .ForMember(dest => dest.SalaNombre, opt => opt.MapFrom(src => $"Sala {src.Sala.Numero}"));
 
             // Para Editar (GET)
             CreateMap<Equipo, EditarEquipoModel>()
-                .ForMember(dest => dest.Estado, opt => opt.MapFrom(src => (EstadoEquipoModel)src.Estado));
+                .ForMember(dest => dest.Estado, opt => opt.MapFrom(src => (EstadoEquipo)src.Estado));
 
             // Para Editar (POST)
             CreateMap<EditarEquipoModel, Equipo>()
                 .ForMember(dest => dest.Estado, opt => opt.MapFrom(src => (EstadoEquipo)src.Estado));
         }
-
         private void MilkMapper()
         {
             CreateMap<Milk, MilkModel>()

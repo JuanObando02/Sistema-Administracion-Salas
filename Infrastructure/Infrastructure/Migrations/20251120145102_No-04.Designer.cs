@@ -4,6 +4,7 @@ using Infrastructure;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -11,9 +12,11 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace Infrastructure.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    partial class AppDbContextModelSnapshot : ModelSnapshot
+    [Migration("20251120145102_No-04")]
+    partial class No04
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -137,7 +140,7 @@ namespace Infrastructure.Migrations
 
                     b.HasIndex("UsuarioId");
 
-                    b.ToTable("Asesorias", (string)null);
+                    b.ToTable("Asesorias");
                 });
 
             modelBuilder.Entity("Domain.Cow", b =>
@@ -157,7 +160,7 @@ namespace Infrastructure.Migrations
 
                     b.HasIndex("FarmId");
 
-                    b.ToTable("Cows", (string)null);
+                    b.ToTable("Cows");
                 });
 
             modelBuilder.Entity("Domain.Equipo", b =>
@@ -183,7 +186,7 @@ namespace Infrastructure.Migrations
                     b.HasIndex("Serial")
                         .IsUnique();
 
-                    b.ToTable("Equipos", (string)null);
+                    b.ToTable("Equipos");
                 });
 
             modelBuilder.Entity("Domain.Farm", b =>
@@ -202,7 +205,7 @@ namespace Infrastructure.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("Farms", (string)null);
+                    b.ToTable("Farms");
                 });
 
             modelBuilder.Entity("Domain.Milk", b =>
@@ -227,7 +230,7 @@ namespace Infrastructure.Migrations
 
                     b.HasIndex("CowId");
 
-                    b.ToTable("Milks", (string)null);
+                    b.ToTable("Milks");
                 });
 
             modelBuilder.Entity("Domain.Reporte", b =>
@@ -268,7 +271,7 @@ namespace Infrastructure.Migrations
 
                     b.HasIndex("UsuarioId");
 
-                    b.ToTable("Reportes", (string)null);
+                    b.ToTable("Reportes");
                 });
 
             modelBuilder.Entity("Domain.Reserva", b =>
@@ -312,7 +315,7 @@ namespace Infrastructure.Migrations
 
                     b.HasIndex("UsuarioId");
 
-                    b.ToTable("Reservas", (string)null);
+                    b.ToTable("Reservas");
                 });
 
             modelBuilder.Entity("Domain.Sala", b =>
@@ -335,7 +338,10 @@ namespace Infrastructure.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("Salas", (string)null);
+                    b.HasIndex("Numero")
+                        .IsUnique();
+
+                    b.ToTable("Salas");
                 });
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityRole", b =>

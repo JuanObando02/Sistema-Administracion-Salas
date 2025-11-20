@@ -14,7 +14,7 @@ namespace Services
             services.AddTransient<IUsuarioService, UsuarioService>();
             services.AddTransient<IReservaService, ReservaService>();
             services.AddTransient<IReporteService, ReporteService>();
-
+            services.AddTransient<IAsesoriaService, AsesoriaService>();
 
             return services;
         }

@@ -1,5 +1,6 @@
 ﻿using AutoMapper;
 using Domain;
+using Domain.Enums;
 using Infrastructure.Repositories;
 using Services.Models.EquipoModels;
 using Microsoft.AspNetCore.Mvc.Rendering;
@@ -24,10 +25,10 @@ namespace Services
             _reservaRepository = reservaRepository;
             _mapper = mapper;
         }
-        public async Task<IList<EquipoIndexModel>> GetEquiposPorSala(Guid salaId)
+        public async Task<IList<EquipoIndexModel>> GetEquiposPorSala (Guid salaId, string? searchSerial = null)
         {
             // Traer los equipos de la BD
-            var equiposEntidad = await _equipoRepository.GetEquiposPorSala(salaId);
+            var equiposEntidad = await _equipoRepository.GetEquiposPorSala(salaId, searchSerial);
 
             // Traer las reservas que están ocurriendo YA MISMO
             var reservasActivas = await _reservaRepository.GetReservasActivasEnHorario(DateTime.Now); //
@@ -45,10 +46,10 @@ namespace Services
             foreach (var modelo in listaModelos)
             {
                 // Si el equipo está físicamente bien (Disponible) PERO tiene reserva activa...
-                if (modelo.Estado == EstadoEquipoModel.Disponible && idsEquiposOcupados.Contains(modelo.Id))
+                if (modelo.Estado == EstadoEquipo.Disponible && idsEquiposOcupados.Contains(modelo.Id))
                 {
                     // se muestra como ASIGNADO en la vista.
-                    modelo.Estado = EstadoEquipoModel.Asignado;
+                    modelo.Estado = EstadoEquipo.Asignado;
                 }
             }
 
@@ -98,10 +99,9 @@ namespace Services
             }
             return modelo;
         }
-
-        public async Task<IList<EquipoIndexModel>> GetEquipos()
+        public async Task<IList<EquipoIndexModel>> GetEquipos(string? searchSerial = null)
         {
-            var equiposEntidad = await _equipoRepository.GetEquipos();
+            var equiposEntidad = await _equipoRepository.GetEquipos(searchSerial);
             var reservasActivas = await _reservaRepository.GetReservasActivasEnHorario(DateTime.Now);
 
             var idsEquiposOcupados = reservasActivas
@@ -113,15 +113,14 @@ namespace Services
 
             foreach (var modelo in listaModelos)
             {
-                if (modelo.Estado == EstadoEquipoModel.Disponible && idsEquiposOcupados.Contains(modelo.Id))
+                if (modelo.Estado == EstadoEquipo.Disponible && idsEquiposOcupados.Contains(modelo.Id))
                 {
-                    modelo.Estado = EstadoEquipoModel.Asignado;
+                    modelo.Estado = EstadoEquipo.Asignado;
                 }
             }
 
             return listaModelos;
         }
-
         public async Task<EditarEquipoModel> GetEquipoParaEditar(Guid id)
         {
             // 1. Obtener el equipo
@@ -141,7 +140,6 @@ namespace Services
 
             return modelo;
         }
-
         public async Task<Guid> UpdateEquipo(EditarEquipoModel model)
         {
             var equipoConEseSerial = await _equipoRepository.GetEquipoPorSerial(model.Serial);
@@ -154,6 +152,20 @@ namespace Services
             if (equipoExistente == null)
             {
                 throw new Exception("El equipo que intenta actualizar no existe.");
+            }
+            bool cambioDeSala = equipoExistente.SalaId != model.SalaId;
+            bool cambioAEstadoNoDisponible = model.Estado != EstadoEquipo.Disponible && model.Estado != equipoExistente.Estado;
+
+            if (cambioDeSala || cambioAEstadoNoDisponible)
+            {
+                // Consultamos si tiene compromisos
+                bool tieneReservas = await _reservaRepository.TieneReservasActivasOFuturas(model.Id);
+
+                if (tieneReservas)
+                {
+                    string motivo = cambioDeSala ? "moverlo de sala" : "cambiar su estado";
+                    throw new InvalidOperationException($"No se puede {motivo} porque el equipo tiene reservas activas o futuras pendientes.");
+                }
             }
 
             // Si el usuario cambió la SalaId, debemos validar la capacidad de la *nueva* sala.

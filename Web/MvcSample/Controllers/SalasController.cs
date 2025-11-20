@@ -146,12 +146,14 @@ namespace MvcSample.Controllers
         
         // LISTAR TODAS LAS SALAS
         [HttpGet]
-        public async Task<IActionResult> Index()
+        public async Task<IActionResult> Index(int? buscarNumero)
         {
-            // 1. Llama al servicio para obtener la lista
-            var listaSalas = await _salaService.GetSalas();
+            // Guardamos el filtro para volver a mostrarlo en la vista (UX)
+            ViewData["FiltroActual"] = buscarNumero;
 
-            // 2. Envía la lista a la Vista
+            // Llamamos al servicio con el filtro
+            var listaSalas = await _salaService.GetSalas(buscarNumero);
+
             return View(listaSalas);
         }
     }
