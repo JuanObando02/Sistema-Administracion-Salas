@@ -1,19 +1,22 @@
-﻿using Microsoft.AspNetCore.Authorization;
+﻿using Domain.Enums;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Services;
-using System.Security.Claims;
 using Services.Models.ReservaModels;
+using System.Security.Claims;
 
 namespace MvcSample.Controllers
 {
-    [Authorize(Roles = "Admin, Master, Estudiante, Profesor")]
+    [Authorize(Roles = "Admin, Master, Estudiante, Profesor, Coordinador")]
     public class ReservasController : Controller
     {
         private readonly IReservaService _reservaService;
+        private readonly IEquipoService _equipoService;
 
-        public ReservasController(IReservaService reservaService)
+        public ReservasController(IReservaService reservaService, IEquipoService equipoService)
         {
             _reservaService = reservaService;
+            _equipoService = equipoService;
         }
         public async Task<IActionResult> Index()
         {
@@ -164,11 +167,135 @@ namespace MvcSample.Controllers
         }
 
         [HttpGet]
-        [Authorize(Roles = "Coordinador, Administrador")]
-        public async Task<IActionResult> Gestionar()
+        [Authorize(Roles = "Coordinador, Admin")]
+        public async Task<IActionResult> Gestionar(string? busqueda,TipoReserva? tipo,DateTime? fecha,string ordenarPor = "fecha_desc",int pagina = 1)
         {
-            var todasLasReservas = await _reservaService.GetTodasLasReservas();
-            return View(todasLasReservas);
+            // Creamos el objeto de filtro
+            var filtro = new FiltroReservaModel
+            {
+                Busqueda = busqueda,
+                Tipo = tipo,
+                Fecha = fecha,
+                OrdenarPor = ordenarPor,
+                Pagina = pagina,
+                RegistrosPorPagina = 10 // Puedes cambiar esto
+            };
+
+            var listaPaginada = await _reservaService.GetReservasGestionar(filtro);
+
+            // Pasamos los filtros actuales a la vista para mantener el estado de los inputs
+            ViewData["BusquedaActual"] = busqueda;
+            ViewData["TipoActual"] = tipo;
+            ViewData["FechaActual"] = fecha?.ToString("yyyy-MM-dd");
+            ViewData["OrdenActual"] = ordenarPor;
+
+            return View(listaPaginada);
         }
+
+        [HttpPost]
+        [Authorize(Roles = "Coordinador, Admin")]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> Aprobar(Guid id)
+        {
+            var coordinadorId = User.FindFirstValue(ClaimTypes.NameIdentifier);
+
+            try
+            {
+                await _reservaService.AprobarReserva(id, coordinadorId);
+                TempData["Mensaje"] = "Reserva aprobada exitosamente.";
+            }
+            catch (Exception ex)
+            {
+                TempData["Error"] = ex.Message;
+            }
+
+            return RedirectToAction("Gestionar"); 
+        }
+
+        [HttpPost]
+        [Authorize(Roles = "Coordinador, Admin")]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> Rechazar(Guid id)
+        {
+            var coordinadorId = User.FindFirstValue(ClaimTypes.NameIdentifier);
+
+            try
+            {
+                await _reservaService.RechazarReserva(id, coordinadorId);
+                TempData["Mensaje"] = "Reserva denegada.";
+            }
+            catch (Exception ex)
+            {
+                TempData["Error"] = ex.Message;
+            }
+
+            return RedirectToAction("Gestionar");
+        }
+
+        [HttpGet]
+        [Authorize(Roles = "Coordinador, Administrador")]
+        public async Task<IActionResult> EditarAdmin(Guid id)
+        {
+            var model = await _reservaService.GetReservaParaEditarAdmin(id);
+            if (model == null) return NotFound();
+            return View(model);
+        }
+
+        [HttpPost]
+        [Authorize(Roles = "Coordinador, Administrador")]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> EditarAdmin(EditarReservaAdminModel model)
+        {
+            // (Recuerda recargar dropdowns si falla el ModelState)
+            if (!ModelState.IsValid) return View(model);
+
+            var coordinadorId = User.FindFirstValue(ClaimTypes.NameIdentifier);
+
+            try
+            {
+                await _reservaService.ActualizarReservaAdmin(model, coordinadorId);
+                TempData["Mensaje"] = "Reserva actualizada correctamente.";
+                return RedirectToAction("Gestionar");
+            }
+            catch (Exception ex)
+            {
+                ModelState.AddModelError("", ex.Message);
+                return View(model);
+            }
+        }
+        
+        [HttpPost]
+        [Authorize(Roles = "Coordinador, Administrador")]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> EliminarAdmin(Guid id)
+        {
+            try
+            {
+                await _reservaService.EliminarReservaAdmin(id);
+                TempData["Mensaje"] = "Reserva eliminada.";
+            }
+            catch (Exception ex)
+            {
+                TempData["Error"] = "Error al eliminar: " + ex.Message;
+            }
+            return RedirectToAction("Gestionar");
+        }
+
+        [HttpGet]
+        public async Task<IActionResult> GetEquiposPorSalaJson(Guid salaId)
+        {
+            // Si este método devuelve EquipoIndexModel...
+            var equipos = await _equipoService.GetEquiposPorSala(salaId);
+
+            // ...asegúrate de usar las propiedades correctas aquí:
+            var listaParaDropdown = equipos.Select(e => new
+            {
+                value = e.Id,
+                text = e.Serial // En el modelo se llama 'Serial', en la entidad también.
+            });
+
+            return Json(listaParaDropdown);
+        }
+
     }
 }
