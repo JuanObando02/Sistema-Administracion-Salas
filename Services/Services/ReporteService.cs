@@ -31,6 +31,48 @@ namespace Services
             _mapper = mapper;
         }
 
+        public async Task<CrearReporteModel> GetDatosParaReportar(Guid? salaId = null, Guid? equipoId = null)
+        {
+            var modelo = new CrearReporteModel();
+
+            // 1. Cargar lista de Salas (Siempre necesaria)
+            var salas = await _salaRepository.GetSalas();
+            modelo.SalasDisponibles = salas.Select(s => new SelectListItem
+            {
+                Value = s.Id.ToString(),
+                Text = $"Sala {s.Numero}"
+            });
+
+            // 2. Lógica de Pre-llenado si viene un EQUIPO
+            if (equipoId.HasValue)
+            {
+                var equipo = await _equipoRepository.GetEquipo(equipoId.Value);
+                if (equipo != null)
+                {
+                    modelo.Tipo = TipoReporte.Equipo; //
+                    modelo.SalaId = equipo.SalaId;    // Pre-selecciona la sala del equipo
+                    modelo.EquipoId = equipo.Id;      // Pre-selecciona el equipo
+
+                    // IMPORTANTE: Debemos cargar la lista de equipos de esa sala
+                    // para que el dropdown de equipos no aparezca vacío
+                    var equiposDeLaSala = await _equipoRepository.GetEquiposPorSala(equipo.SalaId);
+                    modelo.EquiposDisponibles = equiposDeLaSala.Select(e => new SelectListItem
+                    {
+                        Value = e.Id.ToString(),
+                        Text = $"{e.Serial} - {e.Estado}"
+                    });
+                }
+            }
+            // 3. Lógica de Pre-llenado si viene solo SALA
+            else if (salaId.HasValue)
+            {
+                modelo.Tipo = TipoReporte.Sala; //
+                modelo.SalaId = salaId.Value;   // Pre-selecciona la sala
+            }
+
+            return modelo;
+        }
+
         public async Task<CrearReporteModel> GetDatosParaReportar()
         {
             // Cargamos solo las salas para empezar

@@ -12,8 +12,7 @@ namespace Services
     {
         Task<CrearReporteModel> GetDatosParaReportar();
         Task CrearReporte(CrearReporteModel model, string usuarioId);
-
-        // Método extra para cargar equipos cuando seleccionen una sala (AJAX)
         Task<IEnumerable<SelectListItem>> GetEquiposPorSalaParaDropdown(Guid salaId);
+        Task<CrearReporteModel> GetDatosParaReportar(Guid? salaId = null, Guid? equipoId = null);
     }
 }

@@ -28,8 +28,10 @@ namespace Services.Automapper
             CreateMap<Reserva, ReservaIndexModel>()
                 .ForMember(dest => dest.ObjetoReservado, opt => opt.MapFrom(src =>
                     src.Tipo == TipoReserva.Sala
-                    ? $"Sala {src.Sala.Numero}" //
-                    : $"Serial {src.Equipo.Serial}")); //
+                    ? $"Sala {src.Sala.Numero}"
+                    : $"Serial {src.Equipo.Serial}"))
+                    .ForMember(dest => dest.SalaId, opt => opt.MapFrom(src => src.SalaId))
+                    .ForMember(dest => dest.EquipoId, opt => opt.MapFrom(src => src.EquipoId));//
         }
 
         private void UsuarioMapper()

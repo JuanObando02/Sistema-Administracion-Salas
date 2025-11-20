@@ -52,6 +52,31 @@
                     {
                         <a asp-action="Cancelar" asp-route-id="@item.Id" class="btn btn-sm btn-danger">Cancelar</a>
                     }
+                    @* --- BOTÓN REPORTAR --- *@
+                    @if (item.Tipo == Domain.Enums.TipoReserva.Equipo) //
+                    {
+                        @* Pasamos el ID del Equipo para que se pre-llene *@
+                        @* Nota: Asumimos que tu ReservaIndexModel tiene acceso al EquipoId o SalaId. 
+                        Si no, debes agregarlo al modelo ReservaIndexModel *@
+
+                        <a asp-controller="Reportes"
+                           asp-action="Registrar"
+                           asp-route-salaId="@item.SalaId"
+                           asp-route-equipoId="@item.EquipoId"
+                           class="btn btn-sm btn-warning">
+                            Reportar Daño
+                        </a>
+                    }
+                    else
+                    {
+                        @* Pasamos solo el ID de la Sala *@
+                        <a asp-controller="Reportes"
+                           asp-action="Registrar"
+                           asp-route-salaId="@item.SalaId"
+                           class="btn btn-sm btn-warning">
+                            Reportar Daño
+                        </a>
+                    }
                 </td>
             </tr>
         }

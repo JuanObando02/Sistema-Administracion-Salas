@@ -15,5 +15,7 @@ namespace Services.Models.ReservaModels
         public DateTime FechaInicio { get; set; }
         public DateTime FechaFin { get; set; }
         public EstadoReserva Estado { get; set; }
+        public Guid? SalaId { get; set; }
+        public Guid? EquipoId { get; set; }
     }
 }
