@@ -1,83 +1,146 @@
 ﻿@page
 @model LoginModel
-
 @{
-    ViewData["Title"] = "Log in";
+    Layout = "~/Views/Shared/_Layout.cshtml";
 }
 
-<h1>@ViewData["Title"]</h1>
-<div class="row">
-    <div class="col-md-4">
-        <section>
-            <form id="account" method="post">
-                <h2>Use a local account to log in.</h2>
-                <hr />
-                <div asp-validation-summary="ModelOnly" class="text-danger" role="alert"></div>
-                <div class="form-floating mb-3">
-                    <input asp-for="Input.Email" class="form-control" autocomplete="username" aria-required="true" placeholder="name@example.com" />
-                    <label asp-for="Input.Email" class="form-label">Email</label>
-                    <span asp-validation-for="Input.Email" class="text-danger"></span>
-                </div>
-                <div class="form-floating mb-3">
-                    <input asp-for="Input.Password" class="form-control" autocomplete="current-password" aria-required="true" placeholder="password" />
-                    <label asp-for="Input.Password" class="form-label">Password</label>
-                    <span asp-validation-for="Input.Password" class="text-danger"></span>
-                </div>
-                <div class="checkbox mb-3">
-                    <label asp-for="Input.RememberMe" class="form-label">
-                        <input class="form-check-input" asp-for="Input.RememberMe" />
-                        @Html.DisplayNameFor(m => m.Input.RememberMe)
-                    </label>
-                </div>
-                <div>
-                    <button id="login-submit" type="submit" class="w-100 btn btn-lg btn-primary">Log in</button>
-                </div>
-                <div>
-                    <p>
-                        <a id="forgot-password" asp-page="./ForgotPassword">Forgot your password?</a>
-                    </p>
-                    <p>
-                        <a asp-page="./Register" asp-route-returnUrl="@Model.ReturnUrl">Register as a new user</a>
-                    </p>
-                    <p>
-                        <a id="resend-confirmation" asp-page="./ResendEmailConfirmation">Resend email confirmation</a>
-                    </p>
-                </div>
-            </form>
-        </section>
-    </div>
-    <div class="col-md-6 col-md-offset-2">
-        <section>
-            <h3>Use another service to log in.</h3>
-            <hr />
-            @{
-                if ((Model.ExternalLogins?.Count ?? 0) == 0)
-                {
-                    <div>
-                        <p>
-                            There are no external authentication services configured. See this <a href="https://go.microsoft.com/fwlink/?LinkID=532715">article
-                            about setting up this ASP.NET application to support logging in via external services</a>.
-                        </p>
+<link rel="stylesheet" href="~/css/login.css" />
+
+<div class="_1536-w-default">
+    <div class="container">
+        <div class="container2">
+            <div class="background">
+                <div class="container3">
+                    <div class="container4">
+                        <div class="container5">
+                            <img class="background2" src="~/img/Background.png" />
+                        </div>
+                        <div class="container6">
+                            <div class="heading-1">
+                                <div class="salas-sys">SalasSys</div>
+                            </div>
+                            <div class="container7">
+                                <div class="ingresa-a-tu-cuenta-para-continuar">
+                                    Ingresa a tu cuenta para continuar
+                                </div>
+                            </div>
+                        </div>
                     </div>
-                }
-                else
-                {
-                    <form id="external-account" asp-page="./ExternalLogin" asp-route-returnUrl="@Model.ReturnUrl" method="post" class="form-horizontal">
-                        <div>
-                            <p>
-                                @foreach (var provider in Model.ExternalLogins!)
-                                {
-                                    <button type="submit" class="btn btn-primary" name="provider" value="@provider.Name" title="Log in using your @provider.DisplayName account">@provider.DisplayName</button>
-                                }
-                            </p>
+
+                    <!-- FORMULARIO ASP.NET CORE -->
+                    <form method="post" id="account" style="width: 100%;">
+                        <div asp-validation-summary="ModelOnly" class="text-danger" role="alert"></div>
+
+                        <div class="background-border-shadow">
+                            <div class="container8">
+                                <div class="heading-4-margin">
+                                    <div class="heading-4">
+                                        <div class="iniciar-sesi-n">Iniciar Sesión</div>
+                                    </div>
+                                </div>
+                                <div class="container7">
+                                    <div class="ingresa-tus-credenciales-para-acceder-al-sistema">
+                                        Ingresa tus credenciales para acceder al sistema
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="container9">
+                                <div class="form">
+
+                                    <!-- EMAIL -->
+                                    <div class="container10">
+                                        <div class="label">
+                                            <div class="email">Email</div>
+                                        </div>
+
+                                        <div class="container11">
+                                            <div class="input">
+                                                <div class="container12">
+                                                    <input asp-for="Input.Email"
+                                                           placeholder="tu@email.com"
+                                                           autocomplete="username"
+                                                           aria-required="true"
+                                                           class="tu-email-com"
+                                                           style="background: transparent; border: none; width: 100%; outline: none;" />
+                                                </div>
+
+                                                <div class="container13"></div>
+                                            </div>
+
+                                            <img class="svg" src="~/img/SVG.png" />
+                                        </div>
+
+                                        <span asp-validation-for="Input.Email" class="text-danger"></span>
+                                    </div>
+
+                                    <!-- PASSWORD -->
+                                    <div class="container10">
+                                        <div class="label">
+                                            <div class="contrase-a">Contraseña</div>
+                                        </div>
+
+                                        <div class="container11">
+                                            <div class="input">
+                                                <div class="container14">
+                                                    <input asp-for="Input.Password"
+                                                           type="password"
+                                                           placeholder="Tu contraseña"
+                                                           autocomplete="current-password"
+                                                           aria-required="true"
+                                                           class="tu-contrase-a"
+                                                           style="background: transparent; border: none; width: 100%; outline: none;" />
+                                                </div>
+                                                <div class="container15"></div>
+                                            </div>
+
+                                            <img class="svg2" src="~/img/secret.png" />
+
+                                            <div class="button">
+                                                <img class="svg3" src="~/img/eye.png" />
+                                            </div>
+                                        </div>
+
+                                        <span asp-validation-for="Input.Password" class="text-danger"></span>
+                                    </div>
+
+                                    <!-- BOTÓN LOGIN -->
+                                    <div class="button2">
+                                        <button type="submit" style="background:none; border:none; width:100%;">
+                                            <div class="iniciar-sesi-n2">Iniciar Sesión</div>
+                                        </button>
+                                    </div>
+
+                                </div>
+
+                                <!-- OLVIDÓ CONTRASEÑA -->
+                                <div class="container7">
+                                    <div class="button3">
+                                        <a asp-page="./ForgotPassword" class="olvidaste-tu-contrase-a">
+                                            ¿Olvidaste tu contraseña?
+                                        </a>
+                                    </div>
+                                </div>
+
+                            </div>
                         </div>
                     </form>
-                }
-            }
-        </section>
+
+                    <div class="container7">
+                        <div class="sistema-de-administraci-n-de-salas">
+                            Sistema de Administración de Salas
+                        </div>
+                    </div>
+
+                </div>
+            </div>
+        </div>
     </div>
+
+    <img class="image-1" src="~/img/login/image-10.png" />
 </div>
 
 @section Scripts {
     <partial name="_ValidationScriptsPartial" />
 }
+
