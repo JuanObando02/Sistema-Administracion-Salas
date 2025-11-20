@@ -3,6 +3,7 @@ using Domain;
 using Domain.Enums;
 using Infrastructure.Repositories;
 using Microsoft.AspNetCore.Mvc.Rendering;
+using Microsoft.EntityFrameworkCore;
 using Services.Models.ReservaModels;
 using System;
 using System.Collections.Generic;
@@ -30,27 +31,49 @@ namespace Services
             _equipoRepository = equipoRepository;
             _mapper = mapper;
         }
+        private async Task LimpiarReservasVencidas(IEnumerable<Reserva> reservas)
+        {
+            var ahora = DateTime.Now;
+            bool huboCambios = false;
+            foreach (var reserva in reservas)
+            {
+                if (reserva.FechaFin < ahora && (reserva.Estado == EstadoReserva.Aprobada || reserva.Estado == EstadoReserva.EnUso))
+                {
+                    reserva.Estado = EstadoReserva.Finalizada;
+                    // Liberar sala completa si aplica
+                    if (reserva.Tipo == TipoReserva.Sala && reserva.Sala != null)
+                    {
+                        // Solo si estaba ocupada
+                        if (reserva.Sala.Estado == EstadoSala.Ocupada)
+                        {
+                            reserva.Sala.Estado = EstadoSala.Disponible;
+                            await _salaRepository.Update(reserva.Sala);
+                        }
+                    }
+                    // Intentar guardar. Usamos try-catch para manejar la concurrencia con dos posibles usuarios 
+                    try
+                    {
+                        await _reservaRepository.Update(reserva);
+                    }
+                    catch (DbUpdateConcurrencyException)
+                    {
+                        // Si entra aquí, significa que OTRO proceso (el usuario u otro admin)
+                        // ya actualizó esta fila milisegundos antes.
+                        // No hacemos nada, porque el objetivo (que esté finalizada) ya se cumplió.
+                        Console.WriteLine($"Aviso: La reserva {reserva.Id} ya fue actualizada por otro proceso.");
+                    }
+                }
+            }
+
+        }
 
         public async Task<IList<ReservaIndexModel>> GetMisReservas(string usuarioId)
         {
             var reservas = await _reservaRepository.GetReservasPorUsuario(usuarioId);
-            var listaModelos = _mapper.Map<IList<ReservaIndexModel>>(reservas);
 
-            foreach (var modelo in listaModelos)
-            {
-                // Si la fecha de fin ya pasó Y el estado seguía en "Aprobada" o "EnUso"
-                if (modelo.FechaFin < DateTime.Now &&
-                   (modelo.Estado == EstadoReserva.Aprobada || modelo.Estado == EstadoReserva.EnUso))
-                {
-                    modelo.Estado = EstadoReserva.Finalizada;
-
-                    // (Opcional: Si quisieras guardar este cambio en la BD permanentemente,
-                    //  podrías llamar al repositorio aquí, pero para visualización esto basta).
-                }
-            }
-            // -----------------------------------------------------
-
-            return listaModelos;
+            // Limpiamos antes de mostrar
+            await LimpiarReservasVencidas(reservas);
+            return _mapper.Map<IList<ReservaIndexModel>>(reservas);
         } 
         public async Task<ReservarEquipoModel> GetDatosParaReservarEquipo()
         {
@@ -311,6 +334,60 @@ namespace Services
 
             await _reservaRepository.Save(reserva);
         }
+        public async Task FinalizarReserva(Guid reservaId, string usuarioId)
+        {
+            // 1. Obtener la reserva
+            var reserva = await _reservaRepository.GetReservaCompleta(reservaId); //
+            if (reserva == null) throw new Exception("Reserva no encontrada.");
 
+            // 2. Validar dueño
+            if (reserva.UsuarioId != usuarioId)
+            {
+                throw new UnauthorizedAccessException("No tiene permiso para finalizar esta reserva.");
+            }
+
+            // 3. Validar que esté en curso (para no finalizar algo futuro o ya pasado)
+            var ahora = DateTime.Now;
+            bool enCurso = (reserva.Estado == EstadoReserva.Aprobada || reserva.Estado == EstadoReserva.EnUso)
+                           && ahora >= reserva.FechaInicio
+                           && ahora < reserva.FechaFin;
+
+            if (!enCurso)
+            {
+                throw new InvalidOperationException("Solo se pueden finalizar reservas que están en curso actualmente.");
+            }
+
+            // 4. --- LA LÓGICA MAESTRA ---
+            // Cortamos la reserva para que termine AHORA MISMO
+            reserva.FechaFin = DateTime.Now;
+            reserva.Estado = EstadoReserva.Finalizada; // La marcamos como finalizada para el historial
+
+            // 5. Actualizar estados colaterales
+            if (reserva.Tipo == TipoReserva.Equipo && reserva.SalaId.HasValue)
+            {
+                // Si liberamos un equipo, revisamos si la sala deja de estar "llena"
+                await _reservaRepository.Save(reserva); // Guardamos primero el cambio de fecha
+                await ActualizarEstadoSalaIndividual(reserva.SalaId.Value); // Recalculamos la sala
+            }
+            else if (reserva.Tipo == TipoReserva.Sala && reserva.Sala != null)
+            {
+                // Si era una sala completa, la liberamos físicamente
+                reserva.Sala.Estado = EstadoSala.Disponible;
+                await _salaRepository.Update(reserva.Sala);
+                await _reservaRepository.Save(reserva);
+            }
+            else
+            {
+                // Guardado normal
+                await _reservaRepository.Update(reserva);
+            }
+        }
+        public async Task<IList<ReservaIndexModel>> GetTodasLasReservas()
+        {
+            var todas = await _reservaRepository.GetTodasLasReservas();
+
+            await LimpiarReservasVencidas(todas);
+            return _mapper.Map<IList<ReservaIndexModel>>(todas);
+        }
     }
 }

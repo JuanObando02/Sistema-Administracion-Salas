@@ -87,6 +87,14 @@
                     {
                         <div class="btn-group" role="group">
 
+                            @* BOTÓN FINALIZAR (Nuevo) *@
+                            <form asp-action="Finalizar" asp-route-id="@item.Id" method="post"
+                                  onsubmit="return confirm('¿Ya terminaste? Al finalizar, el equipo quedará libre para otros usuarios.');">
+                                <button type="submit" class="btn btn-sm btn-success" title="Liberar equipo ahora">
+                                    <i class="bi bi-check-circle-fill"></i> Finalizar
+                                </button>
+                            </form>
+
                             @* 1. SOLICITAR AYUDA (Asesoría) *@
                             <a asp-controller="Asesorias"
                                asp-action="Solicitar"

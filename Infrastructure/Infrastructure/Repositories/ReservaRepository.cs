@@ -104,5 +104,29 @@ namespace Infrastructure.Repositories
                  r.Estado == Domain.Enums.EstadoReserva.EnUso) // Que sea válida
             );
         }
+        public async Task Update(Reserva reserva)
+        {
+            try
+            {
+                await Beguin();
+                // No usamos AddAsync, usamos Update para modificar lo que ya existe
+                context.Reservas.Update(reserva);
+                await Save();
+                await Comit();
+            }
+            catch (Exception ex)
+            {
+                await RollBack();
+                throw; // 'throw;' es mejor que 'throw ex;' porque mantiene el rastro del error original
+            }
+        }
+        public async Task<IList<Reserva>> GetTodasLasReservas()
+        {
+            return await context.Reservas
+                .Include(r => r.Sala)   // Cargar datos de la sala
+                .Include(r => r.Equipo) // Cargar datos del equipo
+                .OrderByDescending(r => r.FechaInicio) // Ordenar por fecha (lo más nuevo primero)
+                .ToListAsync();
+        }
     }
 }
