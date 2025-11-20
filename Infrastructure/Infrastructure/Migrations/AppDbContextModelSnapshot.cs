@@ -132,7 +132,7 @@ namespace Infrastructure.Migrations
 
                     b.HasIndex("UsuarioId");
 
-                    b.ToTable("Asesorias");
+                    b.ToTable("Asesorias", (string)null);
                 });
 
             modelBuilder.Entity("Domain.Cow", b =>
@@ -152,7 +152,7 @@ namespace Infrastructure.Migrations
 
                     b.HasIndex("FarmId");
 
-                    b.ToTable("Cows");
+                    b.ToTable("Cows", (string)null);
                 });
 
             modelBuilder.Entity("Domain.Equipo", b =>
@@ -178,7 +178,7 @@ namespace Infrastructure.Migrations
                     b.HasIndex("Serial")
                         .IsUnique();
 
-                    b.ToTable("Equipos");
+                    b.ToTable("Equipos", (string)null);
                 });
 
             modelBuilder.Entity("Domain.Farm", b =>
@@ -197,7 +197,7 @@ namespace Infrastructure.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("Farms");
+                    b.ToTable("Farms", (string)null);
                 });
 
             modelBuilder.Entity("Domain.Milk", b =>
@@ -222,7 +222,7 @@ namespace Infrastructure.Migrations
 
                     b.HasIndex("CowId");
 
-                    b.ToTable("Milks");
+                    b.ToTable("Milks", (string)null);
                 });
 
             modelBuilder.Entity("Domain.Reporte", b =>
@@ -263,7 +263,7 @@ namespace Infrastructure.Migrations
 
                     b.HasIndex("UsuarioId");
 
-                    b.ToTable("Reportes");
+                    b.ToTable("Reportes", (string)null);
                 });
 
             modelBuilder.Entity("Domain.Reserva", b =>
@@ -307,7 +307,7 @@ namespace Infrastructure.Migrations
 
                     b.HasIndex("UsuarioId");
 
-                    b.ToTable("Reservas");
+                    b.ToTable("Reservas", (string)null);
                 });
 
             modelBuilder.Entity("Domain.Sala", b =>
@@ -330,10 +330,7 @@ namespace Infrastructure.Migrations
 
                     b.HasKey("Id");
 
-                    b.HasIndex("Numero")
-                        .IsUnique();
-
-                    b.ToTable("Salas");
+                    b.ToTable("Salas", (string)null);
                 });
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityRole", b =>
