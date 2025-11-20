@@ -25,10 +25,10 @@ namespace Services
             _mapper = mapper;
         }
 
-        public async Task<RegistrarAsesoriaModel> GetDatosParaRegistrar()
+        public async Task<RegistrarAsesoriaModel> GetDatosParaRegistrar(Guid? salaId = null)
         {
             var salas = await _salaRepository.GetSalas();
-            return new RegistrarAsesoriaModel
+            var model = new RegistrarAsesoriaModel
             {
                 SalasDisponibles = salas.Select(s => new SelectListItem
                 {
@@ -36,6 +36,11 @@ namespace Services
                     Text = $"Sala {s.Numero}"
                 })
             };
+            if (salaId.HasValue)
+            {
+                model.SalaId = salaId.Value;
+            }
+            return model;
         }
 
         public async Task CrearAsesoria(RegistrarAsesoriaModel model, string usuarioId)

@@ -34,8 +34,24 @@ namespace Services
         public async Task<IList<ReservaIndexModel>> GetMisReservas(string usuarioId)
         {
             var reservas = await _reservaRepository.GetReservasPorUsuario(usuarioId);
-            return _mapper.Map<IList<ReservaIndexModel>>(reservas);
-        }
+            var listaModelos = _mapper.Map<IList<ReservaIndexModel>>(reservas);
+
+            foreach (var modelo in listaModelos)
+            {
+                // Si la fecha de fin ya pasó Y el estado seguía en "Aprobada" o "EnUso"
+                if (modelo.FechaFin < DateTime.Now &&
+                   (modelo.Estado == EstadoReserva.Aprobada || modelo.Estado == EstadoReserva.EnUso))
+                {
+                    modelo.Estado = EstadoReserva.Finalizada;
+
+                    // (Opcional: Si quisieras guardar este cambio en la BD permanentemente,
+                    //  podrías llamar al repositorio aquí, pero para visualización esto basta).
+                }
+            }
+            // -----------------------------------------------------
+
+            return listaModelos;
+        } 
         public async Task<ReservarEquipoModel> GetDatosParaReservarEquipo()
         {
             var salas = await _salaRepository.GetSalasIndividuales();
