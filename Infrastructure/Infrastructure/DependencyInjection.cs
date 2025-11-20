@@ -28,6 +28,8 @@ namespace Infrastructure
             Console.WriteLine("Repositorio de Equipo configurado.");
             services.AddScoped<IReservaRepository, ReservaRepository>();
             Console.WriteLine("Repositorio de Reserva configurado.");
+            services.AddScoped<IReporteRepository, ReporteRepository>();
+            Console.WriteLine("Repositorio de Reporte configurado.");
 
 
             services.AddDbContext<AppDbContext>(options =>

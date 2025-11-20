@@ -14,5 +14,6 @@ namespace Services.Models.SalaModels
         public int Numero { get; set; } // Lo usaremos para "Sala [Numero]"
         public int Capacidad { get; set; }
         public EstadoSala Estado { get; set; }
+        public TipoSala Tipo { get; set; }
     }
 }

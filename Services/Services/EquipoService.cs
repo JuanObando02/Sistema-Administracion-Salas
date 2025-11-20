@@ -16,18 +16,43 @@ namespace Services
         private readonly IEquipoRepository _equipoRepository;
         private readonly ISalaRepository _salaRepository; // Para el dropdown
         private readonly IMapper _mapper;
-
-        public async Task<IList<EquipoIndexModel>> GetEquiposPorSala(Guid salaId)
-        {
-            var lista = await _equipoRepository.GetEquiposPorSala(salaId);
-            return _mapper.Map<IList<EquipoIndexModel>>(lista);
-        }
-        
-        public EquipoService(IEquipoRepository equipoRepository, ISalaRepository salaRepository, IMapper mapper)
+        private readonly IReservaRepository _reservaRepository;
+        public EquipoService(IEquipoRepository equipoRepository, ISalaRepository salaRepository, IMapper mapper, IReservaRepository reservaRepository)
         {
             _equipoRepository = equipoRepository;
             _salaRepository = salaRepository;
+            _reservaRepository = reservaRepository;
             _mapper = mapper;
+        }
+        public async Task<IList<EquipoIndexModel>> GetEquiposPorSala(Guid salaId)
+        {
+            // Traer los equipos de la BD
+            var equiposEntidad = await _equipoRepository.GetEquiposPorSala(salaId);
+
+            // Traer las reservas que están ocurriendo YA MISMO
+            var reservasActivas = await _reservaRepository.GetReservasActivasEnHorario(DateTime.Now); //
+
+            // Crear un HashSet de los IDs ocupados para búsqueda rápida
+            var idsEquiposOcupados = reservasActivas
+                .Where(r => r.EquipoId.HasValue)
+                .Select(r => r.EquipoId.Value)
+                .ToHashSet();
+
+            // Mapear a la lista de modelos
+            var listaModelos = _mapper.Map<IList<EquipoIndexModel>>(equiposEntidad);
+
+            // Sobreescribir el estado visualmente
+            foreach (var modelo in listaModelos)
+            {
+                // Si el equipo está físicamente bien (Disponible) PERO tiene reserva activa...
+                if (modelo.Estado == EstadoEquipoModel.Disponible && idsEquiposOcupados.Contains(modelo.Id))
+                {
+                    // se muestra como ASIGNADO en la vista.
+                    modelo.Estado = EstadoEquipoModel.Asignado;
+                }
+            }
+
+            return listaModelos;
         }
         public async Task<Guid> RegistrarEquipo(RegistrarEquipoModel model)
         {
@@ -52,7 +77,6 @@ namespace Services
 
             return sala.Id;
         }
-
         public async Task<RegistrarEquipoModel> GetDatosParaRegistrar(Guid? salaId)
         {
             var modelo = new RegistrarEquipoModel();
@@ -77,8 +101,25 @@ namespace Services
 
         public async Task<IList<EquipoIndexModel>> GetEquipos()
         {
-            var lista = await _equipoRepository.GetEquipos();
-            return _mapper.Map<IList<EquipoIndexModel>>(lista);
+            var equiposEntidad = await _equipoRepository.GetEquipos();
+            var reservasActivas = await _reservaRepository.GetReservasActivasEnHorario(DateTime.Now);
+
+            var idsEquiposOcupados = reservasActivas
+                .Where(r => r.EquipoId.HasValue)
+                .Select(r => r.EquipoId.Value)
+                .ToHashSet();
+
+            var listaModelos = _mapper.Map<IList<EquipoIndexModel>>(equiposEntidad);
+
+            foreach (var modelo in listaModelos)
+            {
+                if (modelo.Estado == EstadoEquipoModel.Disponible && idsEquiposOcupados.Contains(modelo.Id))
+                {
+                    modelo.Estado = EstadoEquipoModel.Asignado;
+                }
+            }
+
+            return listaModelos;
         }
 
         public async Task<EditarEquipoModel> GetEquipoParaEditar(Guid id)
@@ -131,7 +172,6 @@ namespace Services
 
             return equipoExistente.SalaId;
         }
-
         public async Task DeleteEquipo(Guid id)
         {
             // 1. Obtener el equipo

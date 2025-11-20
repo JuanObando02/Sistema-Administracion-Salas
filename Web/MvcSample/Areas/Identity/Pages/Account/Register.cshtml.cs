@@ -71,6 +71,18 @@ namespace MvcSample.Areas.Identity.Pages.Account
         /// </summary>
         public class InputModel
         {
+            [Required]
+            [Display(Name = "Nombre")]
+            public string Name { get; set; }
+
+            [Required]
+            [Display(Name = "Apellido")]
+            public string LastName { get; set; }
+
+            [Required]
+            [Display(Name = "Documento")]
+            public string DocumentNumber { get; set; }
+
             /// <summary>
             ///     This API supports the ASP.NET Core Identity default UI infrastructure and is not intended to be used
             ///     directly from your code. This API may change or be removed in future releases.
@@ -114,6 +126,9 @@ namespace MvcSample.Areas.Identity.Pages.Account
             if (ModelState.IsValid)
             {
                 var user = CreateUser();
+                user.Name = Input.Name;
+                user.LastName = Input.LastName;
+                user.DocumentNumber = Input.DocumentNumber;
 
                 await _userStore.SetUserNameAsync(user, Input.Email, CancellationToken.None);
                 await _emailStore.SetEmailAsync(user, Input.Email, CancellationToken.None);
@@ -121,6 +136,7 @@ namespace MvcSample.Areas.Identity.Pages.Account
 
                 if (result.Succeeded)
                 {
+                    await _userManager.AddToRoleAsync(user, "Estudiante");
                     _logger.LogInformation("User created a new account with password.");
 
                     var userId = await _userManager.GetUserIdAsync(user);

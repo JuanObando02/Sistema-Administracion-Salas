@@ -13,6 +13,7 @@ namespace Services
             services.AddTransient<IRoleService, RoleService>();
             services.AddTransient<IUsuarioService, UsuarioService>();
             services.AddTransient<IReservaService, ReservaService>();
+            services.AddTransient<IReporteService, ReporteService>();
 
 
             return services;

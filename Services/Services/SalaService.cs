@@ -14,46 +14,14 @@ namespace Services
     public class SalaService : ISalaService
     {
         private readonly ISalaRepository _salaRepository;
+        private readonly IReservaRepository _reservaRepository;
         private readonly IMapper _mapper;
 
-        public SalaService(ISalaRepository salaRepository, IMapper mapper)
+        public SalaService(ISalaRepository salaRepository, IMapper mapper, IReservaRepository reservaRepository)
         {
             _salaRepository = salaRepository;
+            _reservaRepository = reservaRepository;
             _mapper = mapper;
-        }
-        public async Task<IList<EstadoSalaViewModel>> GetEstadoActualSalas()
-        {
-            // 1. Obtenemos todas las salas
-            var salas = await _salaRepository.GetSalas(); //
-
-            var listaEstados = new List<EstadoSalaViewModel>();
-
-            foreach (var sala in salas)
-            {
-                // 2. Para cada sala, necesitamos saber cuántos equipos libres tiene realmente
-                //    (Esto requiere cargar los equipos, así que usaremos GetSalaConEquipos)
-                var salaCompleta = await _salaRepository.GetSalaConEquipos(sala.Id);
-
-                int equiposLibres = 0;
-
-                if (salaCompleta.Equipos != null)
-                {
-                    // Cuenta equipos que estén "Disponibles"
-                    equiposLibres = salaCompleta.Equipos.Count(e => e.Estado == EstadoEquipo.Disponible);
-                }
-
-                listaEstados.Add(new EstadoSalaViewModel
-                {
-                    Id = sala.Id,
-                    NombreSala = $"Sala {sala.Numero}",
-                    Capacidad = sala.Capacidad,
-                    EquiposDisponibles = equiposLibres,
-                    Estado = sala.Estado, // El estado general (Disponible/Ocupada)
-                    Tipo = sala.Tipo
-                });
-            }
-
-            return listaEstados;
         }
         public async Task RegistrarSala(RegistrarSalaModel model)
         {
@@ -72,7 +40,6 @@ namespace Services
             // Mapea la Entidad (Sala) al Modelo (EditarSalaModel)
             return _mapper.Map<EditarSalaModel>(sala);
         }
-
         public async Task UpdateSala(EditarSalaModel model)
         {
             var salaConEseNumero = await _salaRepository.GetSalaPorNumero(model.Numero);
@@ -124,5 +91,81 @@ namespace Services
             // 2. Mapea la lista de Entidades (Sala) a Modelos (SalaIndexModel)
             return _mapper.Map<IList<SalaIndexModel>>(salasList);
         }
+        public async Task<IList<EstadoSalaViewModel>> GetEstadoActualSalas()
+        {
+            var salas = await _salaRepository.GetSalas();
+            var listaEstados = new List<EstadoSalaViewModel>();
+
+            // 2. OBTENER LA "FOTO" DEL MOMENTO
+            // Traemos todas las reservas que están ocurriendo YA MISMO (DateTime.Now)
+            // (Asegúrate de tener este método en tu IReservaRepository como vimos antes)
+            var reservasActivasAhora = await _reservaRepository.GetReservasActivasEnHorario(DateTime.Now);
+
+            // Creamos un HashSet de los IDs de equipos ocupados para que la búsqueda sea ultra rápida
+            var idsEquiposOcupados = reservasActivasAhora
+                .Where(r => r.EquipoId.HasValue)
+                .Select(r => r.EquipoId.Value)
+                .ToHashSet();
+
+            // Creamos un HashSet de los IDs de salas ocupadas (por profesores)
+            var idsSalasOcupadas = reservasActivasAhora
+                .Where(r => r.SalaId.HasValue && r.Tipo == TipoReserva.Sala)
+                .Select(r => r.SalaId.Value)
+                .ToHashSet();
+
+            foreach (var sala in salas)
+            {
+                // Cargamos la sala con sus equipos
+                var salaCompleta = await _salaRepository.GetSalaConEquipos(sala.Id);
+
+                int equiposLibres = 0;
+                var estadoCalculado = sala.Estado; // Empezamos con el estado físico base
+
+                // --- LÓGICA PARA SALA INDIVIDUAL (Estudiantes) ---
+                if (sala.Tipo == TipoSala.Individual)
+                {
+                    if (salaCompleta.Equipos != null)
+                    {
+                        // 3. EL CÁLCULO REAL
+                        // Un equipo cuenta como libre SI:
+                        // a) Físicamente está 'Disponible'
+                        // b) Y NO está en la lista de ocupados ahora mismo
+                        equiposLibres = salaCompleta.Equipos.Count(e =>
+                            e.Estado == EstadoEquipo.Disponible &&
+                            !idsEquiposOcupados.Contains(e.Id));
+                    }
+
+                    // Si la sala físicamente está bien, pero se llenó de gente, la mostramos Ocupada
+                    if (sala.Estado == EstadoSala.Disponible)
+                    {
+                        estadoCalculado = equiposLibres == 0 ? EstadoSala.Ocupada : EstadoSala.Disponible;
+                    }
+                }
+                // --- LÓGICA PARA SALA DE CLASE (Profesores) ---
+                else
+                {
+                    // Si la sala está físicamente bien, revisamos si hay un profesor dando clase ahora
+                    if (sala.Estado == EstadoSala.Disponible)
+                    {
+                        bool hayClaseAhora = idsSalasOcupadas.Contains(sala.Id);
+                        estadoCalculado = hayClaseAhora ? EstadoSala.Ocupada : EstadoSala.Disponible;
+                    }
+                }
+
+                // 4. Construimos el modelo para la vista
+                listaEstados.Add(new EstadoSalaViewModel
+                {
+                    Id = sala.Id,
+                    NombreSala = $"Sala {sala.Numero}",
+                    Capacidad = sala.Capacidad,
+                    EquiposDisponibles = equiposLibres, // Este número ahora es REAL (Físico - Ocupados)
+                    Estado = estadoCalculado,
+                    Tipo = sala.Tipo
+                });
+            }
+
+            return listaEstados;
+        }
     }
+
 }

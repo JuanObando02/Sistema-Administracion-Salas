@@ -9,6 +9,7 @@ namespace Infrastructure.Repositories
 {
     public interface IReservaRepository
     {
+        Task<IList<Reserva>> GetReservasActivasEnHorario(DateTime fechaHora);
         Task<IList<Reserva>> GetReservasPorUsuario(string usuarioId);
         Task<int> ContarReservasDelDia(string usuarioId, DateTime fecha);
         Task<IList<Reserva>> GetReservasDeSalaPorFecha(Guid salaId, DateTime fecha);

@@ -61,27 +61,36 @@
                 </div>
 
                 @* Pie de página con acciones *@
-                <div class="card-footer bg-transparent border-0">
+                <div class="card-footer bg-transparent border-0 text-center">
                     <div class="d-grid gap-2">
-                        @if (User.Identity.IsAuthenticated)
+                        @* --- CASO 1: ADMINISTRADORES (Gestión) --- *@
+                        @if (User.IsInRole("Admin") || User.IsInRole("Coordinador"))
                         {
-                            @if (sala.Tipo == TipoSala.Individual)
+                            if (sala.Tipo == TipoSala.Individual)
                             {
-                                <a asp-controller="Equipos" asp-action="Index" asp-route-salaId="@sala.Id" class="btn btn-outline-primary btn-sm">
-                                    Ver Equipos
-                                </a>
-                            }
-                            
-                            @if (User.IsInRole("Profesor") && sala.Tipo == TipoSala.Clase_Completa && sala.Estado == EstadoSala.Disponible)
-                            {
-                                <a asp-controller="Reservas" asp-action="ReservarSala" class="btn btn-success btn-sm">
-                                    Reservar Sala
+                                <a asp-controller="Equipos"
+                                    asp-action="Index"
+                                    asp-route-salaId="@sala.Id"
+                                    class="btn btn-outline-primary btn-sm">
+                                    Gestionar Equipos
                                 </a>
                             }
                         }
-                        else
+                        @* --- CASO 2: ESTUDIANTES Y PROFESORES (Reserva) --- *@
+                        @if (User.IsInRole("Estudiante") || User.IsInRole("Profesor"))
                         {
-                            <a asp-area="Identity" asp-page="/Account/Login" class="btn btn-outline-secondary btn-sm">Inicie sesión para reservar</a>
+                            bool mostrarBoton = (sala.Tipo == TipoSala.Individual && sala.Estado == EstadoSala.Disponible) ||
+                            (User.IsInRole("Profesor") && sala.Tipo == TipoSala.Clase_Completa && sala.Estado == EstadoSala.Disponible);
+
+                            if (mostrarBoton)
+                            {
+                                @* Los llevamos a "Mis Reservas" como pediste *@
+                                <a asp-controller="Reservas"
+                                    asp-action="Index"
+                                    class="btn btn-success btn-sm">
+                                    Ir a Reservar
+                                </a>
+                            }
                         }
                     </div>
                 </div>

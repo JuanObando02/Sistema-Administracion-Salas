@@ -1,5 +1,6 @@
 ﻿@* Recibe una LISTA del modelo que creamos *@
 @model IEnumerable<Services.Models.SalaModels.SalaIndexModel>
+@using Domain.Enums
 
 @{
     ViewData["Title"] = "Gestión de Salas";
@@ -17,6 +18,7 @@
         <tr>
             <th>Nombre Sala</th>
             <th>Capacidad</th>
+            <th>Tipo</th>
             <th>Estado</th>
             <th>Opciones</th>
         </tr>
@@ -27,7 +29,27 @@
             <tr>
                 <td>Sala @item.Numero</td>
                 <td>@item.Capacidad</td>
-                <td>@item.Estado</td>
+                <td>
+                    @if (item.Tipo == TipoSala.Individual)
+                    {
+                        <span class="badge bg-info text-dark">Individual</span>
+                    }
+                    else
+                    {
+                        <span class="badge bg-primary">Clase Completa</span>
+                    }
+                </td>
+                <td>
+                    @* Puedes darle color al estado también si quieres *@
+                    @if (item.Estado == EstadoSala.Disponible)
+                    {
+                        <span class="badge bg-success">Disponible</span>
+                    }
+                    else
+                    {
+                        <span class="badge bg-danger">@item.Estado</span>
+                    }
+                </td>
                 <td>
                     <a asp-action="Editar" asp-route-id="@item.Id" class="btn btn-sm btn-warning">Editar</a> |
                     <a asp-action="Eliminar" asp-route-id="@item.Id" class="btn btn-sm btn-danger">Eliminar</a> |
