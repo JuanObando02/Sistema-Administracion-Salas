@@ -48,10 +48,31 @@ button.accept-policy {
   line-height: inherit;
 }
 
-.footer {
-    position: static;
-    width: 100%;
-    white-space: nowrap;
-    line-height: 60px;
-    background-color: #f8f9fa;
+.navbar {
+    width: 250px; /* Ancho fijo del sidebar */
+}
+
+body {
+    display: flex;
+    flex-direction: row;
+}
+
+.flex-grow-1 {
+    flex: 1;
+}
+
+/* login.css o site.css */
+body.no-sidebar .navbar {
+    display: none; /* Oculta el sidebar lateral */
+}
+
+body.no-sidebar .flex-grow-1 {
+    margin-left: 0 !important; /* Quita margen del contenido */
+}
+
+/* Opcional: agrega los botones de login/register arriba */
+body.no-sidebar main::before {
+    content: "";
+    display: block;
+    height: 70px; /* espacio superior para los botones si quieres */
 }
