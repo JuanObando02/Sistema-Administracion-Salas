@@ -1,57 +1,14 @@
-﻿/* Please see documentation at https://learn.microsoft.com/aspnet/core/client-side/bundling-and-minification
-for details on configuring this project to bundle and minify static web assets. */
-html, body {
-    height: 100%;
-}
-
-body {
-    display: flex;
-    flex-direction: column;
-    min-height: 100vh;
-}
-
-a.navbar-brand {
-  white-space: normal;
-  text-align: center;
-  word-break: break-all;
-}
-
-a {
-  color: #0077cc;
-}
-
-.btn-primary {
-  color: #fff;
-  background-color: #1b6ec2;
-  border-color: #1861ac;
-}
-
-.nav-pills .nav-link.active, .nav-pills .show > .nav-link {
-  color: #fff;
-  background-color: #1b6ec2;
-  border-color: #1861ac;
-}
-
-.border-top {
-  border-top: 1px solid #e5e5e5;
-}
-.border-bottom {
-  border-bottom: 1px solid #e5e5e5;
-}
-
-.box-shadow {
-  box-shadow: 0 .25rem .75rem rgba(0, 0, 0, .05);
-}
-
-button.accept-policy {
-  font-size: 1rem;
-  line-height: inherit;
-}
-
+﻿/* Sidebar */
 .navbar {
-    width: 250px; /* Ancho fijo del sidebar */
+    width: 250px;
 }
 
+/* Logo al lado del nombre */
+.navbar-brand img {
+    margin-right: 8px;
+}
+
+/* Flex principal */
 body {
     display: flex;
     flex-direction: row;
@@ -61,18 +18,95 @@ body {
     flex: 1;
 }
 
-/* login.css o site.css */
+/* Ocultar sidebar en login/register */
 body.no-sidebar .navbar {
-    display: none; /* Oculta el sidebar lateral */
+    display: none;
 }
 
 body.no-sidebar .flex-grow-1 {
-    margin-left: 0 !important; /* Quita margen del contenido */
+    margin-left: 0 !important;
 }
 
-/* Opcional: agrega los botones de login/register arriba */
+/* Botones login/register arriba */
 body.no-sidebar main::before {
     content: "";
     display: block;
-    height: 70px; /* espacio superior para los botones si quieres */
+    height: 70px;
 }
+
+/* Botón logout */
+.button,
+.button * {
+    box-sizing: border-box;
+}
+
+.button {
+    background: #ffffff;
+    border-radius: 6.75px;
+    border: 1px solid rgba(0,0,0,0.1);
+    padding: 6px 12px;
+    display: flex;
+    flex-direction: row;
+    gap: 8px;
+    align-items: center;
+    justify-content: flex-start;
+    height: 40px;
+    cursor: pointer;
+    min-width: 130px;
+}
+
+.svg-margin {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 24px;
+    height: 24px;
+}
+
+.svg {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 24px;
+    height: 24px;
+}
+
+.cerrar-sesi-n {
+    color: #d4183d;
+    font-family: "SegoeUi-Semibold", sans-serif;
+    font-size: 14px;
+    line-height: 20px;
+    font-weight: 600;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.button i {
+    font-size: 1.2rem;
+}
+
+/* Enlaces normales (inactivos) */
+nav.navbar.navbar-light .nav-pills .nav-link {
+color: #000;
+background-color: transparent;
+border-bottom: 2px solid transparent;
+}
+
+/* Activo: sin fondo, letra negra y línea abajo */
+nav.navbar.navbar-light .nav-pills .nav-link.active {
+    color: #000;
+    background-color: transparent;
+    border-bottom: 2px solid #000;
+}
+
+    /* Íconos dentro del activo: también negros */
+    nav.navbar.navbar-light .nav-pills .nav-link.active i {
+        color: #000;
+    }
+
+/* Separación entre pestañas del sidebar */
+nav.navbar .nav-pills .nav-item {
+    margin-bottom: 12px; /* Ajusta el número a tu gusto */
+}
+
