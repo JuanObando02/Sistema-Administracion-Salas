@@ -143,15 +143,6 @@ input:-webkit-autofill:active {
     opacity: 0.7;
 }
 
-/* Ojo mostrar/ocultar */
-.eye-icon {
-    position: absolute;
-    right: 10px;
-    width: 22px;
-    cursor: pointer;
-    opacity: 0.75;
-}
-
 /* Botón */
 .btn-login {
     margin-top: 20px;
@@ -165,11 +156,6 @@ input:-webkit-autofill:active {
     font-weight: 600;
 }
 
-    .btn-login:hover {
-        background: #2a2950;
-    }
-
-.center {
-    text-align: center;
-    margin-top: 15px;
+.btn-login:hover {
+    background: #2a2950;
 }
