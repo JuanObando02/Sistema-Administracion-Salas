@@ -17,7 +17,7 @@ body {
 }
 
 /* ==========================================
-   ENCABEZADO SUPERIOR DEL LOGIN (Figma)
+   ENCABEZADO SUPERIOR DEL LOGIN
    ========================================== */
 .login-container {
     margin-bottom: 10px;
@@ -55,14 +55,12 @@ body {
 
 .header-title {
     color: #101828;
-    font-family: "Segoe UI", sans-serif;
     font-size: 26px;
     font-weight: 700;
 }
 
 .header-subtitle {
     color: #4a5565;
-    font-family: "Segoe UI", sans-serif;
     font-size: 14px;
     font-weight: 400;
 }
@@ -85,19 +83,19 @@ body {
     box-shadow: 0px 4px 6px rgba(0,0,0,0.1);
 }
 
-.login-card h1 {
-    text-align: center;
-    font-size: 26px;
-    margin-bottom: 5px;
-}
+    .login-card h1 {
+        text-align: center;
+        font-size: 26px;
+        margin-bottom: 5px;
+    }
 
-.login-card .subtitle {
-    text-align: center;
-    color: #4a5565;
-    margin-bottom: 20px;
-}
+    .login-card .subtitle {
+        text-align: center;
+        color: #4a5565;
+        margin-bottom: 20px;
+    }
 
-/* Inputs */
+/* Labels */
 label {
     font-size: 14px;
     font-weight: 600;
@@ -105,42 +103,48 @@ label {
     display: block;
 }
 
+/* Inputs y grupo */
 .input-group {
-position: relative;
-background: #f3f3f5;
-border-radius: 7px;
-margin-top: 5px;
+    position: relative;
+    background: #f3f3f5;
+    border-radius: 7px;
+    margin-top: 5px;
+    display: flex;
+    align-items: center;
 }
 
-.input-group i {
-    position: absolute;
-    left: 12px;
-    top: 50%;
-    transform: translateY(-50%);
-    font-size: 1rem;
-    color: #555;
-}
+    .input-group i {
+        position: absolute;
+        left: 12px;
+        font-size: 1rem;
+        color: #555;
+    }
 
-.input-group input {
-    width: 100%;
-    border: none;
-    background: transparent;
-    padding: 10px 12px 10px 40px; /* espacio para el ícono */
-    font-size: 14px;
-    outline: none;
-}
+    .input-group input {
+        width: 100%;
+        border: none;
+        outline: none;
+        background: #f3f3f5; /* importante: no transparente */
+        padding: 10px 12px 10px 40px; /* espacio para el ícono */
+        font-size: 14px;
+        border-radius: 7px;
+        transition: 0.2s;
+    }
 
-input[type="email"]:-webkit-autofill,
-input[type="password"]:-webkit-autofill,
-/* Aplica a todos los inputs autocompletados, incluidos password */
+        .input-group input:focus {
+            border: 2px solid #161617;
+            background: #fff;
+        }
+
+/* Autofill */
 input:-webkit-autofill,
 input:-webkit-autofill:hover,
 input:-webkit-autofill:focus,
 input:-webkit-autofill:active {
-    -webkit-text-fill-color: #000000; /* color del texto */
+    -webkit-text-fill-color: #000000;
     transition: background-color 5000s ease-in-out 0s;
-    box-shadow: 0 0 0px 1000px #f3f3f5 inset; /* fondo */
-    border-radius: 7px !important; /* fuerza el borde redondeado */
+    box-shadow: 0 0 0px 1000px #f3f3f5 inset;
+    border-radius: 7px !important;
 }
 
 /* Botón */
@@ -148,14 +152,18 @@ input:-webkit-autofill:active {
     margin-top: 20px;
     width: 100%;
     padding: 10px;
-    background: #030213;
+    background: #161617;
     color: white;
     border: none;
     border-radius: 7px;
     cursor: pointer;
     font-weight: 600;
+    font-size: 14px;
+    transition: 0.2s;
 }
 
-.btn-login:hover {
-    background: #2a2950;
-}
+    .btn-login:hover {
+        background: #fff;
+        color: #161617;
+        border: 2px solid #161617;
+    }

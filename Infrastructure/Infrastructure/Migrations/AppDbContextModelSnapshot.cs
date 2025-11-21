@@ -335,6 +335,9 @@ namespace Infrastructure.Migrations
 
                     b.HasKey("Id");
 
+                    b.HasIndex("Numero")
+                        .IsUnique();
+
                     b.ToTable("Salas", (string)null);
                 });
 
