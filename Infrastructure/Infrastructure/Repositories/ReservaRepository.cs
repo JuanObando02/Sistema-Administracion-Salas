@@ -205,7 +205,6 @@ namespace Infrastructure.Repositories
                 (inicio < r.FechaFin && fin > r.FechaInicio)
             );
         }
-
         public async Task<List<Guid>> GetIdsEquiposOcupados(Guid salaId, DateTime inicio, DateTime fin, Guid? reservaIdExcluir = null)
         {
             return await context.Reservas
@@ -225,6 +224,16 @@ namespace Infrastructure.Repositories
                     (inicio < r.FechaFin && fin > r.FechaInicio)
                 )
                 .Select(r => r.EquipoId.Value) // Solo quiero los IDs
+                .ToListAsync();
+        }
+        public async Task<IList<Reserva>> GetReservasPendientes()
+        {
+            return await context.Reservas
+                .Where(r => r.Estado == EstadoReserva.Pendiente) // Solo pendientes
+                .Include(r => r.Sala)
+                .Include(r => r.Equipo)
+                .Include(r => r.UsuarioSolicitante)
+                .OrderBy(r => r.FechaInicio) // Las más próximas primero (urgencia)
                 .ToListAsync();
         }
     }

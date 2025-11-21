@@ -17,5 +17,8 @@ namespace Services.Models.ReservaModels
         public EstadoReserva Estado { get; set; }
         public Guid? SalaId { get; set; }
         public Guid? EquipoId { get; set; }
+        public string NombreSolicitante { get; set; } = string.Empty;
+        public string EmailSolicitante { get; set; } = string.Empty;
+        public string DocumentoSolicitante { get; set; } = string.Empty;
     }
 }

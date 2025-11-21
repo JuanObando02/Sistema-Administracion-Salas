@@ -1,0 +1,151 @@
+﻿@model IEnumerable<Services.Models.AsesoriaModels.AsesoriaIndexModel>
+@using Domain.Enums
+
+@{
+    ViewData["Title"] = "Gestión de Asesorías";
+}
+
+<h1>@ViewData["Title"]</h1>
+
+@if (TempData["Mensaje"] != null)
+{
+    <div class="alert alert-success">@TempData["Mensaje"]</div>
+}
+@if (TempData["Error"] != null)
+{
+    <div class="alert alert-danger">@TempData["Error"]</div>
+}
+
+@if (!Model.Any())
+{
+    <div class="alert alert-success text-center mt-4">
+        <i class="bi bi-check-circle-fill h3"></i>
+        <p class="mb-0">No hay solicitudes de asesoría pendientes.</p>
+    </div>
+}
+else
+{
+    <table class="table table-hover mt-4 align-middle">
+        <thead class="table-dark">
+            <tr>
+                <th>Hora</th>
+                <th>Ubicación</th>
+                <th>Solicitante</th>
+                <th>Descripción</th>
+                <th>Estado</th>
+                <th>Acciones</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var item in Model)
+            {
+                <tr class="@(item.Estado == EstadoAsesoria.EnProceso ? "table-info" : "")">
+                    <td>@item.Fecha.ToString("HH:mm") <br /> <small class="text-muted">@item.Fecha.ToString("dd/MM")</small></td>
+                    <td class="fw-bold text-primary">@item.Ubicacion</td>
+                    <td>
+                        <a href="#" class="text-decoration-none fw-bold btn-detalle-usuario"
+                           data-nombre="@item.NombreSolicitante"
+                           data-email="@item.EmailSolicitante"
+                           data-documento="@item.DocumentoSolicitante"
+                           data-bs-toggle="modal" data-bs-target="#modalUsuario">
+                            <i class="bi bi-person-circle"></i> @item.NombreSolicitante
+                        </a>
+                    </td>
+                    <td>@item.Descripcion</td>
+                    <td>
+                        @if (item.Estado == EstadoAsesoria.Pendiente)
+                        {
+                            <span class="badge bg-warning text-dark">Pendiente</span>
+                        }
+                        else
+                        {
+
+                            <span class="badge bg-info text-dark">En Atención</span>
+                        }
+                    </td>
+                    <td>
+                        <div class="d-flex gap-2">
+
+                            @if (item.Estado == EstadoAsesoria.Pendiente)
+                            {
+                                <form asp-action="Atender" asp-route-id="@item.Id" method="post" style="display:inline;">
+                                    <button type="submit" class="btn btn-sm btn-primary" title="Ir a Atender">
+                                        <i class="bi bi-play-fill"></i> Atender
+                                    </button>
+                                </form>
+
+                                <button type="button" class="btn btn-sm btn-outline-secondary btn-accion"
+                                        data-id="@item.Id"
+                                        data-action="NoAplica"
+                                        data-title="Descartar Solicitud"
+                                        data-bs-toggle="modal" data-bs-target="#modalAccion">
+                                    <i class="bi bi-x-circle"></i>
+                                </button>
+                            }
+
+                            @if (item.Estado == EstadoAsesoria.EnProceso)
+                            {
+                                <button type="button" class="btn btn-sm btn-success btn-accion"
+                                        data-id="@item.Id"
+                                        data-action="Finalizar"
+                                        data-title="Finalizar Asesoría"
+                                        data-bs-toggle="modal" data-bs-target="#modalAccion">
+                                    <i class="bi bi-check2-all"></i> Finalizar
+                                </button>
+                            }
+                        </div>
+                    </td>
+                </tr>
+            }
+        </tbody>
+    </table>
+}
+
+<div class="modal fade" id="modalAccion" tabindex="-1">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <form method="post" id="formAccion">
+                <div class="modal-header bg-light">
+                    <h5 class="modal-title" id="modalAccionTitulo">Confirmar Acción</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body">
+                    <input type="hidden" name="id" id="idAccion" />
+
+                    <div class="mb-3">
+                        <label class="form-label">Observaciones / Solución:</label>
+                        <textarea name="observaciones" class="form-control" rows="3" placeholder="Describa qué se realizó..."></textarea>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+                    <button type="submit" class="btn btn-primary">Confirmar</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <script>
+        $(document).ready(function () {
+            $('.btn-detalle-usuario').click(function () {
+                $('#modalNombre').text($(this).data('nombre'));
+                $('#modalEmail').text($(this).data('email'));
+                $('#modalDocumento').text($(this).data('documento'));
+            });
+            $('.btn-accion').click(function () {
+                var id = $(this).data('id');
+                var action = $(this).data('action'); // "Finalizar" o "NoAplica"
+                var title = $(this).data('title');
+
+                // Configurar el modal
+                $('#idAccion').val(id);
+                $('#modalAccionTitulo').text(title);
+
+                // Cambiar a dónde envía el formulario dinámicamente
+                $('#formAccion').attr('action', '/Asesorias/' + action);
+            });
+        });
+    </script>
+}

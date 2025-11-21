@@ -63,5 +63,58 @@ namespace Services
             var lista = await _asesoriaRepository.GetPorUsuario(usuarioId);
             return _mapper.Map<IList<AsesoriaIndexModel>>(lista);
         }
+        public async Task<IList<AsesoriaIndexModel>> GetAsesoriasGestionar()
+        {
+            var lista = await _asesoriaRepository.GetAsesoriasActivas();
+            return _mapper.Map<IList<AsesoriaIndexModel>>(lista);
+        }
+
+        public async Task MarcarEnProceso(Guid id, string coordinadorId)
+        {
+            var asesoria = await _asesoriaRepository.GetAsesoria(id); // (Necesitas implementar GetAsesoria(id) en repo si no existe)
+            if (asesoria == null) throw new Exception("Asesoría no encontrada.");
+
+            if (asesoria.Estado != EstadoAsesoria.Pendiente)
+                throw new InvalidOperationException("Solo se pueden atender solicitudes pendientes.");
+
+            asesoria.Estado = EstadoAsesoria.EnProceso;
+            asesoria.CoordinadorId = coordinadorId; // Asignamos al coordinador
+
+            await _asesoriaRepository.Update(asesoria);
+        }
+
+        public async Task FinalizarAsesoria(Guid id, string coordinadorId, string? observaciones)
+        {
+            var asesoria = await _asesoriaRepository.GetAsesoria(id);
+            if (asesoria == null) throw new Exception("Asesoría no encontrada.");
+
+            asesoria.Estado = EstadoAsesoria.Cerrada;
+            asesoria.CoordinadorId = coordinadorId;
+
+            // --- GUARDAR SOLUCIÓN ---
+            if (!string.IsNullOrWhiteSpace(observaciones))
+            {
+                asesoria.Descripcion += $"\n\n[Solución]: {observaciones}";
+            }
+
+            await _asesoriaRepository.Update(asesoria);
+        }
+
+        public async Task DescartarAsesoria(Guid id, string coordinadorId, string? observaciones)
+        {
+            var asesoria = await _asesoriaRepository.GetAsesoria(id);
+            if (asesoria == null) throw new Exception("Asesoría no encontrada.");
+
+            asesoria.Estado = EstadoAsesoria.NoAplica;
+            asesoria.CoordinadorId = coordinadorId;
+
+            // --- GUARDAR RAZÓN ---
+            if (!string.IsNullOrWhiteSpace(observaciones))
+            {
+                asesoria.Descripcion += $"\n\n[No Aplica]: {observaciones}";
+            }
+
+            await _asesoriaRepository.Update(asesoria);
+        }
     }
 }

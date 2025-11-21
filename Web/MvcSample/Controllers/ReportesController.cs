@@ -71,6 +71,66 @@ namespace MvcSample.Controllers
 
             return View(misReportes);
         }
+        
+        [HttpGet]
+        [Authorize(Roles = "Coordinador, Admin")]
+        public async Task<IActionResult> Gestionar(
+            string? busqueda,
+            Domain.Enums.EstadoReporte? estado,
+            DateTime? fecha,
+            int pagina = 1)
+        {
+            var filtro = new FiltroReporteModel
+            {
+                Busqueda = busqueda,
+                Estado = estado,
+                Fecha = fecha,
+                Pagina = pagina
+            };
 
+            var listaPaginada = await _reporteService.GetReportesGestionar(filtro);
+
+            // Mantener filtros en la vista
+            ViewData["BusquedaActual"] = busqueda;
+            ViewData["EstadoActual"] = estado;
+            ViewData["FechaActual"] = fecha?.ToString("yyyy-MM-dd");
+
+            return View(listaPaginada);
+        }
+
+        [HttpPost]
+        [Authorize(Roles = "Coordinador, Admin")]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> Atender(Guid id)
+        {
+            try
+            {
+                await _reporteService.AtenderReporte(id);
+                TempData["Mensaje"] = "Reporte marcado 'En Proceso'.";
+            }
+            catch (Exception ex)
+            {
+                TempData["Error"] = ex.Message;
+            }
+            return RedirectToAction("Gestionar");
+        }
+
+        // POST: /Reportes/Cerrar
+        [HttpPost]
+        [Authorize(Roles = "Coordinador, Admin")]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> Cerrar(Guid id, string observaciones)
+        {
+            try
+            {
+                await _reporteService.CerrarReporte(id, observaciones);
+                TempData["Mensaje"] = "Reporte cerrado exitosamente.";
+            }
+            catch (Exception ex)
+            {
+                TempData["Error"] = ex.Message;
+            }
+            return RedirectToAction("Gestionar");
+        }
     }
 }

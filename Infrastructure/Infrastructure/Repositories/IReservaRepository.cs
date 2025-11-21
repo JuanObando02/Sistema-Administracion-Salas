@@ -30,6 +30,7 @@ namespace Infrastructure.Repositories
             int pageSize);    
         Task<bool> ExisteConflicto(Guid? salaId, Guid? equipoId, DateTime inicio, DateTime fin, Guid? reservaIdExcluir = null);
 
+        Task<IList<Reserva>> GetReservasPendientes();
         Task<List<Guid>> GetIdsEquiposOcupados(Guid salaId, DateTime inicio, DateTime fin, Guid? reservaIdExcluir = null);
     }
 }

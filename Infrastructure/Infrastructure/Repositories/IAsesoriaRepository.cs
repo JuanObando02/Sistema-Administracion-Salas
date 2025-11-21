@@ -11,5 +11,8 @@ namespace Infrastructure.Repositories
     {
         Task Save(Asesoria asesoria);
         Task<IList<Asesoria>> GetPorUsuario(string usuarioId);
+        Task<IList<Asesoria>> GetAsesoriasActivas();
+        Task Update(Asesoria asesoria);
+        Task<Asesoria> GetAsesoria(Guid id);
     }
 }

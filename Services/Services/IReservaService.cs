@@ -26,5 +26,6 @@ namespace Services
         Task EliminarReservaAdmin(Guid id);
         Task<EditarReservaAdminModel> RepopularDropdownsEditarAdmin(EditarReservaAdminModel model);
         Task<PaginatedList<ReservaIndexModel>> GetReservasGestionar(FiltroReservaModel filtro);
+        Task<IList<ReservaIndexModel>> GetReservasPendientes();
     }
 }

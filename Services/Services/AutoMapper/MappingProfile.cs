@@ -32,7 +32,10 @@ namespace Services.Automapper
             CreateMap<Asesoria, AsesoriaIndexModel>()
                 .ForMember(dest => dest.Fecha, opt => opt.MapFrom(src => src.FechaSolicitud))
                 .ForMember(dest => dest.Ubicacion, opt => opt.MapFrom(src =>
-                     src.SalaId.HasValue ? $"Sala {src.Sala.Numero}" : "Sin ubicación especificada"));
+                     src.SalaId.HasValue ? $"Sala {src.Sala.Numero}" : "Sin ubicación especificada"))
+                .ForMember(dest => dest.NombreSolicitante, opt => opt.MapFrom(src => $"{src.UsuarioSolicitante.Name} {src.UsuarioSolicitante.LastName}"))
+                .ForMember(dest => dest.EmailSolicitante, opt => opt.MapFrom(src => src.UsuarioSolicitante.Email))
+                .ForMember(dest => dest.DocumentoSolicitante, opt => opt.MapFrom(src => src.UsuarioSolicitante.DocumentNumber));
         }
         private void ReporteMapper()
         {
@@ -45,6 +48,16 @@ namespace Services.Automapper
                     src.Tipo == TipoReporte.Sala
                     ? $"Sala {src.SalaReportada.Numero}"
                     : $"Equipo {src.EquipoReportado.Serial}"));
+
+            CreateMap<Reporte, ReporteAdminIndexModel>()
+                // Reutiliza la lógica de "ObjetoAfectado" del padre (si AutoMapper no lo hace auto, repítelo aquí)
+                .ForMember(dest => dest.ObjetoAfectado, opt => opt.MapFrom(src =>
+                    src.Tipo == Domain.Enums.TipoReporte.Sala
+                    ? $"Sala {src.SalaReportada.Numero}"
+                    : $"Equipo {src.EquipoReportado.Serial}"))
+                // Mapeo del Nombre del Usuario Creador
+                .ForMember(dest => dest.NombreUsuario, opt => opt.MapFrom(src =>
+                    $"{src.UsuarioCreador.Name} {src.UsuarioCreador.LastName}"));
         }
         private void ReservaMapper()
         {
@@ -54,7 +67,10 @@ namespace Services.Automapper
                     ? $"Sala {src.Sala.Numero}"
                     : $"Equipo {src.Equipo.Serial} - Sala {src.Sala.Numero}"))
                     .ForMember(dest => dest.SalaId, opt => opt.MapFrom(src => src.SalaId))
-                    .ForMember(dest => dest.EquipoId, opt => opt.MapFrom(src => src.EquipoId));//
+                    .ForMember(dest => dest.EquipoId, opt => opt.MapFrom(src => src.EquipoId))
+                    .ForMember(dest => dest.NombreSolicitante, opt => opt.MapFrom(src => $"{src.UsuarioSolicitante.Name} {src.UsuarioSolicitante.LastName}")) 
+                    .ForMember(dest => dest.EmailSolicitante, opt => opt.MapFrom(src => src.UsuarioSolicitante.Email))
+                    .ForMember(dest => dest.DocumentoSolicitante, opt => opt.MapFrom(src => src.UsuarioSolicitante.DocumentNumber)); 
         }
         private void UsuarioMapper()
         {

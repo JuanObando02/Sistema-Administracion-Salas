@@ -41,8 +41,18 @@
                                     </li>
                                     <li><hr class="dropdown-divider"></li>
                                     <li>
-                                        <a class="dropdown-item fw-bold text-primary" asp-controller="Reservas" asp-action="Gestionar">
+                                        <a class="dropdown-item fw-bold text-primary" asp-controller="Reservas" asp-action="Pendientes">
                                             <i class="bi bi-calendar-check"></i> Aprobar Reservas
+                                        </a>
+                                    </li>
+                                    <li>
+                                        <a class="dropdown-item fw-bold text-primary" asp-controller="Asesorias" asp-action="Gestionar">
+                                            <i class="bi bi-person"></i> Revisar Asesorías
+                                        </a>
+                                    </li>
+                                    <li>
+                                        <a class="dropdown-item fw-bold text-primary" asp-controller="Reportes" asp-action="Gestionar">
+                                            <i class="bi bi-flag"></i> Revisar Reportes
                                         </a>
                                     </li>
                                     @if (User.IsInRole("Admin")) // Solo Admin ve Usuarios

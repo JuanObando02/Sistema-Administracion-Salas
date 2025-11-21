@@ -35,5 +35,35 @@ namespace Infrastructure.Repositories
                 .OrderByDescending(a => a.FechaSolicitud)
                 .ToListAsync();
         }
+        public async Task<IList<Asesoria>> GetAsesoriasActivas()
+        {
+            return await context.Asesorias
+                .Where(a => a.Estado == Domain.Enums.EstadoAsesoria.Pendiente ||
+                            a.Estado == Domain.Enums.EstadoAsesoria.EnProceso)
+                .Include(a => a.UsuarioSolicitante) // Para ver quién pide ayuda
+                .Include(a => a.Sala)               // Para saber a dónde ir
+                .OrderBy(a => a.FechaSolicitud)     // Las más viejas primero (FIFO)
+                .ToListAsync();
+        }
+        public async Task Update(Asesoria asesoria)
+        {
+            try
+            {
+                await Beguin();
+                context.Asesorias.Update(asesoria);
+                await Save();
+                await Comit();
+            }
+            catch (Exception ex)
+            {
+                await RollBack();
+                throw;
+            }
+        }
+        public async Task<Asesoria> GetAsesoria(Guid id)
+        {
+
+            return await context.Asesorias.FindAsync(id);
+        }
     }
 }
