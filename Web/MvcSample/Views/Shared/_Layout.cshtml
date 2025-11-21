@@ -2,7 +2,7 @@
 <!DOCTYPE html>
 <html lang="en">
 @{
-        // Ocultar sidebar solo en la página "Bienvenido" y login/register
+        // Mostrar u ocultar sidebar según la página
         var showSidebar = ViewData["Title"]?.ToString() != "Bienvenido";
         var hideSidebar = ViewData["Title"]?.ToString() == "Login" || ViewData["Title"]?.ToString() == "Register";
 }
@@ -17,54 +17,6 @@
     <link rel="stylesheet" href="~/MvcSample.styles.css" asp-append-version="true" />
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css">
 </head>
-<body>
-    <header>
-        <nav class="navbar navbar-expand-sm navbar-toggleable-sm navbar-light bg-white border-bottom box-shadow mb-3">
-            <div class="container-fluid">
-                <a class="navbar-brand" asp-area="" asp-controller="Home" asp-action="Index">SalasSys</a>
-                <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target=".navbar-collapse" aria-controls="navbarSupportedContent"
-                        aria-expanded="false" aria-label="Toggle navigation">
-                    <span class="navbar-toggler-icon"></span>
-                </button>
-                <div class="navbar-collapse collapse d-sm-inline-flex justify-content-between">
-                    <ul class="navbar-nav flex-grow-1">
-                        <li class="nav-item">
-                            <a class="nav-link text-dark" asp-area="" asp-controller="Home" asp-action="Index">Home</a>
-                        </li>
-                        @* --- BLOQUE DE ADMINISTRADOR --- *@
-                        @if (User.IsInRole("Admin") || User.IsInRole("Coordinador"))
-                        {
-                            @* Menú desplegable para Gestión (Opcional, para que se vea ordenado) *@
-                            <li class="nav-item dropdown">
-                                <a class="nav-link dropdown-toggle text-dark" href="#" id="navbarDropdownAdmin" role="button" data-bs-toggle="dropdown" aria-expanded="false">
-                                    Administración
-                                </a>
-                                <ul class="dropdown-menu" aria-labelledby="navbarDropdownAdmin">
-                                    <li>
-                                        <a class="dropdown-item" asp-area="" asp-controller="Salas" asp-action="Index">Gestión de Salas</a>
-                                    </li>
-                                    <li>
-                                        <a class="dropdown-item" asp-area="" asp-controller="Equipos" asp-action="Index">Gestión de Equipos</a>
-                                    </li>
-                                    <li><hr class="dropdown-divider"></li>
-                                    <li>
-                                        <a class="dropdown-item fw-bold text-primary" asp-controller="Reservas" asp-action="Pendientes">
-                                            <i class="bi bi-calendar-check"></i> Aprobar Reservas
-                                        </a>
-                                    </li>
-                                    <li>
-                                        <a class="dropdown-item fw-bold text-primary" asp-controller="Asesorias" asp-action="Gestionar">
-                                            <i class="bi bi-person"></i> Revisar Asesorías
-                                        </a>
-                                    </li>
-                                    <li>
-                                        <a class="dropdown-item fw-bold text-primary" asp-controller="Reportes" asp-action="Pendientes">
-                                            <i class="bi bi-flag"></i> Revisar Reportes
-                                        </a>
-                                    </li>
-                                    @if (User.IsInRole("Admin")) // Solo Admin ve Usuarios
-                                    {
-                                        <li><hr class="dropdown-divider"></li>
 
 <body class="@(hideSidebar ? "no-sidebar" : "")">
 
@@ -89,7 +41,7 @@
         <header>
             <nav class="navbar navbar-light bg-white border-end vh-100 position-fixed flex-column p-3">
 
-                @* Logo al lado de SalasSys *@
+                @* Logo y marca *@
                 <div class="d-flex align-items-center mb-4">
                     <img src="~/img/Background.png" alt="Logo" style="width:40px; height:40px; margin-right:8px;" />
                     <a class="navbar-brand mb-0 text-dark fw-bold" asp-area="" asp-controller="Home" asp-action="Index">
@@ -102,7 +54,7 @@
                         <a class="nav-link text-dark" asp-area="" asp-controller="Home" asp-action="Index">Home</a>
                     </li>
 
-                    @* --- BLOQUE ADMINISTRACIÓN SEPARADO --- *@
+                    @* --- BLOQUE ADMINISTRACIÓN --- *@
                     @if (User.IsInRole("Admin") || User.IsInRole("Coordinador"))
                     {
                         <li class="nav-item">
@@ -140,7 +92,7 @@
                         </li>
                     }
 
-                    @* --- ENLACES PARA TODOS --- *@
+                    @* --- ENLACES PARA TODOS LOS USUARIOS --- *@
                     @if (User.Identity.IsAuthenticated && !User.IsInRole("Admin") && !User.IsInRole("Coordinador"))
                     {
                         <li class="nav-item">
