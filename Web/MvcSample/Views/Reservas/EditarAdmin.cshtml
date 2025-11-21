@@ -6,8 +6,7 @@
 }
 
 <h2>Modificar Reserva</h2>
-<hr />
-
+<div asp-validation-summary="ModelOnly" class="text-danger"></div>
 <form asp-action="EditarAdmin" method="post">
     <input type="hidden" asp-for="Id" />
     <input type="hidden" asp-for="Tipo" />
@@ -61,65 +60,65 @@
 
     <script>
         $(document).ready(function () {
-            console.log("1. El script ha iniciado correctamente.");
 
-            // Verificamos si jQuery encontró el elemento
-            var dropdownSala = $('#ddlSala');
-            if (dropdownSala.length === 0) {
-                alert("ERROR CRÍTICO: No encuentro el dropdown con id='ddlSala'. Revisa el HTML.");
-                return;
-            }
+            // Función para cargar equipos
+            function cargarEquipos() {
+                var salaId = $('#ddlSala').val();
+                var fechaInicio = $('#FechaInicio').val();
+                var fechaFin = $('#FechaFin').val();
 
-            $('#ddlSala').change(function () {
-                var salaIdSeleccionada = $(this).val();
-                console.log("2. Cambio detectado. Sala ID: " + salaIdSeleccionada);
+                // Obtenemos el ID de la reserva actual (está en el input hidden)
+                var reservaId = $('#Id').val();
 
-                // Referencia al dropdown de equipos
                 var ddlEquipo = $('#ddlEquipo');
 
-                // Limpiar visualmente
-                ddlEquipo.empty();
-                ddlEquipo.append('<option value="">Buscando equipos...</option>');
-
-                if (!salaIdSeleccionada) {
-                    console.log("3. No hay sala seleccionada, cancelando.");
+                if (!salaId) {
+                    ddlEquipo.empty().append('<option value="">-- Seleccione Sala Primero --</option>');
                     return;
                 }
 
-                // Construir la URL manualmente para verificar
-                var urlDestino = '/Reservas/GetEquiposPorSalaJson';
-                console.log("4. Iniciando llamada AJAX a: " + urlDestino);
+                if (!fechaInicio || !fechaFin) {
+                    ddlEquipo.empty().append('<option value="">-- Seleccione Fechas Primero --</option>');
+                    return;
+                }
+
+                ddlEquipo.empty().append('<option value="">Buscando disponibles...</option>');
 
                 $.ajax({
-                    url: urlDestino,
+                    url: '/Reservas/GetEquiposPorSalaJson',
                     type: 'GET',
-                    data: { salaId: salaIdSeleccionada },
+                    data: {
+                        salaId: salaId,
+                        inicio: fechaInicio,
+                        fin: fechaFin,
+                        reservaId: reservaId // Enviamos el ID para excluir la propia reserva
+                    },
                     success: function (data) {
-                        console.log("5. ¡ÉXITO! Datos recibidos del servidor:", data);
-
                         ddlEquipo.empty();
-                        ddlEquipo.append('<option value="">-- Seleccione Equipo --</option>');
 
                         if (data.length === 0) {
-                            console.warn("6. OJO: El servidor devolvió una lista vacía (0 equipos).");
-                            ddlEquipo.append('<option value="">(Esta sala no tiene equipos)</option>');
+                            ddlEquipo.append('<option value="">-- No hay equipos disponibles en este horario --</option>');
+                        } else {
+                            ddlEquipo.append('<option value="">-- Seleccione Equipo --</option>');
+                            $.each(data, function (index, item) {
+                                ddlEquipo.append('<option value="' + item.value + '">' + item.text + '</option>');
+                            });
                         }
-
-                        $.each(data, function (index, item) {
-                            // console.log("Agregando equipo: ", item.text);
-                            ddlEquipo.append('<option value="' + item.value + '">' + item.text + '</option>');
-                        });
                     },
-                    error: function (xhr, status, error) {
-                        console.error("ERROR AJAX:");
-                        console.error("Estado: " + status);
-                        console.error("Error: " + error);
-                        console.error("Respuesta: " + xhr.responseText);
-
-                        alert("Error al llamar al servidor. Mira la consola (F12) para detalles.");
+                    error: function () {
+                        ddlEquipo.empty().append('<option value="">Error al cargar</option>');
                     }
                 });
+            }
+
+            // Ejecutar la función cuando cambie CUALQUIERA de estos campos
+            $('#ddlSala, #FechaInicio, #FechaFin').change(function () {
+                cargarEquipos();
             });
+
+            // Ejecutar al iniciar (por si ya vienen datos cargados)
+            // (Opcional: Puedes comentarlo si prefieres que el usuario toque algo primero)
+            // cargarEquipos();
         });
     </script>
 }

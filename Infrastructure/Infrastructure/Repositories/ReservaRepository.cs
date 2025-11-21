@@ -205,5 +205,27 @@ namespace Infrastructure.Repositories
                 (inicio < r.FechaFin && fin > r.FechaInicio)
             );
         }
+
+        public async Task<List<Guid>> GetIdsEquiposOcupados(Guid salaId, DateTime inicio, DateTime fin, Guid? reservaIdExcluir = null)
+        {
+            return await context.Reservas
+                .Where(r =>
+                    r.SalaId == salaId && // De esta sala
+                    r.Tipo == Domain.Enums.TipoReserva.Equipo && // Que sean reservas de equipos
+                    r.EquipoId.HasValue &&
+
+                    // Que estén activas
+                    r.Estado != Domain.Enums.EstadoReserva.Rechazada &&
+                    r.Estado != Domain.Enums.EstadoReserva.Finalizada &&
+
+                    // Que NO sea la reserva que estoy editando (si aplica)
+                    (reservaIdExcluir == null || r.Id != reservaIdExcluir) &&
+
+                    // CRUCE DE HORARIOS: (InicioA < FinB) Y (FinA > InicioB)
+                    (inicio < r.FechaFin && fin > r.FechaInicio)
+                )
+                .Select(r => r.EquipoId.Value) // Solo quiero los IDs
+                .ToListAsync();
+        }
     }
 }

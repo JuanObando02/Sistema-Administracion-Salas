@@ -219,5 +219,23 @@ namespace Services
             // Devuelve el modelo ahora completo
             return model;
         }
+
+        public async Task<IList<EquipoIndexModel>> GetEquiposDisponibles(Guid salaId, DateTime inicio, DateTime fin, Guid? reservaIdExcluir = null)
+        {
+            // 1. Traer TODOS los equipos de la sala
+            var todosLosEquipos = await _equipoRepository.GetEquiposPorSala(salaId);
+
+            // 2. Traer los IDs de los equipos OCUPADOS en ese horario
+            var idsOcupados = await _reservaRepository.GetIdsEquiposOcupados(salaId, inicio, fin, reservaIdExcluir);
+            var setOcupados = idsOcupados.ToHashSet();
+
+            // 3. Filtrar: Solo devolver los que NO están en la lista de ocupados
+            // Y que físicamente estén disponibles
+            var disponibles = todosLosEquipos
+                .Where(e => e.Estado == Domain.Enums.EstadoEquipo.Disponible && !setOcupados.Contains(e.Id))
+                .ToList();
+
+            return _mapper.Map<IList<EquipoIndexModel>>(disponibles);
+        }
     }
 }

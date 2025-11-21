@@ -233,7 +233,7 @@ namespace MvcSample.Controllers
         }
 
         [HttpGet]
-        [Authorize(Roles = "Coordinador, Administrador")]
+        [Authorize(Roles = "Coordinador, Admin")]
         public async Task<IActionResult> EditarAdmin(Guid id)
         {
             var model = await _reservaService.GetReservaParaEditarAdmin(id);
@@ -242,12 +242,18 @@ namespace MvcSample.Controllers
         }
 
         [HttpPost]
-        [Authorize(Roles = "Coordinador, Administrador")]
+        [Authorize(Roles = "Coordinador, Admin")]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> EditarAdmin(EditarReservaAdminModel model)
         {
-            // (Recuerda recargar dropdowns si falla el ModelState)
-            if (!ModelState.IsValid) return View(model);
+            // Si el formulario está incompleto (Validación automática)
+            if (!ModelState.IsValid)
+            {
+                // Debemos recargar las listas antes de devolver la vista
+                model = await _reservaService.RepopularDropdownsEditarAdmin(model);
+                // ------------------------------
+                return View(model);
+            }
 
             var coordinadorId = User.FindFirstValue(ClaimTypes.NameIdentifier);
 
@@ -259,13 +265,18 @@ namespace MvcSample.Controllers
             }
             catch (Exception ex)
             {
+                // Muestra el error en la pantalla
                 ModelState.AddModelError("", ex.Message);
+
+                model = await _reservaService.RepopularDropdownsEditarAdmin(model);
+                // ------------------------------
+
                 return View(model);
             }
         }
         
         [HttpPost]
-        [Authorize(Roles = "Coordinador, Administrador")]
+        [Authorize(Roles = "Coordinador, Admin")]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> EliminarAdmin(Guid id)
         {
@@ -282,16 +293,23 @@ namespace MvcSample.Controllers
         }
 
         [HttpGet]
-        public async Task<IActionResult> GetEquiposPorSalaJson(Guid salaId)
+        public async Task<IActionResult> GetEquiposPorSalaJson(Guid salaId, DateTime? inicio, DateTime? fin, Guid? reservaId)
         {
-            // Si este método devuelve EquipoIndexModel...
-            var equipos = await _equipoService.GetEquiposPorSala(salaId);
+            // Validar que tengamos fechas. Si no, no podemos filtrar por horario,
+            if (inicio == null || fin == null)
+            {
+                // Opción A: Devolver todos si no hay fecha seleccionada
+                var todos = await _equipoService.GetEquiposPorSala(salaId);
+                return Json(todos.Select(e => new { value = e.Id, text = e.Serial }));
+            }
 
-            // ...asegúrate de usar las propiedades correctas aquí:
-            var listaParaDropdown = equipos.Select(e => new
+            // Llamar al servicio de filtrado
+            var equiposDisponibles = await _equipoService.GetEquiposDisponibles(salaId, inicio.Value, fin.Value, reservaId);
+
+            var listaParaDropdown = equiposDisponibles.Select(e => new
             {
                 value = e.Id,
-                text = e.Serial // En el modelo se llama 'Serial', en la entidad también.
+                text = e.Serial
             });
 
             return Json(listaParaDropdown);
