@@ -35,33 +35,47 @@ namespace Services
         private async Task LimpiarReservasVencidas(IEnumerable<Reserva> reservas)
         {
             var ahora = DateTime.Now;
-            bool huboCambios = false;
+
             foreach (var reserva in reservas)
             {
-                if (reserva.FechaFin < ahora && (reserva.Estado == EstadoReserva.Aprobada || reserva.Estado == EstadoReserva.EnUso))
+                // Solo intentamos limpiar si ya venció Y sigue activa
+                if (reserva.FechaFin < ahora &&
+                   (reserva.Estado == EstadoReserva.Aprobada || reserva.Estado == EstadoReserva.EnUso))
                 {
-                    reserva.Estado = EstadoReserva.Finalizada;
-                    // Liberar sala completa si aplica
-                    if (reserva.Tipo == TipoReserva.Sala && reserva.Sala != null)
-                    {
-                        // Solo si estaba ocupada
-                        if (reserva.Sala.Estado == EstadoSala.Ocupada)
-                        {
-                            reserva.Sala.Estado = EstadoSala.Disponible;
-                            await _salaRepository.Update(reserva.Sala);
-                        }
-                    }
-                    // Intentar guardar. Usamos try-catch para manejar la concurrencia con dos posibles usuarios 
+                    // --- BLINDAJE CONTRA ERRORES ---
+                    // Envolvemos TODO el proceso de actualización en un try-catch
                     try
                     {
+                        reserva.Estado = EstadoReserva.Finalizada;
+
+                        // 1. Liberar sala completa si aplica
+                        if (reserva.Tipo == TipoReserva.Sala && reserva.Sala != null)
+                        {
+                            if (reserva.Sala.Estado == EstadoSala.Ocupada)
+                            {
+                                reserva.Sala.Estado = EstadoSala.Disponible;
+                                // Intentamos actualizar la sala
+                                await _salaRepository.Update(reserva.Sala);
+                            }
+                        }
+
+                        // 2. Si era EQUIPO, recalculamos la sala
+                        // Nota: Guardamos primero la reserva para que el cálculo sea real
                         await _reservaRepository.Update(reserva);
+
+                        if (reserva.Tipo == TipoReserva.Equipo && reserva.SalaId.HasValue)
+                        {
+                            await ActualizarEstadoSalaIndividual(reserva.SalaId.Value);
+                        }
                     }
-                    catch (DbUpdateConcurrencyException)
+                    catch (Exception)
                     {
-                        // Si entra aquí, significa que OTRO proceso (el usuario u otro admin)
-                        // ya actualizó esta fila milisegundos antes.
-                        // No hacemos nada, porque el objetivo (que esté finalizada) ya se cumplió.
-                        Console.WriteLine($"Aviso: La reserva {reserva.Id} ya fue actualizada por otro proceso.");
+                        // 🛑 SILENCIAR ERROR
+                        // Si falla la limpieza automática de ESTA reserva (por bloqueo de BD, datos sucios, etc.),
+                        // simplemente la ignoramos y seguimos con la siguiente.
+                        // No queremos que esto rompa la vista del usuario.
+
+                        // (Opcional: Aquí podrías agregar un _logger.LogError(ex, ...) si tuvieras logger)
                     }
                 }
             }
@@ -337,7 +351,7 @@ namespace Services
         public async Task FinalizarReserva(Guid reservaId, string usuarioId)
         {
             // 1. Obtener la reserva
-            var reserva = await _reservaRepository.GetReservaCompleta(reservaId); //
+            var reserva = await _reservaRepository.GetReservaCompleta(reservaId);
             if (reserva == null) throw new Exception("Reserva no encontrada.");
 
             // 2. Validar dueño
@@ -346,7 +360,7 @@ namespace Services
                 throw new UnauthorizedAccessException("No tiene permiso para finalizar esta reserva.");
             }
 
-            // 3. Validar que esté en curso (para no finalizar algo futuro o ya pasado)
+            // 3. Validar que esté en curso
             var ahora = DateTime.Now;
             bool enCurso = (reserva.Estado == EstadoReserva.Aprobada || reserva.Estado == EstadoReserva.EnUso)
                            && ahora >= reserva.FechaInicio
@@ -357,28 +371,28 @@ namespace Services
                 throw new InvalidOperationException("Solo se pueden finalizar reservas que están en curso actualmente.");
             }
 
-            // 4. --- LA LÓGICA MAESTRA ---
-            // Cortamos la reserva para que termine AHORA MISMO
+            // 4. Cortamos la reserva
             reserva.FechaFin = DateTime.Now;
-            reserva.Estado = EstadoReserva.Finalizada; // La marcamos como finalizada para el historial
+            reserva.Estado = EstadoReserva.Finalizada;
 
             // 5. Actualizar estados colaterales
             if (reserva.Tipo == TipoReserva.Equipo && reserva.SalaId.HasValue)
             {
-                // Si liberamos un equipo, revisamos si la sala deja de estar "llena"
-                await _reservaRepository.Save(reserva); // Guardamos primero el cambio de fecha
-                await ActualizarEstadoSalaIndividual(reserva.SalaId.Value); // Recalculamos la sala
+                // CASO 1: Equipo
+                await _reservaRepository.Update(reserva);
+
+                // Recalculamos la sala
+                await ActualizarEstadoSalaIndividual(reserva.SalaId.Value);
             }
             else if (reserva.Tipo == TipoReserva.Sala && reserva.Sala != null)
             {
-                // Si era una sala completa, la liberamos físicamente
+                // CASO 2: Sala Completa
                 reserva.Sala.Estado = EstadoSala.Disponible;
                 await _salaRepository.Update(reserva.Sala);
-                await _reservaRepository.Save(reserva);
+                await _reservaRepository.Update(reserva);
             }
             else
             {
-                // Guardado normal
                 await _reservaRepository.Update(reserva);
             }
         }

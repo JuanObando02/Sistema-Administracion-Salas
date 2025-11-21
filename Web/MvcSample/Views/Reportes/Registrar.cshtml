@@ -23,7 +23,7 @@
             </div>
 
             @* 2. SALA (Siempre visible) *@
-            <div class="mb-3">
+            <div class="mb-3" id="divSala">
                 <label asp-for="SalaId" class="form-label">Sala</label>
                 <select asp-for="SalaId" asp-items="Model.SalasDisponibles" class="form-control" id="ddlSala">
                     <option value="">-- Seleccione Sala --</option>
@@ -66,31 +66,45 @@
     <script>
         $(document).ready(function () {
 
-            // Lógica para mostrar/ocultar dropdown de Equipos
-            $('#ddlTipo').change(function () {
-                var tipo = $(this).val();
-                // Asumiendo que el valor del enum 'Equipo' es 1 (Verifica tu enum)
-                if (tipo == '1' || $(this).find("option:selected").text() == 'Equipo') {
-                    $('#divEquipo').show();
-                } else {
-                    $('#divEquipo').hide();
-                    $('#ddlEquipo').val(''); // Limpiar selección
-                }
-            });
+            // --- 1. LÓGICA VISUAL (Mostrar/Ocultar campos) ---
 
-            function toggleEquipoDiv() {
-                var tipo = $('#ddlTipo').val();
-                // Asumiendo que el valor del enum 'Equipo' es 1 (o verifica el texto)
-                // Ajusta el '1' si tu enum tiene otro valor numérico
-                if (tipo == '1' || $('#ddlTipo option:selected').text() == 'Equipo') {
-                    $('#divEquipo').show();
-                } else {
-                    $('#divEquipo').hide();
+            function toggleCampos() {
+                // Obtenemos el texto de la opción seleccionada (ej. "Sala", "Equipo", "Otro")
+                var tipoTexto = $('#ddlTipo option:selected').text();
+
+                // Referencias a los divs que contienen los dropdowns
+                var divSala = $('#divSala');
+                var divEquipo = $('#divEquipo');
+
+                // REGLAS DE NEGOCIO:
+                if (tipoTexto === 'Equipo') {
+                    // Caso Equipo: Necesita Sala Y Equipo
+                    divSala.show();
+                    divEquipo.show();
+                }
+                else if (tipoTexto === 'Sala') {
+                    // Caso Sala: Solo necesita Sala
+                    divSala.show();
+                    divEquipo.hide();
+                }
+                else {
+                    // Caso Otro (o "Seleccione"): No necesita nada, solo descripción
+                    divSala.hide();
+                    divEquipo.hide();
                 }
             }
-            toggleEquipoDiv();
 
-            // Lógica para cargar equipos cuando cambia la Sala (AJAX)
+            // Ejecutar cuando el usuario cambie el tipo
+            $('#ddlTipo').change(function () {
+                toggleCampos();
+            });
+
+            // Ejecutar al cargar la página (por si viene un error y hay que mantener el estado)
+            toggleCampos();
+
+
+            // --- 2. LÓGICA DE DATOS (Cargar equipos con AJAX) ---
+
             $('#ddlSala').change(function () {
                 var salaId = $(this).val();
                 var ddlEquipo = $('#ddlEquipo');

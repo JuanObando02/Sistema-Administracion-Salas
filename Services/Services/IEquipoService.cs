@@ -17,5 +17,6 @@ namespace Services
         Task DeleteEquipo(Guid id);
         Task<EditarEquipoModel> RepopularDropdownsParaEditar(EditarEquipoModel model);
         Task<IList<EquipoIndexModel>> GetEquiposPorSala(Guid salaId, string? searchSerial = null);
+        Task<IList<EquipoIndexModel>> GetEquiposDisponibles(Guid salaId, DateTime inicio, DateTime fin, Guid? reservaIdExcluir = null);
     }
 }
