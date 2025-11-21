@@ -2,9 +2,15 @@
 <!DOCTYPE html>
 <html lang="en">
 @{
-        // Mostrar u ocultar sidebar según la página
-        var showSidebar = ViewData["Title"]?.ToString() != "Bienvenido";
-        var hideSidebar = ViewData["Title"]?.ToString() == "Login" || ViewData["Title"]?.ToString() == "Register";
+        var title = ViewData["Title"]?.ToString();
+        var isLoginOrRegister = title == "Login" || title == "Register";
+        var isBienvenido = title == "Bienvenido";
+        var isAuthenticated = User.Identity.IsAuthenticated;
+
+        // Mostrar sidebar solo si el usuario está autenticado y no es Login/Register/Bienvenido
+        var showSidebar = isAuthenticated && !isLoginOrRegister && !isBienvenido;
+        // Mostrar topbar solo si no hay sidebar (Bienvenido/Login/Register)
+        var showTopbar = !showSidebar;
 }
 
 <head>
@@ -18,30 +24,34 @@
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css">
 </head>
 
-<body class="@(hideSidebar ? "no-sidebar" : "")">
+<body class="@(showSidebar ? "sidebar-active" : "")">
 
-    @* ------------------ Top bar login/register ------------------ *@
-    @if (hideSidebar)
+    @* ------------------ Topbar (Login/Register/Bienvenido) ------------------ *@
+    @if (showTopbar)
     {
         <div class="d-flex justify-content-between align-items-center p-3 bg-light border-bottom">
             <a class="navbar-brand fw-bold fs-3 text-dark"
                asp-area="" asp-controller="Home" asp-action="Index">
                 SalasSys
             </a>
+
             <div>
-                <a asp-area="Identity" asp-page="/Account/Login" class="btn btn-primary me-2">Iniciar Sesión</a>
-                <a asp-area="Identity" asp-page="/Account/Register" class="btn btn-outline-secondary">Registrarse</a>
+                @if (!isAuthenticated)
+                {
+                    <a asp-area="Identity" asp-page="/Account/Login" class="btn btn-primary me-2">Iniciar Sesión</a>
+                    <a asp-area="Identity" asp-page="/Account/Register" class="btn btn-outline-secondary">Registrarse</a>
+                }
             </div>
         </div>
     }
 
-    @* ------------------ Sidebar ------------------ *@
+    @* ------------------ Sidebar (para usuarios autenticados) ------------------ *@
     @if (showSidebar)
     {
         <header>
             <nav class="navbar navbar-light bg-white border-end vh-100 position-fixed flex-column p-3">
 
-                @* Logo y marca *@
+                @* Logo al lado de SalasSys *@
                 <div class="d-flex align-items-center mb-4">
                     <img src="~/img/Background.png" alt="Logo" style="width:40px; height:40px; margin-right:8px;" />
                     <a class="navbar-brand mb-0 text-dark fw-bold" asp-area="" asp-controller="Home" asp-action="Index">
@@ -58,14 +68,10 @@
                     @if (User.IsInRole("Admin") || User.IsInRole("Coordinador"))
                     {
                         <li class="nav-item">
-                            <a class="nav-link text-dark" asp-area="" asp-controller="Salas" asp-action="Index">
-                                Gestión de Salas
-                            </a>
+                            <a class="nav-link text-dark" asp-area="" asp-controller="Salas" asp-action="Index">Gestión de Salas</a>
                         </li>
                         <li class="nav-item">
-                            <a class="nav-link text-dark" asp-area="" asp-controller="Equipos" asp-action="Index">
-                                Gestión de Equipos
-                            </a>
+                            <a class="nav-link text-dark" asp-area="" asp-controller="Equipos" asp-action="Index">Gestión de Equipos</a>
                         </li>
                         <li class="nav-item">
                             <a class="nav-link text-dark" asp-controller="Reservas" asp-action="Gestionar">
@@ -75,14 +81,10 @@
                         @if (User.IsInRole("Admin"))
                         {
                             <li class="nav-item">
-                                <a class="nav-link text-dark" asp-area="" asp-controller="Usuarios" asp-action="Index">
-                                    Gestión de Usuarios
-                                </a>
+                                <a class="nav-link text-dark" asp-area="" asp-controller="Usuarios" asp-action="Index">Gestión de Usuarios</a>
                             </li>
                             <li class="nav-item">
-                                <a class="nav-link text-dark" asp-area="" asp-controller="Roles" asp-action="Index">
-                                    Gestión de Roles
-                                </a>
+                                <a class="nav-link text-dark" asp-area="" asp-controller="Roles" asp-action="Index">Gestión de Roles</a>
                             </li>
                         }
                         <li class="nav-item">
@@ -92,8 +94,8 @@
                         </li>
                     }
 
-                    @* --- ENLACES PARA TODOS LOS USUARIOS --- *@
-                    @if (User.Identity.IsAuthenticated && !User.IsInRole("Admin") && !User.IsInRole("Coordinador"))
+                    @* --- ENLACES PARA TODOS LOS USUARIOS AUTENTICADOS --- *@
+                    @if (!User.IsInRole("Admin") && !User.IsInRole("Coordinador"))
                     {
                         <li class="nav-item">
                             <a class="nav-link text-dark" asp-area="" asp-controller="Reservas" asp-action="Index">Mis Reservas</a>
@@ -111,36 +113,19 @@
                     </li>
                 </ul>
 
-                @* ------------------ Logout / Login / Register ------------------ *@
+                @* ------------------ Footer del sidebar (Hola + Cerrar Sesión) ------------------ *@
                 <ul class="nav flex-column mt-auto">
-                    @if (User.Identity.IsAuthenticated)
-                    {
-                        <li class="nav-item">
-                            <span class="nav-link text-dark">Hola, @User.Identity.Name!</span>
-                        </li>
-                        <li class="nav-item">
-                            <form class="form-inline" asp-area="Identity" asp-page="/Account/Logout"
-                                  asp-route-returnUrl="@Url.Action("Index", "Home", new { area = "" })">
-                                <button type="submit" class="button">
-                                    <div class="svg-margin">
-                                        <div class="svg">
-                                            <i class="bi bi-box-arrow-left"></i>
-                                        </div>
-                                    </div>
-                                    <div class="cerrar-sesi-n">Cerrar Sesión</div>
-                                </button>
-                            </form>
-                        </li>
-                    }
-                    else
-                    {
-                        <li class="nav-item">
-                            <a class="nav-link text-dark" asp-area="Identity" asp-page="/Account/Register">Register</a>
-                        </li>
-                        <li class="nav-item">
-                            <a class="nav-link text-dark" asp-area="Identity" asp-page="/Account/Login">Login</a>
-                        </li>
-                    }
+                    <li class="nav-item">
+                        <span class="nav-link text-dark">Hola, @User.Identity.Name!</span>
+                    </li>
+                    <li class="nav-item">
+                        <form class="form-inline" asp-area="Identity" asp-page="/Account/Logout"
+                              asp-route-returnUrl="@Url.Action("Index", "Home", new { area = "" })">
+                            <button type="submit" class="btn btn-danger w-100">
+                                <i class="bi bi-box-arrow-left me-1"></i> Cerrar Sesión
+                            </button>
+                        </form>
+                    </li>
                 </ul>
             </nav>
         </header>
