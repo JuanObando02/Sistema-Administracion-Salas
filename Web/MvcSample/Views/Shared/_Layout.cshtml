@@ -55,6 +55,19 @@
                                             <i class="bi bi-flag"></i> Revisar Reportes
                                         </a>
                                     </li>
+                                    @* 1. ASIGNAR EQUIPO (Azul con Icono de PC) *@
+                                    <li>
+                                        <a class="dropdown-item fw-bold text-primary" asp-controller="Reservas" asp-action="ReservarEquipoCoord">
+                                            <i class="bi bi-pc-display-horizontal me-2"></i> Asignar Equipo
+                                        </a>
+                                    </li>
+
+                                    @* 2. ASIGNAR SALA (Verde con Icono de Tablero de clase) *@
+                                    <li>
+                                        <a class="dropdown-item fw-bold text-success" asp-controller="Reservas" asp-action="ReservarSalaCoord">
+                                            <i class="bi bi-easel2-fill me-2"></i> Asignar Sala
+                                        </a>
+                                    </li>
                                     @if (User.IsInRole("Admin")) // Solo Admin ve Usuarios
                                     {
                                         <li><hr class="dropdown-divider"></li>
@@ -88,6 +101,7 @@
                                 <li class="nav-item">
                                     <a class="nav-link text-dark" asp-controller="Asesorias" asp-action="Index">Asesorías</a>
                                 </li>
+                                
                             }
                         }
                         <li class="nav-item">

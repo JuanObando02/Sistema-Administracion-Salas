@@ -1,0 +1,79 @@
+﻿@model Services.Models.ReservaModels.ReservarEquipoCoordinadorModel
+
+@{
+    ViewData["Title"] = "Asignar Equipo a Usuario";
+}
+
+<div class="row">
+    <div class="col-md-6 offset-md-3">
+        <div class="card shadow-sm">
+            <div class="card-header bg-primary text-white">
+                <h4 class="mb-0"><i class="bi bi-pc-display-horizontal"></i> Asignar Equipo</h4>
+            </div>
+            <div class="card-body">
+                <form asp-action="ReservarEquipoCoord" method="post">
+                    <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+
+                    @* --- CAMPO EXCLUSIVO COORDINADOR: SELECCIÓN DE USUARIO --- *@
+                    <div class="mb-4 p-3 bg-light rounded border">
+                        <label asp-for="UsuarioIdSeleccionado" class="form-label fw-bold text-primary">
+                            <i class="bi bi-person-badge"></i> Beneficiario (Usuario)
+                        </label>
+                        <select asp-for="UsuarioIdSeleccionado"
+                                asp-items="Model.UsuariosDisponibles"
+                                class="form-select form-select-lg">
+                            <option value="">-- Seleccione el Usuario --</option>
+                        </select>
+                        <span asp-validation-for="UsuarioIdSeleccionado" class="text-danger"></span>
+                        <div class="form-text">La reserva quedará registrada a nombre de este usuario.</div>
+                    </div>
+
+                    <hr />
+
+                    @* --- CAMPOS DE RESERVA ESTÁNDAR --- *@
+
+                    <div class="mb-3">
+                        <label asp-for="SalaId" class="form-label">Sala</label>
+                        <select asp-for="SalaId" asp-items="Model.SalasDisponibles" class="form-control">
+                            <option value="">-- Seleccione una Sala --</option>
+                        </select>
+                        <span asp-validation-for="SalaId" class="text-danger"></span>
+                    </div>
+
+                    <div class="mb-3">
+                        <label asp-for="FechaInicio" class="form-label">Fecha y Hora de Inicio</label>
+                        @* Usamos el truco del value y step para formato limpio *@
+                        <input name="FechaInicio"
+                               id="FechaInicio"
+                               type="datetime-local"
+                               value="@Model.FechaInicio.ToString("yyyy-MM-ddTHH:mm")"
+                               class="form-control"
+                               step="1800" />
+                        <span asp-validation-for="FechaInicio" class="text-danger"></span>
+                    </div>
+
+                    <div class="mb-3">
+                        <label asp-for="DuracionHoras" class="form-label">Duración</label>
+                        <select asp-for="DuracionHoras" class="form-select">
+                            <option value="1">1 Hora</option>
+                            <option value="2">2 Horas</option>
+                            <option value="3">3 Horas</option>
+                        </select>
+                        <span asp-validation-for="DuracionHoras" class="text-danger"></span>
+                    </div>
+
+                    <div class="d-grid gap-2 mt-4">
+                        <button type="submit" class="btn btn-primary btn-lg">Crear Reserva</button>
+                        <a asp-action="Gestionar" class="btn btn-secondary">Cancelar</a>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    @{
+        await Html.RenderPartialAsync("_ValidationScriptsPartial");
+    }
+}

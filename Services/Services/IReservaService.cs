@@ -11,7 +11,7 @@ namespace Services
     public interface IReservaService
     {
         Task<IList<ReservaIndexModel>> GetMisReservas(string usuarioId);
-        Task<ReservarEquipoModel> GetDatosParaReservarEquipo();
+        Task<ReservarEquipoModel> GetDatosParaReservarEquipo(Guid? salaId = null);
         Task CrearReservaEquipo(ReservarEquipoModel model, string usuarioId, bool esProfesor);//bool esProfesor para quitar la restriccion de horas
         Task CancelarReserva(Guid reservaId, string usuarioId);
         Task ActualizarEstadoSalaIndividual(Guid salaId);
@@ -27,5 +27,7 @@ namespace Services
         Task<EditarReservaAdminModel> RepopularDropdownsEditarAdmin(EditarReservaAdminModel model);
         Task<PaginatedList<ReservaIndexModel>> GetReservasGestionar(FiltroReservaModel filtro);
         Task<IList<ReservaIndexModel>> GetReservasPendientes();
+        Task<ReservarEquipoCoordinadorModel> GetDatosParaReservarEquipoCoord(Guid? salaId = null);
+        Task<ReservarSalaCoordinadorModel> GetDatosParaReservarSalaCoord();
     }
 }

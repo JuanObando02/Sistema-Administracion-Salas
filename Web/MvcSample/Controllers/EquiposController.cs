@@ -6,7 +6,7 @@ using Services.Models.EquipoModels;
 
 namespace MvcSample.Controllers
 {
-    [Authorize(Roles = "Admin, Master")]
+    [Authorize(Roles = "Admin, Master, Coordinador")]
     public class EquiposController : Controller
     {
         private readonly IEquipoService _equipoService;

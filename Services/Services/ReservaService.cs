@@ -11,6 +11,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using Services.Models.Shared;
+using Services;
 
 namespace Services
 {
@@ -20,17 +21,47 @@ namespace Services
         private readonly ISalaRepository _salaRepository; // Para el dropdown
         private readonly IEquipoRepository _equipoRepository; // Para buscar equipo
         private readonly IMapper _mapper;
+        private readonly IUsuarioService _usuarioService;
 
         public ReservaService(
             IReservaRepository reservaRepository,
             ISalaRepository salaRepository,
             IEquipoRepository equipoRepository,
+            IUsuarioService usuarioService,
             IMapper mapper)
         {
             _reservaRepository = reservaRepository;
             _salaRepository = salaRepository;
             _equipoRepository = equipoRepository;
+            _usuarioService = usuarioService;
             _mapper = mapper;
+        }
+        public async Task<ReservarEquipoCoordinadorModel> GetDatosParaReservarEquipoCoord(Guid? salaId = null)
+        {
+            // 1. Reutilizamos la lógica de salas
+            var datosBase = await GetDatosParaReservarEquipo(salaId);
+
+            // 2. Cargamos usuarios
+            var usuarios = await _usuarioService.GetUsuariosParaDropdown();
+
+            return new ReservarEquipoCoordinadorModel
+            {
+                SalasDisponibles = datosBase.SalasDisponibles, // Copiamos las salas
+                SalaId = datosBase.SalaId,
+                UsuariosDisponibles = usuarios // Asignamos usuarios
+            };
+        }
+
+        public async Task<ReservarSalaCoordinadorModel> GetDatosParaReservarSalaCoord()
+        {
+            var datosBase = await GetDatosParaReservarSala();
+            var usuarios = await _usuarioService.GetUsuariosParaDropdown();
+
+            return new ReservarSalaCoordinadorModel
+            {
+                SalasDisponibles = datosBase.SalasDisponibles,
+                UsuariosDisponibles = usuarios
+            };
         }
         private async Task LimpiarReservasVencidas(IEnumerable<Reserva> reservas)
         {
@@ -88,18 +119,29 @@ namespace Services
             // Limpiamos antes de mostrar
             await LimpiarReservasVencidas(reservas);
             return _mapper.Map<IList<ReservaIndexModel>>(reservas);
-        } 
-        public async Task<ReservarEquipoModel> GetDatosParaReservarEquipo()
+        }
+        public async Task<ReservarEquipoModel> GetDatosParaReservarEquipo(Guid? salaId = null)
         {
+            // 1. Obtener solo las salas marcadas como "Individual" (para equipos)
             var salas = await _salaRepository.GetSalasIndividuales();
+
+            // 2. Crear el modelo inicial
             var modelo = new ReservarEquipoModel
             {
+                // 3. Llenar el dropdown con el formato "Sala X (Cap: Y)"
                 SalasDisponibles = salas.Select(s => new SelectListItem
                 {
                     Value = s.Id.ToString(),
-                    Text = $"Sala {s.Numero}"
+                    Text = $"Sala {s.Numero} (Cap: {s.Capacidad})"
                 })
             };
+
+            // 4. Si nos pasan un ID (ej. desde el botón "Asignar"), lo pre-seleccionamos
+            if (salaId.HasValue)
+            {
+                modelo.SalaId = salaId.Value;
+            }
+
             return modelo;
         }
         public async Task CrearReservaEquipo(ReservarEquipoModel model, string usuarioId, bool esProfesor)

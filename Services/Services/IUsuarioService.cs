@@ -1,4 +1,5 @@
 ﻿using Microsoft.AspNetCore.Identity;
+using Microsoft.AspNetCore.Mvc.Rendering;
 using Services.Models.UsuarioModels;
 using System;
 using System.Collections.Generic;
@@ -16,5 +17,6 @@ namespace Services
         Task<EditarUsuarioRolesModel> GetUsuarioParaEditarRoles(string id);
         Task ActualizarRolesUsuario(EditarUsuarioRolesModel model);
         Task EliminarUsuario(string id);
+        Task<IEnumerable<SelectListItem>> GetUsuariosParaDropdown();
     }
 }

@@ -136,5 +136,15 @@ namespace Services
                 throw new InvalidOperationException("No se puede eliminar el usuario. Es probable que tenga reservas, reportes o asesorías asociadas.");
             }
         }
+        public async Task<IEnumerable<SelectListItem>> GetUsuariosParaDropdown()
+        {
+            var usuarios = await _userManager.Users.ToListAsync();
+
+            return usuarios.Select(u => new SelectListItem
+            {
+                Value = u.Id,
+                Text = $"{u.Name} {u.LastName} (Doc: {u.DocumentNumber})"
+            }).OrderBy(u => u.Text);
+        }
     }
 }

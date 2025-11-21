@@ -1,5 +1,7 @@
-﻿using Domain.Enums;
+﻿using Domain;
+using Domain.Enums;
 using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Services;
 using Services.Models.ReservaModels;
@@ -12,11 +14,13 @@ namespace MvcSample.Controllers
     {
         private readonly IReservaService _reservaService;
         private readonly IEquipoService _equipoService;
+        private readonly UserManager<AppUser> _userManager;
 
-        public ReservasController(IReservaService reservaService, IEquipoService equipoService)
+        public ReservasController(IReservaService reservaService, IEquipoService equipoService, UserManager<AppUser> userManager)
         {
             _reservaService = reservaService;
             _equipoService = equipoService;
+            _userManager = userManager;
         }
         public async Task<IActionResult> Index()
         {
@@ -321,6 +325,99 @@ namespace MvcSample.Controllers
         {
             var listaPendientes = await _reservaService.GetReservasPendientes();
             return View(listaPendientes);
+        }
+
+        [HttpGet]
+        [Authorize(Roles = "Coordinador, Admin")]
+        public async Task<IActionResult> ReservarEquipoCoord(Guid? salaId)
+        {
+            var model = await _reservaService.GetDatosParaReservarEquipoCoord(salaId);
+            return View(model);
+        }
+
+        // POST: Para EQUIPO (Coordinador)
+        [HttpPost]
+        [Authorize(Roles = "Coordinador, Admin")]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> ReservarEquipoCoord(ReservarEquipoCoordinadorModel model)
+        {
+            if (!ModelState.IsValid)
+            {
+                var recargado = await _reservaService.GetDatosParaReservarEquipoCoord(model.SalaId == Guid.Empty ? null : model.SalaId);
+                // Copiar datos para no perderlos
+                model.SalasDisponibles = recargado.SalasDisponibles;
+                model.UsuariosDisponibles = recargado.UsuariosDisponibles;
+                return View(model);
+            }
+
+            try
+            {
+                // 1. Averiguar el rol del usuario SELECCIONADO (Target)
+                var targetUser = await _userManager.FindByIdAsync(model.UsuarioIdSeleccionado);
+                bool esProfesorTarget = await _userManager.IsInRoleAsync(targetUser, "Profesor");
+
+                // 2. Crear la reserva a nombre de ÉL
+                // Nota: Como lo hace un coordinador, ¿queremos ignorar el límite de 2 reservas?
+                // Si sí, puedes pasar 'true' siempre en el tercer parámetro. 
+                // Si quieres respetar las reglas del usuario, pasas 'esProfesorTarget'.
+                // Yo recomiendo 'true' (el coordinador tiene poder de override).
+                await _reservaService.CrearReservaEquipo(model, model.UsuarioIdSeleccionado, true);
+
+                TempData["Mensaje"] = $"Reserva creada exitosamente para {targetUser.Name}.";
+                return RedirectToAction("Gestionar");
+            }
+            catch (Exception ex)
+            {
+                ModelState.AddModelError(string.Empty, ex.Message);
+                var recargado = await _reservaService.GetDatosParaReservarEquipoCoord(model.SalaId == Guid.Empty ? null : model.SalaId);
+                model.SalasDisponibles = recargado.SalasDisponibles;
+                model.UsuariosDisponibles = recargado.UsuariosDisponibles;
+                return View(model);
+            }
+        }
+
+        // GET: Para SALA (Coordinador)
+        [HttpGet]
+        [Authorize(Roles = "Coordinador, Admin")]
+        public async Task<IActionResult> ReservarSalaCoord()
+        {
+            var model = await _reservaService.GetDatosParaReservarSalaCoord();
+            return View(model);
+        }
+
+        // POST: Para SALA (Coordinador)
+        [HttpPost]
+        [Authorize(Roles = "Coordinador, Admin")]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> ReservarSalaCoord(ReservarSalaCoordinadorModel model)
+        {
+            if (!ModelState.IsValid)
+            {
+                var recargado = await _reservaService.GetDatosParaReservarSalaCoord();
+                model.SalasDisponibles = recargado.SalasDisponibles;
+                model.UsuariosDisponibles = recargado.UsuariosDisponibles;
+                return View(model);
+            }
+
+            try
+            {
+                // Aquí usamos el ID seleccionado
+                await _reservaService.CrearReservaSala(model, model.UsuarioIdSeleccionado);
+
+                // Opcional: Como lo hace el coordinador, podríamos aprobarla automáticamente aquí
+                // Pero por defecto quedará Pendiente.
+
+                TempData["Mensaje"] = "Solicitud de sala creada para el usuario.";
+                return RedirectToAction("Gestionar");
+            }
+            catch (Exception ex)
+            {
+                ModelState.AddModelError(string.Empty, ex.Message);
+                var recargado = await _reservaService.GetDatosParaReservarSalaCoord();
+                model.SalasDisponibles = recargado.SalasDisponibles;
+                model.UsuariosDisponibles = recargado.UsuariosDisponibles;
+                return View(model);
+            }
         }
     }
 }

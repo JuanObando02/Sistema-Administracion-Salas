@@ -1,0 +1,87 @@
+﻿@model Services.Models.ReservaModels.ReservarSalaCoordinadorModel
+
+@{
+    ViewData["Title"] = "Asignar Sala a Profesor";
+}
+
+<div class="row">
+    <div class="col-md-6 offset-md-3">
+        <div class="card shadow-sm">
+            <div class="card-header bg-success text-white">
+                <h4 class="mb-0"><i class="bi bi-easel"></i> Asignar Sala de Clase</h4>
+            </div>
+            <div class="card-body">
+
+                <div class="alert alert-warning d-flex align-items-center" role="alert">
+                    <i class="bi bi-exclamation-triangle-fill me-2"></i>
+                    <div>
+                        <strong>Atención:</strong> Esta función es para asignar salas completas (uso docente).
+                    </div>
+                </div>
+
+                <form asp-action="ReservarSalaCoord" method="post">
+                    <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+
+                    @* --- CAMPO EXCLUSIVO COORDINADOR: SELECCIÓN DE USUARIO --- *@
+                    <div class="mb-4 p-3 bg-light rounded border">
+                        <label asp-for="UsuarioIdSeleccionado" class="form-label fw-bold text-success">
+                            <i class="bi bi-person-badge"></i> Docente Beneficiario
+                        </label>
+                        @* Nota: Aquí idealmente solo deberían salir profesores, pero tu lista trae todos *@
+                        <select asp-for="UsuarioIdSeleccionado"
+                                asp-items="Model.UsuariosDisponibles"
+                                class="form-select form-select-lg">
+                            <option value="">-- Seleccione el Docente --</option>
+                        </select>
+                        <span asp-validation-for="UsuarioIdSeleccionado" class="text-danger"></span>
+                    </div>
+
+                    <hr />
+
+                    @* --- CAMPOS DE RESERVA ESTÁNDAR --- *@
+
+                    <div class="mb-3">
+                        <label asp-for="SalaId" class="form-label">Sala de Clase</label>
+                        <select asp-for="SalaId" asp-items="Model.SalasDisponibles" class="form-control">
+                            <option value="">-- Seleccione una Sala --</option>
+                        </select>
+                        <span asp-validation-for="SalaId" class="text-danger"></span>
+                    </div>
+
+                    <div class="mb-3">
+                        <label asp-for="FechaInicio" class="form-label">Fecha y Hora de Inicio</label>
+                        <input name="FechaInicio"
+                               id="FechaInicio"
+                               type="datetime-local"
+                               value="@Model.FechaInicio.ToString("yyyy-MM-ddTHH:mm")"
+                               class="form-control"
+                               step="1800" />
+                        <span asp-validation-for="FechaInicio" class="text-danger"></span>
+                    </div>
+
+                    <div class="mb-3">
+                        <label asp-for="DuracionHoras" class="form-label">Duración</label>
+                        <select asp-for="DuracionHoras" class="form-select">
+                            <option value="1">1 Hora</option>
+                            <option value="2">2 Horas</option>
+                            <option value="3">3 Horas</option>
+                            <option value="4">4 Horas</option>
+                        </select>
+                        <span asp-validation-for="DuracionHoras" class="text-danger"></span>
+                    </div>
+
+                    <div class="d-grid gap-2 mt-4">
+                        <button type="submit" class="btn btn-success btn-lg">Asignar Sala</button>
+                        <a asp-action="Gestionar" class="btn btn-secondary">Cancelar</a>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    @{
+        await Html.RenderPartialAsync("_ValidationScriptsPartial");
+    }
+}
