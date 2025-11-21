@@ -1,90 +1,115 @@
-﻿@* Recibe una LISTA del modelo que creamos *@
-@model IEnumerable<Services.Models.SalaModels.SalaIndexModel>
+﻿@model IEnumerable<Services.Models.SalaModels.SalaIndexModel>
 @using Domain.Enums
 
 @{
     ViewData["Title"] = "Gestión de Salas";
 }
 
-<h1>@ViewData["Title"]</h1>
+<link rel="stylesheet" href="~/css/tableSala.css" />
 
-<div class="row mb-3 align-items-center">
+<h1 class="mb-4">@ViewData["Title"]</h1>
+
+<div class="row mb-4 align-items-center">
     <div class="col-md-6">
         <a asp-action="Registrar" class="btn btn-primary">Registrar Nueva Sala</a>
     </div>
-    @* --- FORMULARIO DE BÚSQUEDA --- *@
-    <div class="col-md-6">
-        <form asp-action="Index" method="get" class="d-flex gap-2 justify-content-end">
-            <div class="input-group" style="max-width: 300px;">
-                <span class="input-group-text" id="basic-addon1">N° Sala</span>
 
-                @* El name="buscarNumero" debe coincidir con el parámetro del Controlador *@
-                <input type="number" name="buscarNumero"
-                       class="form-control"
-                       placeholder="Ej. 101"
-                       value="@ViewData["FiltroActual"]" />
+    <div class="col-md-6 d-flex justify-content-end">
 
-                <button type="submit" class="btn btn-outline-secondary">Buscar</button>
+        <form asp-action="Index" method="get" class="search-wrapper">
+
+            <div class="search-input">
+                <input type="number"
+                       name="buscarNumero"
+                       value="@ViewData["FiltroActual"]"
+                       placeholder="Buscar por número de sala..."
+                       class="search-box" />
             </div>
 
-            @* Botón para limpiar el filtro (recarga la página sin parámetros) *@
+            <button type="submit" class="search-btn">Buscar</button>
+
             @if (ViewData["FiltroActual"] != null)
             {
-                <a asp-action="Index" class="btn btn-link text-decoration-none">Ver Todas</a>
+                <a asp-action="Index" class="search-clear">Ver Todas</a>
             }
+
         </form>
+
     </div>
 </div>
 
-<table class="table table-hover">
-    <thead>
-        <tr>
-            <th>Nombre Sala</th>
-            <th>Capacidad</th>
-            <th>Tipo</th>
-            <th>Estado</th>
-            <th>Opciones</th>
-        </tr>
-    </thead>
-    <tbody>
-        @foreach (var item in Model)
-        {
+<div class="table-wrapper">
+    <table class="table-modern">
+        <thead>
             <tr>
-                <td>Sala @item.Numero</td>
-                <td>@item.Capacidad</td>
-                <td>
-                    @if (item.Tipo == TipoSala.Individual)
-                    {
-                        <span class="badge bg-info text-dark">Individual</span>
-                    }
-                    else
-                    {
-                        <span class="badge bg-primary">Clase Completa</span>
-                    }
-                </td>
-                <td>
-                    @* Puedes darle color al estado también si quieres *@
-                    @if (item.Estado == EstadoSala.Disponible)
-                    {
-                        <span class="badge bg-success">Disponible</span>
-                    }
-                    else
-                    {
-                        <span class="badge bg-danger">@item.Estado</span>
-                    }
-                </td>
-                <td>
-                    <a asp-action="Editar" asp-route-id="@item.Id" class="btn btn-sm btn-warning">Editar</a> |
-                    <a asp-action="Eliminar" asp-route-id="@item.Id" class="btn btn-sm btn-danger">Eliminar</a> |
-
-                    <a asp-action="Index"
-                       asp-controller="Equipos"
-                       asp-route-salaId="@item.Id"
-                       class="btn btn-sm btn-info">
-                        Ver Equipos
-                    </a>
-                </td>
+                <th>Nombre Sala</th>
+                <th>Capacidad</th>
+                <th>Tipo</th>
+                <th>Estado</th>
+                <th>Opciones</th>
             </tr>
-        }
-    </tbody>
-</table>
+        </thead>
+
+        <tbody>
+            @foreach (var item in Model)
+            {
+                <tr>
+                    <td>Sala @item.Numero</td>
+                    <td>@item.Capacidad</td>
+
+                    <td>
+                        @if (item.Tipo == TipoSala.Individual)
+                        {
+                            <span class="badge-modern badge-info">Individual</span>
+                        }
+                        else
+                        {
+                            <span class="badge-modern badge-primary">Clase Completa</span>
+                        }
+                    </td>
+
+                    <td>
+                        @if (item.Estado == EstadoSala.Disponible)
+                        {
+                            <span class="badge-modern badge-success">Disponible</span>
+                        }
+                        else if (item.Estado == EstadoSala.Deshabilitada)
+                        {
+                            <span class="badge-modern badge-disabled">Deshabilitada</span>
+                        }
+                        else if (item.Estado == EstadoSala.EnMantenimiento)
+                        {
+                            <span class="badge-modern badge-maintenance">Mantenimiento</span>
+                        }
+                        else if (item.Estado == EstadoSala.Ocupada)
+                        {
+                            <span class="badge-modern badge-danger">Ocupada</span>
+                        }
+                    </td>
+
+
+                    <td>
+                        <a asp-action="Editar"
+                           asp-route-id="@item.Id"
+                           class="modern-btn btn-edit">
+                            <i class="bi bi-pencil-square"></i>Editar
+                        </a>
+
+                        <a asp-action="Eliminar"
+                           asp-route-id="@item.Id"
+                           class="modern-btn btn-delete">
+                            <i class="bi bi-trash"></i>Eliminar
+                        </a>
+
+                        <a asp-action="Index"
+                           asp-controller="Equipos"
+                           asp-route-salaId="@item.Id"
+                           class="modern-btn btn-equipos">
+                            <i class="bi bi-laptop"></i>Ver Equipos
+                        </a>
+                    </td>
+                </tr>
+            }
+        </tbody>
+    </table>
+</div>

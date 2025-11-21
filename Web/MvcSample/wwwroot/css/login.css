@@ -106,19 +106,26 @@ label {
 }
 
 .input-group {
-    position: relative;
-    background: #f3f3f5;
-    border-radius: 7px;
-    margin-top: 5px;
-    display: flex;
-    align-items: center;
+position: relative;
+background: #f3f3f5;
+border-radius: 7px;
+margin-top: 5px;
+}
+
+.input-group i {
+    position: absolute;
+    left: 12px;
+    top: 50%;
+    transform: translateY(-50%);
+    font-size: 1rem;
+    color: #555;
 }
 
 .input-group input {
     width: 100%;
     border: none;
     background: transparent;
-    padding: 10px 12px 10px 38px;
+    padding: 10px 12px 10px 40px; /* espacio para el ícono */
     font-size: 14px;
     outline: none;
 }
@@ -134,13 +141,6 @@ input:-webkit-autofill:active {
     transition: background-color 5000s ease-in-out 0s;
     box-shadow: 0 0 0px 1000px #f3f3f5 inset; /* fondo */
     border-radius: 7px !important; /* fuerza el borde redondeado */
-}
-
-.input-icon {
-    position: absolute;
-    left: 10px;
-    width: 18px;
-    opacity: 0.7;
 }
 
 /* Botón */
