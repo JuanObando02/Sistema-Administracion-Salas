@@ -14,5 +14,8 @@ namespace Services.Models.AsesoriaModels
         public string Descripcion { get; set; } = string.Empty;
         public string Ubicacion { get; set; } = string.Empty; // "Sala 101" o "Sin ubicación"
         public EstadoAsesoria Estado { get; set; }
+        public string NombreSolicitante { get; set; } = string.Empty;
+        public string EmailSolicitante { get; set; } = string.Empty;
+        public string DocumentoSolicitante { get; set; } = string.Empty;
     }
 }

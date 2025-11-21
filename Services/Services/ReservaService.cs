@@ -598,7 +598,21 @@ namespace Services
 
             return model;
         }
+        public async Task<IList<ReservaIndexModel>> GetReservasPendientes()
+        {
+            // 1. Obtener datos
+            var pendientes = await _reservaRepository.GetReservasPendientes();
 
+            // 2. Limpiar vencidas (Importante: si una pendiente ya pasó de fecha, se marca Finalizada/Rechazada auto)
+            // Usamos el método privado que ya creamos
+            await LimpiarReservasVencidas(pendientes);
+
+            // 3. Filtramos de nuevo en memoria por si LimpiarReservasVencidas cambió alguna a Finalizada
+            var pendientesReales = pendientes.Where(r => r.Estado == EstadoReserva.Pendiente);
+
+            // 4. Mapear
+            return _mapper.Map<IList<ReservaIndexModel>>(pendientesReales);
+        }
     }
 
 }

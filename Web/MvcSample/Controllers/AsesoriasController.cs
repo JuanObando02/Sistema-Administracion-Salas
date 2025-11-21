@@ -59,5 +59,79 @@ namespace MvcSample.Controllers
                 return View(model);
             }
         }
+        
+        [HttpGet]
+        [Authorize(Roles = "Coordinador, Admin")]
+        public async Task<IActionResult> Gestionar()
+        {
+            var lista = await _asesoriaService.GetAsesoriasGestionar();
+            return View(lista);
+        }
+        
+        [HttpPost]
+        [Authorize(Roles = "Coordinador, Admin")]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> Atender(Guid id)
+        {
+            var coordId = User.FindFirstValue(ClaimTypes.NameIdentifier);
+            try
+            {
+                await _asesoriaService.MarcarEnProceso(id, coordId);
+                TempData["Mensaje"] = "Asesoría marcada en proceso.";
+            }
+            catch (Exception ex) { TempData["Error"] = ex.Message; }
+            return RedirectToAction("Gestionar");
+        }
+
+        [HttpPost]
+        [Authorize(Roles = "Coordinador, Admin")]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> Finalizar(Guid id, string? observaciones) // <-- Recibe observaciones
+        {
+            var coordId = User.FindFirstValue(ClaimTypes.NameIdentifier);
+            try
+            {
+                await _asesoriaService.FinalizarAsesoria(id, coordId, observaciones);
+                TempData["Mensaje"] = "Asesoría finalizada con éxito.";
+            }
+            catch (Exception ex) { TempData["Error"] = ex.Message; }
+            return RedirectToAction("Gestionar");
+        }
+
+        [HttpPost]
+        [Authorize(Roles = "Coordinador, Admin")]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> NoAplica(Guid id, string? observaciones) // <-- Recibe observaciones
+        {
+            var coordId = User.FindFirstValue(ClaimTypes.NameIdentifier);
+            try
+            {
+                await _asesoriaService.DescartarAsesoria(id, coordId, observaciones);
+                TempData["Mensaje"] = "Solicitud cerrada como No Aplica.";
+            }
+            catch (Exception ex) { TempData["Error"] = ex.Message; }
+            return RedirectToAction("Gestionar");
+        }
+        [HttpGet]
+        [Authorize(Roles = "Coordinador, Admin")]
+        public async Task<IActionResult> Historial(string? busqueda,Domain.Enums.EstadoAsesoria? estado,DateTime? fecha,int pagina = 1)
+        {
+            var filtro = new FiltroAsesoriaModel
+            {
+                Busqueda = busqueda,
+                Estado = estado,
+                Fecha = fecha,
+                Pagina = pagina
+            };
+
+            var listaPaginada = await _asesoriaService.GetHistorialAsesorias(filtro);
+
+            // Guardar estado de filtros para la vista
+            ViewData["BusquedaActual"] = busqueda;
+            ViewData["EstadoActual"] = estado;
+            ViewData["FechaActual"] = fecha?.ToString("yyyy-MM-dd");
+
+            return View(listaPaginada);
+        }
     }
 }

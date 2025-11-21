@@ -11,5 +11,14 @@ namespace Infrastructure.Repositories
     {
         Task Save(Reporte reporte);
         Task<IList<Reporte>> GetReportesPorUsuario(string usuarioId);
+        Task<(IList<Reporte> Items, int TotalCount)> GetReportesConFiltros(
+            string? busqueda,
+            Domain.Enums.EstadoReporte? estado,
+            DateTime? fecha,
+            int pagina,
+            int pageSize);
+        Task Update(Reporte reporte);
+        Task<Reporte> GetReportePorId(Guid id);
+        Task<IList<Reporte>> GetReportesPendientes();
     }
 }

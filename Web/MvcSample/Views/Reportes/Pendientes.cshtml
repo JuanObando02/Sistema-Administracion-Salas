@@ -1,0 +1,102 @@
+﻿@model IEnumerable<Services.Models.ReporteModels.ReporteAdminIndexModel>
+@using Domain.Enums
+
+@{
+    ViewData["Title"] = "Reportes Pendientes";
+}
+
+<div class="d-flex justify-content-between align-items-center mb-3">
+    <h1><i class="bi bi-exclamation-circle"></i> Reportes Pendientes</h1>
+
+    @* --- BOTÓN PARA IR AL HISTORIAL CON FILTROS --- *@
+    <a asp-action="Gestionar" class="btn btn-outline-secondary">
+        <i class="bi bi-archive"></i> Ver Historial Completo
+    </a>
+</div>
+
+@if (TempData["Mensaje"] != null)
+{
+    <div class="alert alert-success">@TempData["Mensaje"]</div>
+}
+@if (TempData["Error"] != null)
+{
+    <div class="alert alert-danger">@TempData["Error"]</div>
+}
+
+@if (!Model.Any())
+{
+    <div class="alert alert-success text-center mt-4">
+        <i class="bi bi-check2-circle h3"></i>
+        <p class="mb-0">No hay reportes pendientes de revisión.</p>
+    </div>
+}
+else
+{
+    <div class="card shadow-sm">
+        <div class="card-body p-0">
+            <table class="table table-hover mb-0 align-middle">
+                <thead class="table-light">
+                    <tr>
+                        <th>Fecha</th>
+                        <th>Tipo</th>
+                        <th>Ubicación</th>
+                        <th>Reportado Por</th>
+                        <th>Descripción</th>
+                        <th class="text-end">Acciones</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach (var item in Model)
+                    {
+                        <tr>
+                            <td>@item.FechaCreacion.ToString("dd/MM HH:mm")</td>
+                            <td>
+                                @if (item.Tipo == TipoReporte.Sala)
+                                {
+                                    <span class="badge bg-primary">Sala</span>
+                                }
+                                else if (item.Tipo == TipoReporte.Equipo)
+                                {
+
+                                    <span class="badge bg-info text-dark">Equipo</span>
+                                }
+                                else
+                                {
+
+                                    <span class="badge bg-secondary">Otro</span>
+                                }
+                            </td>
+                            <td class="fw-bold">@item.ObjetoAfectado</td>
+                            <td>@item.NombreUsuario</td>
+                            <td>
+                                <span class="d-inline-block text-truncate" style="max-width: 250px;" title="@item.Descripcion">
+                                    @item.Descripcion
+                                </span>
+                            </td>
+                            <td class="text-end">
+                                <div class="d-flex gap-2 justify-content-end">
+
+                                    @* ATENDER (Pasa a En Proceso) *@
+                                    <form asp-action="Atender" asp-route-id="@item.Id" method="post">
+                                        <button type="submit" class="btn btn-sm btn-primary" title="Atender e Iniciar Proceso">
+                                            <i class="bi bi-play-fill"></i> Atender
+                                        </button>
+                                    </form>
+
+                                    @* RECHAZAR (Descarta el reporte) *@
+                                    <form asp-action="Rechazar" asp-route-id="@item.Id" method="post"
+                                          onsubmit="return confirm('¿Rechazar este reporte? Se marcará como inválido.');">
+                                        <button type="submit" class="btn btn-sm btn-danger" title="Rechazar / Inválido">
+                                            <i class="bi bi-x-lg"></i>
+                                        </button>
+                                    </form>
+
+                                </div>
+                            </td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+    </div>
+}

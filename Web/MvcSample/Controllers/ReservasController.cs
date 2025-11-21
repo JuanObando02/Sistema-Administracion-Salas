@@ -315,5 +315,12 @@ namespace MvcSample.Controllers
             return Json(listaParaDropdown);
         }
 
+        [HttpGet]
+        [Authorize(Roles = "Coordinador, Admin")]
+        public async Task<IActionResult> Pendientes()
+        {
+            var listaPendientes = await _reservaService.GetReservasPendientes();
+            return View(listaPendientes);
+        }
     }
 }

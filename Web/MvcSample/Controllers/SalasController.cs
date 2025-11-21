@@ -6,7 +6,7 @@ using System;
 
 namespace MvcSample.Controllers
 {
-    [Authorize(Roles = "Admin, Master")]
+    [Authorize(Roles = "Admin, Master, Coordinador")]
     public class SalasController : Controller
     {
         private readonly ISalaService _salaService;

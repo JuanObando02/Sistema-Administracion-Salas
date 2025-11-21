@@ -1,0 +1,112 @@
+﻿@using Services.Models.Shared
+@model PaginatedList<Services.Models.AsesoriaModels.AsesoriaIndexModel>
+@using Domain.Enums
+
+@{
+    ViewData["Title"] = "Historial de Asesorías";
+
+    var prevDisabled = !Model.HasPreviousPage ? "disabled" : "";
+    var nextDisabled = !Model.HasNextPage ? "disabled" : "";
+    var busqueda = ViewData["BusquedaActual"];
+    var estado = ViewData["EstadoActual"];
+    var fecha = ViewData["FechaActual"];
+}
+
+<div class="d-flex justify-content-between align-items-center mb-3">
+    <h1>@ViewData["Title"]</h1>
+    <a asp-action="Gestionar" class="btn btn-outline-primary">
+        <i class="bi bi-arrow-left"></i> Volver a Pendientes
+    </a>
+</div>
+
+<div class="card mb-4 bg-light">
+    <div class="card-body">
+        <form asp-action="Historial" method="get" class="row g-3">
+            <div class="col-md-4">
+                <label class="form-label">Buscar</label>
+                <input type="text" name="busqueda" class="form-control" placeholder="Solicitante, Sala o Descripción..." value="@busqueda">
+            </div>
+            <div class="col-md-3">
+                <label class="form-label">Estado</label>
+                <select name="estado" class="form-select" asp-items="Html.GetEnumSelectList<EstadoAsesoria>()">
+                    <option value="">-- Todos --</option>
+                </select>
+                @if (estado != null)
+                {
+                    <script>document.getElementsByName('estado')[0].value = '@estado';</script>
+                }
+            </div>
+            <div class="col-md-3">
+                <label class="form-label">Fecha</label>
+                <input type="date" name="fecha" class="form-control" value="@fecha">
+            </div>
+            <div class="col-md-2 d-flex align-items-end gap-2">
+                <button type="submit" class="btn btn-primary w-100">Filtrar</button>
+                <a asp-action="Historial" class="btn btn-outline-secondary"><i class="bi bi-x-lg"></i></a>
+            </div>
+        </form>
+    </div>
+</div>
+
+<table class="table table-striped table-hover align-middle">
+    <thead class="table-dark">
+        <tr>
+            <th>Fecha</th>
+            <th>Ubicación</th>
+            <th>Solicitante</th>
+            <th>Descripción</th>
+            <th>Estado</th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var item in Model)
+        {
+            <tr>
+                <td>@item.Fecha.ToString("dd/MM/yyyy HH:mm")</td>
+                <td>@item.Ubicacion</td>
+                <td>
+                    <span class="fw-bold"><i class="bi bi-person"></i> @item.NombreSolicitante</span><br />
+                    <small class="text-muted">@item.EmailSolicitante</small>
+                </td>
+                <td>
+                    <span class="d-inline-block text-truncate" style="max-width: 250px;" title="@item.Descripcion">
+                        @item.Descripcion
+                    </span>
+                </td>
+                <td>
+                    @if (item.Estado == EstadoAsesoria.Pendiente)
+                    {
+                        <span class="badge bg-warning text-dark">Pendiente</span>
+                    }
+                    else if (item.Estado == EstadoAsesoria.EnProceso)
+                    {
+
+                        <span class="badge bg-info text-dark">En Proceso</span>
+                    }
+                    else if (item.Estado == EstadoAsesoria.Cerrada)
+                    {
+
+                        <span class="badge bg-success">Resuelta</span>
+                    }
+                    else
+                    {
+
+                        <span class="badge bg-secondary">No Aplica</span>
+                    }
+                </td>
+            </tr>
+        }
+    </tbody>
+</table>
+
+<nav>
+    <ul class="pagination justify-content-center">
+        <li class="page-item @prevDisabled">
+            <a asp-action="Historial" asp-route-pagina="@(Model.PageIndex - 1)" asp-route-busqueda="@busqueda" asp-route-estado="@estado" class="page-link">Anterior</a>
+        </li>
+        <li class="page-item disabled"><span class="page-link">Página @Model.PageIndex de @Model.TotalPages</span></li>
+        <li class="page-item @nextDisabled">
+            <a asp-action="Historial" asp-route-pagina="@(Model.PageIndex + 1)" asp-route-busqueda="@busqueda" asp-route-estado="@estado" class="page-link">Siguiente</a>
+        </li>
+    </ul>
+</nav>
