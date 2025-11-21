@@ -8,7 +8,7 @@
 
 <div class="page-wrapper">
 
-    <!-- Header (fuera de la tarjeta) -->
+    <!-- HEADER FUERA DE LA TARJETA -->
     <div class="header-container">
         <div class="header-logo-wrapper">
             <img class="header-logo" src="~/img/Background.png" alt="Logo" />
@@ -19,10 +19,9 @@
         </div>
     </div>
 
-    <!-- Tarjeta de registro -->
+    <!-- TARJETA DE REGISTRO -->
     <div class="card">
         <form id="registerForm" asp-route-returnUrl="@Model.ReturnUrl" method="post" class="form">
-
             <div asp-validation-summary="ModelOnly" class="text-danger mb-3"></div>
 
             <!-- Nombre / Apellido -->
@@ -39,54 +38,46 @@
                 </div>
             </div>
 
-            <!-- Documento / Email -->
-            <div class="form-row">
-                <div class="form-group">
-                    <label asp-for="Input.DocumentNumber">Documento</label>
-                    <input asp-for="Input.DocumentNumber" class="input-group" placeholder="Documento" />
-                    <span asp-validation-for="Input.DocumentNumber" class="text-danger"></span>
-                </div>
-                <div class="form-group">
-                    <label asp-for="Input.Email">Email</label>
-                    <input asp-for="Input.Email" class="input-group" placeholder="Email" autocomplete="username" />
-                    <span asp-validation-for="Input.Email" class="text-danger"></span>
-                </div>
-            </div>
-
-            <div class="form-floating mb-3">
-                <input asp-for="Input.DocumentNumber" class="form-control" placeholder="Documento" />
+            <!-- Documento -->
+            <div class="form-group">
                 <label asp-for="Input.DocumentNumber">Documento</label>
+                <input asp-for="Input.DocumentNumber" class="input-group" placeholder="Documento" />
                 <span asp-validation-for="Input.DocumentNumber" class="text-danger"></span>
             </div>
-            <div class="form-floating mb-3">
-                <select asp-for="Input.RoleName" class="form-select" aria-required="true">
+
+            <!-- Perfil / Rol -->
+            <div class="form-group">
+                <label asp-for="Input.RoleName">Soy</label>
+                <select asp-for="Input.RoleName" class="input-group">
                     <option value="">-- Seleccione su Perfil --</option>
                     <option value="Estudiante">Estudiante (Reserva Equipos)</option>
                     <option value="Profesor">Profesor (Reserva Salas)</option>
                 </select>
-                <label asp-for="Input.RoleName">Soy</label>
                 <span asp-validation-for="Input.RoleName" class="text-danger"></span>
             </div>
-            <div class="form-floating mb-3">
-                <input asp-for="Input.Email" class="form-control" autocomplete="username" aria-required="true" placeholder="name@example.com" />
+
+            <!-- Email -->
+            <div class="form-group">
                 <label asp-for="Input.Email">Email</label>
+                <input asp-for="Input.Email" class="input-group" placeholder="Email" autocomplete="username" />
                 <span asp-validation-for="Input.Email" class="text-danger"></span>
             </div>
-            <div class="form-floating mb-3">
-                <input asp-for="Input.Password" class="form-control" autocomplete="new-password" aria-required="true" placeholder="password" />
+
+            <!-- Password -->
+            <div class="form-group">
                 <label asp-for="Input.Password">Password</label>
+                <input asp-for="Input.Password" type="password" class="input-group" placeholder="Password" autocomplete="new-password" />
                 <span asp-validation-for="Input.Password" class="text-danger"></span>
             </div>
 
             <!-- Confirmar Contraseña -->
             <div class="form-group">
                 <label asp-for="Input.ConfirmPassword">Confirmar Contraseña</label>
-                <input asp-for="Input.ConfirmPassword" class="input-group" placeholder="Confirmar contraseña" autocomplete="new-password" />
+                <input asp-for="Input.ConfirmPassword" type="password" class="input-group" placeholder="Confirmar contraseña" autocomplete="new-password" />
                 <span asp-validation-for="Input.ConfirmPassword" class="text-danger"></span>
             </div>
 
             <button type="submit" class="btn-submit">Registrarse</button>
-
         </form>
     </div>
 </div>

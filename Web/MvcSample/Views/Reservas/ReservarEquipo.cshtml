@@ -4,50 +4,65 @@
     ViewData["Title"] = "Reservar un Equipo";
 }
 
-<h2>@ViewData["Title"]</h2>
-<p>Recuerde que solo puede reservar un máximo de 3 horas, entre las 7:00 AM y las 6:00 PM, y un máximo de 2 reservas por día.</p>
-<hr />
+<link rel="stylesheet" href="~/css/equiposEdit.css" />
 
-<div class="row">
-    <div class="col-md-6">
-        <form asp-action="ReservarEquipo" method="post">
+<div class="modal-wrapper">
+    <div class="radix-ru">
 
-            <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+        <!-- Título -->
+        <div class="flex-flex-col-gap-2-text-center-sm-text-left">
+            <div class="nuevo-usuario">@ViewData["Title"]</div>
+            <div class="registra-un-nuevo-usuario-en-el-sistema">
+                Recuerde que solo puede reservar un máximo de 3 horas, entre las 7:00 AM y las 6:00 PM, y un máximo de 2 reservas por día.
+            </div>
+        </div>
 
-            <div class="mb-3">
-                <label asp-for="SalaId" class="form-label"></label>
-                <select asp-for="SalaId" asp-items="Model.SalasDisponibles" class="form-control">
-                    <option value="">-- Seleccione una Sala (para préstamo individual) --</option>
-                </select>
+        <!-- Formulario -->
+        <form asp-action="ReservarEquipo" method="post" class="form-space-y-4">
+
+            <div>
+                <div class="nombre">Sala</div>
+                <div class="input-nombre">
+                    <select asp-for="SalaId" asp-items="Model.SalasDisponibles">
+                        <option value="">-- Seleccione una Sala (para préstamo individual) --</option>
+                    </select>
+                </div>
                 <span asp-validation-for="SalaId" class="text-danger"></span>
             </div>
 
-            <div class="mb-3">
-                <label asp-for="FechaInicio" class="form-label"></label>
-                @* Input de Fecha y Hora *@
-                <input name="FechaInicio"
-                       id="FechaInicio"
-                       type="datetime-local"
-                       value="@Model.FechaInicio.ToString("yyyy-MM-ddTHH:mm")"
-                       class="form-control"
-                       step="1800" />
+            <div>
+                <div class="nombre">Fecha y Hora de Inicio</div>
+                <div class="input-nombre">
+                    <input name="FechaInicio"
+                           id="FechaInicio"
+                           type="datetime-local"
+                           value="@Model.FechaInicio.ToString("yyyy-MM-ddTHH:mm")"
+                           step="1800" />
+                </div>
                 <span asp-validation-for="FechaInicio" class="text-danger"></span>
             </div>
 
-            <div class="mb-3">
-                <label asp-for="DuracionHoras" class="form-label"></label>
-                @* Dropdown para la regla de 3 horas *@
-                <select asp-for="DuracionHoras" class="form-control">
-                    <option value="1">1 Hora</option>
-                    <option value="2">2 Horas</option>
-                    <option value="3">3 Horas</option>
-                </select>
+            <div>
+                <div class="nombre">Duración</div>
+                <div class="input-nombre">
+                    <select asp-for="DuracionHoras">
+                        <option value="1">1 Hora</option>
+                        <option value="2">2 Horas</option>
+                        <option value="3">3 Horas</option>
+                    </select>
+                </div>
                 <span asp-validation-for="DuracionHoras" class="text-danger"></span>
             </div>
 
-            <div class="form-group">
-                <input type="submit" value="Buscar y Reservar" class="btn btn-primary" />
+            <!-- Botones centrados -->
+            <div class="form-buttons">
+                <div class="btn-submit-modal">
+                    <div>Buscar y Reservar</div>
+                    <input type="submit" />
+                </div>
+                <a asp-action="Index" class="btn-cancel-modal">Cancelar</a>
             </div>
+
         </form>
     </div>
 </div>
