@@ -100,26 +100,32 @@ namespace Services
 
         public async Task CrearReporte(CrearReporteModel model, string usuarioId)
         {
-            // Validación de Lógica: Si es Equipo, debe tener EquipoId
-            if (model.Tipo == TipoReporte.Equipo && !model.EquipoId.HasValue)
+            // 1. Validación para EQUIPO
+            if (model.Tipo == TipoReporte.Equipo)
             {
-                throw new InvalidOperationException("Debe seleccionar el equipo dañado.");
+                if (!model.SalaId.HasValue) throw new InvalidOperationException("Debe seleccionar la sala.");
+                if (!model.EquipoId.HasValue) throw new InvalidOperationException("Debe seleccionar el equipo dañado.");
             }
-            // Si es Sala, debe tener SalaId
-            if (model.Tipo == TipoReporte.Sala && !model.SalaId.HasValue)
+
+            // 2. Validación para SALA
+            else if (model.Tipo == TipoReporte.Sala)
             {
-                throw new InvalidOperationException("Debe seleccionar la sala afectada.");
+                if (!model.SalaId.HasValue) throw new InvalidOperationException("Debe seleccionar la sala afectada.");
+            }// 3. Validación para OTRO
+            else if (model.Tipo == TipoReporte.Otro)
+            {
+
             }
 
             var reporte = new Reporte
             {
                 Tipo = model.Tipo,
                 Descripcion = model.Descripcion,
-                UsuarioId = usuarioId, // El usuario logueado
+                UsuarioId = usuarioId,
                 FechaCreacion = DateTime.Now,
-                Estado = EstadoReporte.Pendiente, // Siempre nace pendiente
+                Estado = EstadoReporte.Pendiente,
 
-                SalaId = model.SalaId,
+                SalaId = (model.Tipo != TipoReporte.Otro) ? model.SalaId : null,
                 EquipoId = (model.Tipo == TipoReporte.Equipo) ? model.EquipoId : null
             };
 

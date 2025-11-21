@@ -9,6 +9,82 @@
     <h1 class="display-5 fw-bold">Bienvenido al Sistema de Salas</h1>
     <p class="col-md-8 fs-4 mx-auto">Consulte la disponibilidad de espacios y equipos en tiempo real.</p>
 </div>
+@if (User.IsInRole("Admin") || User.IsInRole("Coordinador"))
+{
+    // Calculamos los totales aquí mismo para usar variables en el HTML
+    var total = Model.Count();
+    var disponibles = Model.Count(s => s.Estado == EstadoSala.Disponible);
+    var ocupadas = Model.Count(s => s.Estado == EstadoSala.Ocupada);
+    var mantenimiento = Model.Count(s => s.Estado == EstadoSala.EnMantenimiento);
+    var deshabilitadas = Model.Count(s => s.Estado == EstadoSala.Deshabilitada);
+
+    <div class="row mb-5 g-3">
+        @* 1. DISPONIBLES *@
+        <div class="col-md">
+            <div class="card h-100 border-0 shadow-sm">
+                <div class="card-body">
+                    <div class="d-flex justify-content-between align-items-start">
+                        <span class="text-muted fw-bold small">DISPONIBLES</span>
+                        <i class="bi bi-check-circle text-success fs-4"></i>
+                    </div>
+                    <h2 class="display-5 fw-bold text-success mt-2 mb-0">@disponibles</h2>
+                </div>
+            </div>
+        </div>
+
+        @* 2. OCUPADAS *@
+        <div class="col-md">
+            <div class="card h-100 border-0 shadow-sm">
+                <div class="card-body">
+                    <div class="d-flex justify-content-between align-items-start">
+                        <span class="text-muted fw-bold small">OCUPADAS</span>
+                        <i class="bi bi-people text-danger fs-4"></i>
+                    </div>
+                    <h2 class="display-5 fw-bold text-danger mt-2 mb-0">@ocupadas</h2>
+                </div>
+            </div>
+        </div>
+
+        @* 3. DESHABILITADAS *@
+        <div class="col-md">
+            <div class="card h-100 border-0 shadow-sm">
+                <div class="card-body">
+                    <div class="d-flex justify-content-between align-items-start">
+                        <span class="text-muted fw-bold small">DESHABILITADAS</span>
+                        <i class="bi bi-dash-circle text-secondary fs-4"></i> @* O bi-stars como en tu imagen *@
+                    </div>
+                    <h2 class="display-5 fw-bold text-secondary mt-2 mb-0">@deshabilitadas</h2>
+                </div>
+            </div>
+        </div>
+
+        @* 4. MANTENIMIENTO *@
+        <div class="col-md">
+            <div class="card h-100 border-0 shadow-sm">
+                <div class="card-body">
+                    <div class="d-flex justify-content-between align-items-start">
+                        <span class="text-muted fw-bold small">EN MANTENIMIENTO</span>
+                        <i class="bi bi-tools text-primary fs-4"></i>
+                    </div>
+                    <h2 class="display-5 fw-bold text-primary mt-2 mb-0">@mantenimiento</h2>
+                </div>
+            </div>
+        </div>
+
+        @* 5. TOTAL *@
+        <div class="col-md">
+            <div class="card h-100 border-0 shadow-sm bg-white">
+                <div class="card-body">
+                    <div class="d-flex justify-content-between align-items-start">
+                        <span class="text-muted fw-bold small">TOTAL SALAS</span>
+                        <i class="bi bi-hdd-network text-dark fs-4"></i>
+                    </div>
+                    <h2 class="display-5 fw-bold text-dark mt-2 mb-0">@total</h2>
+                </div>
+            </div>
+        </div>
+    </div>
+}
 
 <div class="row">
     @foreach (var sala in Model)
