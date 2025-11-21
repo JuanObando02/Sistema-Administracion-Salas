@@ -3,46 +3,53 @@
     ViewData["Title"] = "Gestión de Usuarios";
 }
 
-<h1>@ViewData["Title"]</h1>
+<link rel="stylesheet" href="~/css/tableSala.css" />
 
-<p>
-    <a asp-action="Registrar" class="btn btn-primary">Registrar Nuevo Usuario</a>
-</p>
+<h1 class="mb-4">@ViewData["Title"]</h1>
 
-<table class="table table-striped">
-    @* Agregué table-striped para que se vea mejor *@
-    <thead>
-        <tr>
-            <th>Email</th>
-            <th>Nombre Completo</th>
-            <th>Documento</th>
-            <th>Roles</th>
-            <th>Opciones</th>
-        </tr>
-    </thead>
-    <tbody>
-        @foreach (var item in Model)
-        {
+<div class="row mb-4 align-items-center">
+    <div class="col-md-6">
+        <a asp-action="Registrar" class="btn btn-primary">Registrar Nuevo Usuario</a>
+    </div>
+</div>
+
+<div class="table-wrapper">
+    <table class="table-modern">
+        <thead>
             <tr>
-                <td>@item.Email</td>
-                <td>@item.NombreCompleto</td>
-                <td>@item.Documento</td>
-                <td>
-                    <span class="badge bg-secondary">@item.Roles</span>
-                </td>
-                <td>
-                    <a asp-action="Editar"
-                       asp-route-id="@item.Id"
-                       class="btn btn-sm btn-warning">
-                        Editar Roles
-                    </a>
-                    <a asp-action="Eliminar"
-                       asp-route-id="@item.Id"
-                       class="btn btn-sm btn-danger">
-                        Eliminar
-                    </a>
-                </td>
+                <th>Email</th>
+                <th>Nombre Completo</th>
+                <th>Documento</th>
+                <th>Roles</th>
+                <th>Opciones</th>
             </tr>
-        }
-    </tbody>
-</table>
+        </thead>
+
+        <tbody>
+            @foreach (var item in Model)
+            {
+                <tr>
+                    <td>@item.Email</td>
+                    <td>@item.NombreCompleto</td>
+                    <td>@item.Documento</td>
+                    <td>
+                        <span class="badge-modern badge-info">@item.Roles</span>
+                    </td>
+                    <td>
+                        <a asp-action="Editar"
+                           asp-route-id="@item.Id"
+                           class="modern-btn btn-edit">
+                            <i class="bi bi-pencil-square"></i>Editar Roles
+                        </a>
+
+                        <a asp-action="Eliminar"
+                           asp-route-id="@item.Id"
+                           class="modern-btn btn-delete">
+                            <i class="bi bi-trash"></i>Eliminar
+                        </a>
+                    </td>
+                </tr>
+            }
+        </tbody>
+    </table>
+</div>

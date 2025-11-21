@@ -2,93 +2,126 @@
 
 @{
     ViewData["Title"] = "Gestión de Equipos";
-    // Recupera el SalaId que el Controlador envió
     Guid? salaId = ViewBag.SalaId;
 }
 
-<h1>@ViewData["Title"]</h1>
+<link rel="stylesheet" href="~/css/tableSala.css" />
 
-<div class="row mb-3 align-items-center">
+<h1 class="mb-4">@ViewData["Title"]</h1>
+
+<div class="row mb-4 align-items-center">
+
     <div class="col-md-6">
-    @* Si venimos de una sala, el botón "Registrar" pasará ese ID *@
-    @if (salaId.HasValue)
-    {
-        <a asp-action="Registrar" asp-route-salaId="@salaId.Value" class="btn btn-primary">Registrar Nuevo Equipo (en esta Sala)</a>
-        <a asp-action="Index" asp-controller="Salas" class="btn btn-secondary">Volver al Listado de Salas</a>
-    }
-    else
-    {
-        <a asp-action="Registrar" class="btn btn-primary">Registrar Nuevo Equipo (General)</a>
-    }
+
+        @if (salaId.HasValue)
+        {
+            <a asp-action="Registrar"
+               asp-route-salaId="@salaId.Value"
+               class="btn btn-primary">
+                Registrar Nuevo Equipo (en esta Sala)
+            </a>
+
+            <a asp-action="Index"
+               asp-controller="Salas"
+               class="btn btn-secondary">
+                Volver al Listado de Salas
+            </a>
+        }
+        else
+        {
+            <a asp-action="Registrar"
+               class="btn btn-primary">
+                Registrar Nuevo Equipo (General)
+            </a>
+        }
     </div>
-    <div class="col-md-6">
-        <form asp-action="Index" method="get" class="d-flex gap-2 justify-content-end">
 
-            @* ¡TRUCO IMPORTANTE! *@
-            @* Si estamos en una sala, guardamos el ID en un campo oculto *@
-            @* Así, al dar click en "Buscar", el formulario envía: ?salaId=XXX&buscarSerial=YYY *@
+    <div class="col-md-6 d-flex justify-content-end">
+
+        <form asp-action="Index" method="get" class="search-wrapper">
+
             @if (salaId.HasValue)
             {
                 <input type="hidden" name="salaId" value="@salaId.Value" />
             }
 
-            <div class="input-group" style="max-width: 300px;">
-                <span class="input-group-text"><i class="bi bi-search"></i> Serial</span>
-
-                <input type="text" name="buscarSerial"
-                       class="form-control"
-                       placeholder="Ej. PC-01"
-                       value="@ViewData["FiltroSerial"]" />
-
-                <button type="submit" class="btn btn-outline-secondary">Buscar</button>
+            <div class="search-input">
+                <input type="text"
+                       name="buscarSerial"
+                       value="@ViewData["FiltroSerial"]"
+                       placeholder="Buscar por serial..."
+                       class="search-box" />
             </div>
 
-            @* Botón Limpiar *@
+            <button type="submit" class="search-btn">Buscar</button>
+
             @if (ViewData["FiltroSerial"] != null)
             {
-                @* Si limpiamos, debemos decidir a dónde volver *@
                 @if (salaId.HasValue)
                 {
-                    // Volver a la lista limpia DE ESTA SALA
-                    <a asp-action="Index" asp-route-salaId="@salaId.Value" class="btn btn-link text-decoration-none">Ver Todos</a>
+                    <a asp-action="Index"
+                       asp-route-salaId="@salaId.Value"
+                       class="search-clear">
+                        Ver Todos
+                    </a>
                 }
                 else
                 {
-                    // Volver a la lista limpia GENERAL
-                    <a asp-action="Index" class="btn btn-link text-decoration-none">Ver Todos</a>
+                    <a asp-action="Index"
+                       class="search-clear">
+                        Ver Todos
+                    </a>
                 }
             }
+
         </form>
+
     </div>
+
 </div>
-<table class="table">
-    <thead>
-        <tr>
-            <th>Serial</th>
-            <th>Estado</th>
-            <th>Sala</th>
-            <th>Opciones</th>
-        </tr>
-    </thead>
-    <tbody>
-        @* Itera sobre la lista de equipos que el controlador envió *@
-        @foreach (var item in Model)
-        {
+
+
+<div class="table-wrapper">
+    <table class="table-modern">
+        <thead>
             <tr>
-                <td>
-                    @item.Serial
-                </td>
-                <td>
-                    @item.Estado
-                </td>
-                <td>
-                    @item.SalaNombre
-                </td>
-                <td>
-                    <a asp-action="Editar" asp-route-id="@item.Id" class="btn btn-sm btn-warning">Editar</a> |
-                    <a asp-action="Eliminar" asp-route-id="@item.Id" class="btn btn-sm btn-danger">Eliminar</a>
-                </td>
+                <th>Serial</th>
+                <th>Estado</th>
+                <th>Sala</th>
+                <th>Opciones</th>
             </tr>
-        }
-    </tbody>
-</table>
+        </thead>
+
+        <tbody>
+            @foreach (var item in Model)
+            {
+                <tr>
+
+                    <td>@item.Serial</td>
+
+                    <td>
+                        <span class="badge-modern badge-info">@item.Estado</span>
+                    </td>
+
+                    <td>@item.SalaNombre</td>
+
+                    <td>
+                        <a asp-action="Editar"
+                           asp-route-id="@item.Id"
+                           class="modern-btn btn-edit">
+                            <i class="bi bi-pencil-square"></i>Editar
+                        </a>
+
+                        <a asp-action="Eliminar"
+                           asp-route-id="@item.Id"
+                           class="modern-btn btn-delete">
+                            <i class="bi bi-trash"></i>Eliminar
+                        </a>
+                    </td>
+
+                </tr>
+            }
+        </tbody>
+
+    </table>
+</div>
