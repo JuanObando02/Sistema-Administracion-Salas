@@ -5,54 +5,61 @@
     ViewData["Title"] = "Mis Reportes de Daños";
 }
 
-<h1>@ViewData["Title"]</h1>
+<link rel="stylesheet" href="~/css/tableSala.css" />
 
-<p>
-    <a asp-action="Registrar" class="btn btn-danger">
-        <i class="bi bi-plus-circle"></i> Nuevo Reporte
-    </a>
-</p>
+<h1 class="mb-4">@ViewData["Title"]</h1>
 
-<table class="table table-hover">
-    <thead>
-        <tr>
-            <th>Fecha</th>
-            <th>Tipo</th>
-            <th>Objeto Afectado</th>
-            <th>Descripción</th>
-            <th>Estado</th>
-        </tr>
-    </thead>
-    <tbody>
-        @foreach (var item in Model)
-        {
+<div class="row mb-4 align-items-center">
+    <div class="col-md-6">
+        <a asp-action="Registrar" class="modern-btn btn-delete">
+            <i class="bi bi-plus-circle"></i> Nuevo Reporte
+        </a>
+    </div>
+</div>
+
+<div class="table-wrapper">
+    <table class="table-modern">
+        <thead>
             <tr>
-                <td>@item.FechaCreacion.ToString("dd/MM/yyyy HH:mm")</td>
-                <td>@item.Tipo</td>
-                <td>@item.ObjetoAfectado</td>
-                <td>@item.Descripcion</td>
-                <td>
-                    @if (item.Estado == EstadoReporte.Pendiente)
-                    {
-                        <span class="badge bg-warning text-dark">Pendiente</span>
-                    }
-                    else if (item.Estado == EstadoReporte.EnProceso)
-                    {
-                        <span class="badge bg-info text-dark">En Proceso</span>
-                    }
-                    else if (item.Estado == EstadoReporte.Cerrado)
-                    {
-                        <span class="badge bg-success">Solucionado</span>
-                    }
-                    else
-                    {
-                        <span class="badge bg-secondary">@item.Estado</span>
-                    }
-                </td>
+                <th>Fecha</th>
+                <th>Tipo</th>
+                <th>Objeto Afectado</th>
+                <th>Descripción</th>
+                <th>Estado</th>
             </tr>
-        }
-    </tbody>
-</table>
+        </thead>
+
+        <tbody>
+            @foreach (var item in Model)
+            {
+                <tr>
+                    <td>@item.FechaCreacion.ToString("dd/MM/yyyy HH:mm")</td>
+                    <td>@item.Tipo</td>
+                    <td>@item.ObjetoAfectado</td>
+                    <td>@item.Descripcion</td>
+                    <td>
+                        @if (item.Estado == EstadoReporte.Pendiente)
+                        {
+                            <span class="badge-modern badge-warning">Pendiente</span>
+                        }
+                        else if (item.Estado == EstadoReporte.EnProceso)
+                        {
+                            <span class="badge-modern badge-info">En Proceso</span>
+                        }
+                        else if (item.Estado == EstadoReporte.Cerrado)
+                        {
+                            <span class="badge-modern badge-success">Solucionado</span>
+                        }
+                        else
+                        {
+                            <span class="badge-modern badge-disabled">@item.Estado</span>
+                        }
+                    </td>
+                </tr>
+            }
+        </tbody>
+    </table>
+</div>
 
 @if (!Model.Any())
 {

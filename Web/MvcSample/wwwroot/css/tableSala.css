@@ -125,7 +125,6 @@ input[type=number] {
 .modern-btn {
     padding: 6px 14px;
     border-radius: 8px;
-    border: none;
     font-size: 0.85rem;
     font-weight: 600;
     display: inline-block;
@@ -138,6 +137,7 @@ input[type=number] {
 .modern-btn:hover {
     background: #fff;
     color: #161617;
+    border: 1px solid #161617;
 }
 
 .modern-btn i {
@@ -184,6 +184,11 @@ input[type=number] {
 .badge-maintenance {
     background: #dbeafe;
     color: #1e3a8a;
+}
+
+.badge-warning {
+    background: #FEF9C2;
+    color: #894B00;
 }
 
 .table-modern th:last-child,
