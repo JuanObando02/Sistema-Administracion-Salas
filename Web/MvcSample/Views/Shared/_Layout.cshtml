@@ -61,35 +61,45 @@
 
                 <ul class="nav nav-pills flex-column mb-auto">
                     <li class="nav-item">
-                        <a class="nav-link text-dark" asp-area="" asp-controller="Home" asp-action="Index">Home</a>
+                        <a class="nav-link text-dark" asp-area="" asp-controller="Home" asp-action="Index">
+                            <i class="bi bi-house-door-fill me-2"></i> Home
+                        </a>
                     </li>
 
                     @* --- BLOQUE ADMINISTRACIÓN --- *@
                     @if (User.IsInRole("Admin") || User.IsInRole("Coordinador"))
                     {
                         <li class="nav-item">
-                            <a class="nav-link text-dark" asp-area="" asp-controller="Salas" asp-action="Index">Gestión de Salas</a>
+                            <a class="nav-link text-dark" asp-area="" asp-controller="Salas" asp-action="Index">
+                                <i class="bi bi-building me-2"></i> Gestión de Salas
+                            </a>
                         </li>
                         <li class="nav-item">
-                            <a class="nav-link text-dark" asp-area="" asp-controller="Equipos" asp-action="Index">Gestión de Equipos</a>
+                            <a class="nav-link text-dark" asp-area="" asp-controller="Equipos" asp-action="Index">
+                                <i class="bi bi-hdd-network me-2"></i> Gestión de Equipos
+                            </a>
                         </li>
                         <li class="nav-item">
                             <a class="nav-link text-dark" asp-controller="Reservas" asp-action="Gestionar">
-                                <i class="bi bi-calendar-check"></i> Aprobar Reservas
+                                <i class="bi bi-calendar-check-fill me-2"></i> Aprobar Reservas
                             </a>
                         </li>
                         @if (User.IsInRole("Admin"))
                         {
                             <li class="nav-item">
-                                <a class="nav-link text-dark" asp-area="" asp-controller="Usuarios" asp-action="Index">Gestión de Usuarios</a>
+                                <a class="nav-link text-dark" asp-area="" asp-controller="Usuarios" asp-action="Index">
+                                    <i class="bi bi-people-fill me-2"></i> Gestión de Usuarios
+                                </a>
                             </li>
                             <li class="nav-item">
-                                <a class="nav-link text-dark" asp-area="" asp-controller="Roles" asp-action="Index">Gestión de Roles</a>
+                                <a class="nav-link text-dark" asp-area="" asp-controller="Roles" asp-action="Index">
+                                    <i class="bi bi-shield-lock-fill me-2"></i> Gestión de Roles
+                                </a>
                             </li>
                         }
                         <li class="nav-item">
                             <a class="nav-link text-dark" asp-area="" asp-controller="Reportes" asp-action="Registrar">
-                                <i class="bi bi-exclamation-triangle"></i> Reportar Daño
+                                <i class="bi bi-exclamation-triangle-fill me-2"></i> Reportar Daño
                             </a>
                         </li>
                     }
@@ -98,20 +108,29 @@
                     @if (!User.IsInRole("Admin") && !User.IsInRole("Coordinador"))
                     {
                         <li class="nav-item">
-                            <a class="nav-link text-dark" asp-area="" asp-controller="Reservas" asp-action="Index">Mis Reservas</a>
+                            <a class="nav-link text-dark" asp-area="" asp-controller="Reservas" asp-action="Index">
+                                <i class="bi bi-calendar2-check-fill me-2"></i> Mis Reservas
+                            </a>
                         </li>
                         <li class="nav-item">
-                            <a class="nav-link text-dark" asp-controller="Reportes" asp-action="MisReportes">Mis Reportes</a>
+                            <a class="nav-link text-dark" asp-controller="Reportes" asp-action="MisReportes">
+                                <i class="bi bi-clipboard-check-fill me-2"></i> Mis Reportes
+                            </a>
                         </li>
                         <li class="nav-item">
-                            <a class="nav-link text-dark" asp-controller="Asesorias" asp-action="Index">Asesorías</a>
+                            <a class="nav-link text-dark" asp-controller="Asesorias" asp-action="Index">
+                                <i class="bi bi-journal-text me-2"></i> Asesorías
+                            </a>
                         </li>
                     }
 
                     <li class="nav-item">
-                        <a class="nav-link text-dark" asp-area="" asp-controller="Home" asp-action="Privacy">Privacy</a>
+                        <a class="nav-link text-dark" asp-area="" asp-controller="Home" asp-action="Privacy">
+                            <i class="bi bi-file-lock2-fill me-2"></i> Privacy
+                        </a>
                     </li>
                 </ul>
+
 
                 @* ------------------ Footer del sidebar (Hola + Cerrar Sesión) ------------------ *@
                 <ul class="nav flex-column mt-auto">

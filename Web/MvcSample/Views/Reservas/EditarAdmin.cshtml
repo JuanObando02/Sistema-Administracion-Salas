@@ -5,71 +5,94 @@
     ViewData["Title"] = "Modificar Reserva";
 }
 
-<h2>Modificar Reserva</h2>
-<div asp-validation-summary="ModelOnly" class="text-danger"></div>
-<form asp-action="EditarAdmin" method="post">
-    <input type="hidden" asp-for="Id" />
-    <input type="hidden" asp-for="Tipo" />
+<link rel="stylesheet" href="~/css/equiposEdit.css" />
 
-    <div class="row">
-        <div class="col-md-6">
-            @* Fechas *@
-            <div class="mb-3">
-                <label asp-for="FechaInicio" class="form-label"></label>
-                <input asp-for="FechaInicio" class="form-control" type="datetime-local" step="1800" />
+<div class="modal-wrapper">
+    <div class="radix-ru">
+        <!-- Título -->
+        <div class="flex-flex-col-gap-2-text-center-sm-text-left">
+            <div class="nuevo-usuario">Modificar Reserva</div>
+            <div class="registra-un-nuevo-usuario-en-el-sistema">
+                Modifique la información de la reserva
             </div>
-            <div class="mb-3">
-                <label asp-for="FechaFin" class="form-label"></label>
-                <input asp-for="FechaFin" class="form-control" type="datetime-local" step="1800" />
-            </div>
+        </div>
 
-            @* Selección de Recurso *@
-            <div class="mb-3">
-                <label asp-for="SalaId" class="form-label">Sala</label>
-                <select asp-for="SalaId"
-                        asp-items="Model.SalasDisponibles"
-                        class="form-control"
-                        id="ddlSala">
-                </select>
+        <!-- Formulario -->
+        <form asp-action="EditarAdmin" method="post" class="form-space-y-4">
+            <input type="hidden" asp-for="Id" />
+            <input type="hidden" asp-for="Tipo" />
+
+            <!-- Fecha Inicio -->
+            <div>
+                <label asp-for="FechaInicio" class="fecha-de-nacimiento"></label>
+                <div class="input-fecha-nacimiento">
+                    <input asp-for="FechaInicio" class="form-control form-control-sm border-0 bg-transparent" type="datetime-local" step="1800" />
+                </div>
+                <span asp-validation-for="FechaInicio" class="text-danger"></span>
             </div>
 
+            <!-- Fecha Fin -->
+            <div>
+                <label asp-for="FechaFin" class="fecha-de-nacimiento"></label>
+                <div class="input-fecha-nacimiento">
+                    <input asp-for="FechaFin" class="form-control form-control-sm border-0 bg-transparent" type="datetime-local" step="1800" />
+                </div>
+                <span asp-validation-for="FechaFin" class="text-danger"></span>
+            </div>
+
+            <!-- Sala -->
+            <div>
+                <label asp-for="SalaId" class="tel-fono">Sala</label>
+                <div class="input-telefono">
+                    <select asp-for="SalaId"
+                            asp-items="Model.SalasDisponibles"
+                            class="form-control form-control-sm border-0 bg-transparent"
+                            id="ddlSala">
+                    </select>
+                </div>
+                <span asp-validation-for="SalaId" class="text-danger"></span>
+            </div>
+
+            <!-- Equipo -->
             @if (Model.Tipo == TipoReserva.Equipo)
             {
-                <div class="mb-3">
-                    <label asp-for="EquipoId" class="form-label">Equipo</label>
-                    <select asp-for="EquipoId"
-                            asp-items="Model.EquiposDisponibles"
-                            class="form-control"
-                            id="ddlEquipo">
-                        <option value="">-- Seleccione Equipo --</option>
-                    </select>
-                    <div class="form-text">Si cambia la sala, guarde para refrescar equipos o use JS.</div>
+                <div>
+                    <label asp-for="EquipoId" class="tel-fono">Equipo</label>
+                    <div class="input-telefono">
+                        <select asp-for="EquipoId"
+                                asp-items="Model.EquiposDisponibles"
+                                class="form-control form-control-sm border-0 bg-transparent"
+                                id="ddlEquipo">
+                            <option value="">-- Seleccione Equipo --</option>
+                        </select>
+                    </div>
+                    <span class="form-text">Si cambia la sala, guarde para refrescar equipos o use JS.</span>
                 </div>
             }
-        </div>
-    </div>
 
-    <button type="submit" class="btn btn-primary">Guardar Cambios</button>
-    <a asp-action="Gestionar" class="btn btn-secondary">Cancelar</a>
-</form>
+            <!-- Botones -->
+            <div class="form-buttons">
+                <div class="btn-submit-modal">
+                    Guardar Cambios
+                    <input type="submit" />
+                </div>
+                <a asp-action="Gestionar" class="btn-cancel-modal">Cancelar</a>
+            </div>
+        </form>
+    </div>
+</div>
 
 @section Scripts {
-    @{
-        await Html.RenderPartialAsync("_ValidationScriptsPartial");
-    }
+@{
+    await Html.RenderPartialAsync("_ValidationScriptsPartial");}
 
     <script>
         $(document).ready(function () {
-
-            // Función para cargar equipos
             function cargarEquipos() {
                 var salaId = $('#ddlSala').val();
                 var fechaInicio = $('#FechaInicio').val();
                 var fechaFin = $('#FechaFin').val();
-
-                // Obtenemos el ID de la reserva actual (está en el input hidden)
                 var reservaId = $('#Id').val();
-
                 var ddlEquipo = $('#ddlEquipo');
 
                 if (!salaId) {
@@ -91,11 +114,10 @@
                         salaId: salaId,
                         inicio: fechaInicio,
                         fin: fechaFin,
-                        reservaId: reservaId // Enviamos el ID para excluir la propia reserva
+                        reservaId: reservaId
                     },
                     success: function (data) {
                         ddlEquipo.empty();
-
                         if (data.length === 0) {
                             ddlEquipo.append('<option value="">-- No hay equipos disponibles en este horario --</option>');
                         } else {
@@ -111,14 +133,7 @@
                 });
             }
 
-            // Ejecutar la función cuando cambie CUALQUIERA de estos campos
-            $('#ddlSala, #FechaInicio, #FechaFin').change(function () {
-                cargarEquipos();
-            });
-
-            // Ejecutar al iniciar (por si ya vienen datos cargados)
-            // (Opcional: Puedes comentarlo si prefieres que el usuario toque algo primero)
-            // cargarEquipos();
+            $('#ddlSala, #FechaInicio, #FechaFin').change(cargarEquipos);
         });
     </script>
 }
