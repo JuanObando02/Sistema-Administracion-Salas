@@ -1,0 +1,143 @@
+﻿/* Contenedor que centra el modal */
+.modal-wrapper {
+    height: auto;
+    width: 100%;
+    display: flex;
+    justify-content: center; /* Centrado horizontal */
+    align-items: center; /* Centrado vertical */
+    min-height: 100vh; /* Altura completa de la ventana */
+    background: linear-gradient(135deg, #eef2ff, #ffe2e2);
+}
+
+/* Contenedor principal del modal */
+.radix-ru {
+    background: #ffffff;
+    border-radius: 8.75px;
+    border: 0.8px solid rgba(0, 0, 0, 0.1);
+    box-shadow: 0px 10px 15px -3px rgba(0, 0, 0, 0.1), 0px 4px 6px -4px rgba(0, 0, 0, 0.1);
+    padding: 20px 25px;
+    max-width: 500px;
+    width: 100%;
+    box-sizing: border-box;
+    position: relative;
+}
+
+/* Títulos */
+.flex-flex-col-gap-2-text-center-sm-text-left {
+    margin-bottom: 25px;
+}
+
+.nuevo-usuario {
+    color: #0a0a0a;
+    font-family: "Arial-Regular", sans-serif;
+    font-size: 16px;
+    font-weight: 400;
+    margin-bottom: 5px;
+}
+
+.registra-un-nuevo-usuario-en-el-sistema {
+    color: #717182;
+    font-family: "Arial-Regular", sans-serif;
+    font-size: 12px;
+    line-height: 17px;
+}
+
+/* Formulario en columna */
+.form-space-y-4 {
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+}
+
+    /* Cada campo: label arriba, input/select debajo */
+    .form-space-y-4 > div {
+        display: flex;
+        flex-direction: column;
+    }
+
+    /* Labels */
+    .form-space-y-4 label,
+    .nombre,
+    .apellido,
+    .identificaci-n,
+    .fecha-de-nacimiento,
+    .email,
+    .tel-fono {
+        color: #0a0a0a;
+        font-family: "Arial-Regular", sans-serif;
+        font-size: 12.25px;
+        font-weight: 400;
+        margin-bottom: 5px;
+    }
+
+/* Inputs y selects */
+.input-nombre,
+.input-apellido,
+.input-dni,
+.input-fecha-nacimiento,
+.input-email,
+.input-telefono {
+    background: #f3f3f5;
+    border-radius: 6.75px;
+    border: none;
+    padding: 4px 8px;
+    height: 32px;
+}
+
+    .input-nombre input,
+    .input-apellido input,
+    .input-dni input,
+    .input-fecha-nacimiento input,
+    .input-email input,
+    .input-telefono input,
+    .input-nombre select,
+    .input-apellido select,
+    .input-dni select,
+    .input-fecha-nacimiento select,
+    .input-email select,
+    .input-telefono select {
+        background: transparent;
+        border: none;
+        width: 100%;
+        height: 100%;
+        font-family: "Arial-Regular", sans-serif;
+        font-size: 12.25px;
+    }
+
+/* Mensajes de validación */
+.text-danger {
+    font-size: 11px;
+    margin-top: 2px;
+    display: block;
+}
+
+/* Botón Guardar Cambios */
+.button-inline-flex-items-center-justify-center-gap-2-whitespace-nowrap-rounded-md-text-sm-font-medium-transition-all-disabled-pointer-events-none-disabled-opacity-50-svg-pointer-events-none-svg-not-class-size-size-4-shrink-0-svg-shrink-0-outline-none-focus-visible-border-ring-focus-visible-ring-ring-50-focus-visible-ring-3-px-aria-invalid-ring-destructive-20-dark-aria-invalid-ring-destructive-40-aria-invalid-border-destructive-bg-primary-text-primary-foreground-hover-bg-primary-90-h-9-px-4-py-2-has-svg-px-3 {
+    background: #030213;
+    border-radius: 6.75px;
+    height: 36px;
+    width: 140px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: #ffffff;
+    font-family: "Arial-Regular", sans-serif;
+    font-size: 12px;
+    font-weight: 400;
+    cursor: pointer;
+    margin-top: 10px;
+    position: relative;
+}
+
+    /* Input invisible sobre el botón */
+    .button-inline-flex-items-center-justify-center-gap-2-whitespace-nowrap-rounded-md-text-sm-font-medium-transition-all-disabled-pointer-events-none-disabled-opacity-50-svg-pointer-events-none-svg-not-class-size-size-4-shrink-0-svg-shrink-0-outline-none-focus-visible-border-ring-focus-visible-ring-ring-50-focus-visible-ring-3-px-aria-invalid-ring-destructive-20-dark-aria-invalid-ring-destructive-40-aria-invalid-border-destructive-bg-primary-text-primary-foreground-hover-bg-primary-90-h-9-px-4-py-2-has-svg-px-3 input[type="submit"] {
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        opacity: 0;
+        cursor: pointer;
+    }
+
+

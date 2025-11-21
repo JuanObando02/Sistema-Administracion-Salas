@@ -5,42 +5,62 @@
     ViewData["Title"] = "Editar Sala";
 }
 
-<h2>Editar Sala N° @Model.Numero</h2>
-<hr />
+<link rel="stylesheet" href="~/css/equiposEdit.css" />
 
-<div class="row">
-    <div class="col-md-6">
-        <form asp-action="Editar" method="post">
-            <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+<div class="modal-wrapper">
+    <div class="radix-ru">
+        <!-- Título -->
+        <div class="flex-flex-col-gap-2-text-center-sm-text-left">
+            <div class="nuevo-usuario">Editar Sala</div>
+            <div class="registra-un-nuevo-usuario-en-el-sistema">
+                Modifique la información de la sala
+            </div>
+        </div>
 
-            @* Este campo es crucial. Guarda el Id pero no se lo muestra al usuario *@
+        <!-- Formulario -->
+        <form asp-action="Editar" method="post" class="form-space-y-4">
             <input type="hidden" asp-for="Id" />
 
-            <div class="mb-3">
-                <label asp-for="Numero" class="form-label"></label>
-                <input asp-for="Numero" class="form-control" />
+            <!-- Número -->
+            <div>
+                <div class="nombre">Número</div>
+                <div class="input-nombre">
+                    <input asp-for="Numero" class="form-control form-control-sm border-0 bg-transparent" />
+                </div>
                 <span asp-validation-for="Numero" class="text-danger"></span>
             </div>
 
-            <div class="mb-3">
-                <label asp-for="Capacidad" class="form-label"></label>
-                <input asp-for="Capacidad" class="form-control" type="number" />
+            <!-- Capacidad -->
+            <div>
+                <div class="apellido">Capacidad</div>
+                <div class="input-apellido">
+                    <input asp-for="Capacidad" type="number" class="form-control form-control-sm border-0 bg-transparent" />
+                </div>
                 <span asp-validation-for="Capacidad" class="text-danger"></span>
             </div>
 
-            <div class="mb-3">
-                <label asp-for="Estado" class="form-label"></label>
-                <select asp-for="Estado" asp-items="Html.GetEnumSelectList<EstadoSala>()" class="form-control"></select>
+            <!-- Estado -->
+            <div>
+                <div class="tel-fono">Estado</div>
+                <div class="input-telefono">
+                    <select asp-for="Estado" asp-items="Html.GetEnumSelectList<EstadoSala>()" class="form-control form-control-sm border-0 bg-transparent"></select>
+                </div>
                 <span asp-validation-for="Estado" class="text-danger"></span>
             </div>
 
-            <div class="mb-3">
-                <label asp-for="Tipo" class="form-label"></label>
-                <select asp-for="Tipo" asp-items="Html.GetEnumSelectList<TipoSala>()" class="form-control"></select>
+            <!-- Tipo -->
+            <div>
+                <div class="identificaci-n">Tipo</div>
+                <div class="input-dni">
+                    <select asp-for="Tipo" asp-items="Html.GetEnumSelectList<TipoSala>()" class="form-control form-control-sm border-0 bg-transparent"></select>
+                </div>
                 <span asp-validation-for="Tipo" class="text-danger"></span>
             </div>
-            <div class="form-group">
-                <input type="submit" value="Guardar Cambios" class="btn btn-primary" />
+
+            <!-- Botón -->
+            <div class="button-inline-flex-items-center-justify-center-gap-2-whitespace-nowrap-rounded-md-text-sm-font-medium-transition-all-disabled-pointer-events-none-disabled-opacity-50-svg-pointer-events-none-svg-not-class-size-size-4-shrink-0-svg-shrink-0-outline-none-focus-visible-border-ring-focus-visible-ring-ring-50-focus-visible-ring-3-px-aria-invalid-ring-destructive-20-dark-aria-invalid-ring-destructive-40-aria-invalid-border-destructive-bg-primary-text-primary-foreground-hover-bg-primary-90-h-9-px-4-py-2-has-svg-px-3">
+                <div class="registra-usuario">Guardar Cambios</div>
+                <input type="submit" class="position-absolute opacity-0" style="width:100%; height:100%; top:0; left:0;" />
             </div>
         </form>
     </div>

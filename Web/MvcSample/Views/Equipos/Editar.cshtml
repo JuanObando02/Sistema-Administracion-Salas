@@ -1,48 +1,60 @@
 ﻿@model Services.Models.EquipoModels.EditarEquipoModel
-@using Domain.Enums; // Para el enum
+@using Domain.Enums;
 
 @{
     ViewData["Title"] = "Editar Equipo";
 }
 
-<h2>Editar Equipo: @Model.Serial</h2>
-<hr />
+<link rel="stylesheet" href="~/css/equiposEdit.css" />
 
-<div class="row">
-    <div class="col-md-6">
-        <form asp-action="Editar" method="post">
-            <div asp-validation-summary="ModelOnly" class="text-danger"></div>
-            <input type="hidden" asp-for="Id" />
+<div class="modal-wrapper">
+<div class="radix-ru">
+    <!-- Título -->
+    <div class="flex-flex-col-gap-2-text-center-sm-text-left">
+        <div class="nuevo-usuario">Editar Equipo</div>
+        <div class="registra-un-nuevo-usuario-en-el-sistema">
+            Modifique la información del equipo
+        </div>
+    </div>
 
-            <div class="mb-3">
-                <label asp-for="Serial" class="form-label"></label>
-                <input asp-for="Serial" class="form-control" />
-                <span asp-validation-for="Serial" class="text-danger"></span>
+    <!-- Formulario -->
+    <form asp-action="Editar" method="post" class="form-space-y-4">
+        <input type="hidden" asp-for="Id" />
+
+        <!-- Serial -->
+        <div class="grid-grid-cols-2-gap-4">
+            <div class="nombre">Serial</div>
+            <div class="input-nombre">
+                <input asp-for="Serial" class="form-control form-control-sm border-0 bg-transparent" />
             </div>
+            <span asp-validation-for="Serial" class="text-danger"></span>
+        </div>
 
-            <div class="mb-3">
-                <label asp-for="SalaId" class="form-label"></label>
-                <select asp-for="SalaId" asp-items="Model.SalasDisponibles" class="form-control">
+        <!-- Sala -->
+        <div class="grid-grid-cols-2-gap-42">
+            <div class="identificaci-n">Sala</div>
+            <div class="input-apellido">
+                <select asp-for="SalaId" asp-items="Model.SalasDisponibles" class="form-control form-control-sm border-0 bg-transparent">
                     <option value="">-- Seleccione una Sala --</option>
                 </select>
-                <span asp-validation-for="SalaId" class="text-danger"></span>
             </div>
+            <span asp-validation-for="SalaId" class="text-danger"></span>
+        </div>
 
-            <div class="mb-3">
-                <label asp-for="Estado" class="form-label"></label>
-                <select asp-for="Estado" asp-items="Html.GetEnumSelectList<EstadoEquipo>()" class="form-control"></select>
-                <span asp-validation-for="Estado" class="text-danger"></span>
+        <!-- Estado -->
+        <div class="grid-grid-cols-2-gap-43">
+            <div class="tel-fono">Estado</div>
+            <div class="input-telefono">
+                <select asp-for="Estado" asp-items="Html.GetEnumSelectList<EstadoEquipo>()" class="form-control form-control-sm border-0 bg-transparent"></select>
             </div>
+            <span asp-validation-for="Estado" class="text-danger"></span>
+        </div>
 
-            <div class="form-group">
-                <input type="submit" value="Guardar Cambios" class="btn btn-primary" />
-            </div>
-        </form>
-    </div>
+        <!-- Botón -->
+        <div class="button-inline-flex-items-center-justify-center-gap-2-whitespace-nowrap-rounded-md-text-sm-font-medium-transition-all-disabled-pointer-events-none-disabled-opacity-50-svg-pointer-events-none-svg-not-class-size-size-4-shrink-0-svg-shrink-0-outline-none-focus-visible-border-ring-focus-visible-ring-ring-50-focus-visible-ring-3-px-aria-invalid-ring-destructive-20-dark-aria-invalid-ring-destructive-40-aria-invalid-border-destructive-bg-primary-text-primary-foreground-hover-bg-primary-90-h-9-px-4-py-2-has-svg-px-3">
+            <div class="registra-usuario">Guardar Cambios</div>
+            <input type="submit" class="position-absolute opacity-0" style="width:100%; height:100%; top:0; left:0;" />
+        </div>
+    </form>
 </div>
-
-@section Scripts {
-    @{
-        await Html.RenderPartialAsync("_ValidationScriptsPartial");
-    }
-}
+</div>

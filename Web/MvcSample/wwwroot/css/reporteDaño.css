@@ -1,0 +1,140 @@
+﻿.modal-wrapper {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    min-height: 100vh;
+    background: linear-gradient(135deg, #eef2ff, #ffe2e2);
+}
+
+.radix-ru {
+    background: #ffffff;
+    border-radius: 8.75px;
+    border: 0.8px solid rgba(0,0,0,0.1);
+    box-shadow: 0px 10px 15px -3px rgba(0,0,0,0.1), 0px 4px 6px -4px rgba(0,0,0,0.1);
+    padding: 25px;
+    max-width: 500px;
+    width: 100%;
+    box-sizing: border-box;
+    position: relative;
+}
+
+.flex-flex-col-gap-2-text-center-sm-text-left {
+    margin-bottom: 25px;
+}
+
+.nuevo-usuario {
+    color: #0a0a0a;
+    font-family: "Arial-Regular", sans-serif;
+    font-size: 16px;
+    font-weight: 400;
+    margin-bottom: 5px;
+}
+
+.registra-un-nuevo-usuario-en-el-sistema {
+    color: #717182;
+    font-family: "Arial-Regular", sans-serif;
+    font-size: 12px;
+    line-height: 17px;
+}
+
+.form-space-y-4 {
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+}
+
+    .form-space-y-4 > div {
+        display: flex;
+        flex-direction: column;
+    }
+
+.nombre,
+.apellido,
+.identificaci-n,
+.tel-fono {
+    color: #0a0a0a;
+    font-family: "Arial-Regular", sans-serif;
+    font-size: 12.25px;
+    font-weight: 400;
+    margin-bottom: 5px;
+}
+
+.input-nombre,
+.input-apellido,
+.input-dni,
+.input-telefono,
+.input-textarea {
+    background: #f3f3f5;
+    border-radius: 6.75px;
+    border: none;
+    padding: 6px 10px;
+}
+
+    .input-nombre input,
+    .input-apellido select,
+    .input-dni textarea,
+    .input-telefono select,
+    .input-textarea textarea {
+        background: transparent;
+        border: none;
+        width: 100%;
+        font-family: "Arial-Regular", sans-serif;
+        font-size: 12.25px;
+    }
+
+.input-textarea {
+    min-height: 120px;
+}
+
+.text-danger {
+    font-size: 11px;
+    margin-top: 2px;
+}
+
+.form-buttons {
+    display: flex;
+    gap: 10px;
+    margin-top: 10px;
+    align-items: center;
+}
+
+.button-inline-flex-items-center-justify-center {
+    background: #0a0a0a; /* Color negro */
+    border-radius: 6.75px;
+    height: 36px;
+    width: 140px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: #ffffff; /* Color del texto */
+    font-family: "Arial-Regular", sans-serif;
+    font-size: 12px;
+    font-weight: 400;
+    cursor: pointer;
+    position: relative;
+}
+
+    .button-inline-flex-items-center-justify-center .registra-usuario {
+        color: #ffffff; /* Asegura que el texto sea blanco */
+    }
+
+
+    .button-inline-flex-items-center-justify-center input[type="submit"] {
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        opacity: 0;
+        cursor: pointer;
+    }
+
+.btn-cancel {
+    border:1px solid #0a0a0a;
+    background:#ffffff;
+    color:#0a0a0a;
+    height: 36px;
+    display: flex;
+    align-items: center;
+    padding: 0 12px;
+}
