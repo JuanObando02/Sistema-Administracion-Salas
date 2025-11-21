@@ -5,99 +5,7 @@
     ViewData["Title"] = "Inicio";
 }
 
-<style>
-    .sala-card {
-        border-radius: 14px;
-        border: 1px solid #e5e5e5;
-        padding: 20px;
-        background: #ffffff;
-        box-shadow: 0px 3px 8px rgba(0,0,0,0.06);
-        transition: 0.2s;
-        height: 100%;
-    }
-
-        .sala-card:hover {
-            transform: translateY(-3px);
-        }
-
-    .sala-header {
-        display: flex;
-        justify-content: space-between;
-        align-items: center;
-        margin-bottom: 12px;
-    }
-
-    .estado-pill {
-        font-size: 0.85rem;
-        font-weight: 600;
-        padding: 5px 14px;
-        border-radius: 20px;
-    }
-
-    .estado-success {
-        background: #d6f5e3;
-        color: #18794e;
-        border: 1px solid #b6efcf;
-    }
-
-    .estado-danger {
-        background: #ffe0e0;
-        color: #b91c1c;
-        border: 1px solid #ffb3b3;
-    }
-
-    .estado-warning {
-        background: #fff3cd;
-        color: #8a6d00;
-        border: 1px solid #ffe39c;
-    }
-
-    .estado-dark {
-        background: #e3e3e3;
-        color: #333;
-        border: 1px solid #ccc;
-    }
-
-    .tipo-pill {
-        background: #0a0a1a;
-        color: #fff;
-        font-size: 0.75rem;
-        padding: 5px 12px;
-        border-radius: 8px;
-        display: inline-block;
-        font-weight: 600;
-        margin-bottom: 10px;
-    }
-
-    .label-grey {
-        color: #6c757d;
-        font-weight: 500;
-        font-size: 0.95rem;
-    }
-
-    .sala-btn {
-        width: 100%;
-        border-radius: 10px;
-        border: 1px solid #dcdcdc;
-        background: #fff;
-        padding: 10px;
-        font-weight: 600;
-        display: flex;
-        justify-content: center;
-        align-items: center;
-        gap: 8px;
-        color: #333;
-        transition: 0.2s;
-    }
-
-        .sala-btn:hover {
-            background: #f5f5f5;
-        }
-
-        .sala-btn i {
-            font-size: 16px;
-        }
-</style>
+<link rel="stylesheet" href="~/css/home.css" />
 
 <div class="text-center py-5 bg-light rounded-3 mb-4">
     <h1 class="display-5 fw-bold">Control de Salas</h1>
@@ -173,7 +81,7 @@
                         <span class="text-muted fw-bold small">TOTAL SALAS</span>
                         <i class="bi bi-hdd-network text-dark fs-4"></i>
                     </div>
-                    <h2 class="display-5 fw-bold text-dark mt-2 mb-0">@total</h2>
+                    <h2 class="display-5 fw-bold text-total mt-2 mb-0">@total</h2>
                 </div>
             </div>
         </div>

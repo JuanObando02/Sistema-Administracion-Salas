@@ -1,0 +1,165 @@
+﻿.sala-card {
+    border-radius: 14px;
+    border: 1px solid #e5e5e5;
+    padding: 20px;
+    background: #ffffff;
+    box-shadow: 0px 3px 8px rgba(0,0,0,0.06);
+    transition: 0.2s;
+    height: 100%;
+}
+
+.sala-card:hover {
+    transform: translateY(-3px);
+}
+
+.sala-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 12px;
+}
+
+.estado-pill {
+    font-size: 0.85rem;
+    font-weight: 600;
+    padding: 5px 14px;
+    border-radius: 20px;
+}
+
+.estado-success {
+    background: #d6f5e3;
+    color: #18794e;
+    border: 1px solid #b6efcf;
+}
+
+.estado-danger {
+    background: #ffe0e0;
+    color: #b91c1c;
+    border: 1px solid #ffb3b3;
+}
+
+.estado-warning {
+    background: #fff3cd;
+    color: #8a6d00;
+    border: 1px solid #ffe39c;
+}
+
+.estado-dark {
+    background: #e3e3e3;
+    color: #333;
+    border: 1px solid #ccc;
+}
+
+.tipo-pill {
+    background: #0a0a1a;
+    color: #fff;
+    font-size: 0.75rem;
+    padding: 5px 12px;
+    border-radius: 8px;
+    display: inline-block;
+    font-weight: 600;
+    margin-bottom: 10px;
+}
+
+.label-grey {
+    color: #6c757d;
+    font-weight: 500;
+    font-size: 0.95rem;
+}
+
+.sala-btn {
+    width: 100%;
+    border-radius: 10px;
+    border: 1px solid #dcdcdc;
+    background: #fff;
+    padding: 10px;
+    font-weight: 600;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 8px;
+    color: #333;
+    transition: 0.2s;
+}
+
+    .sala-btn:hover {
+        background: #f5f5f5;
+    }
+
+    .sala-btn i {
+        font-size: 16px;
+    }
+
+/* Contenedor general de cada tarjeta */
+.card.h-100 {
+    background: #ffffff;
+    border: 1px solid rgba(0,0,0,0.1);
+    border-radius: 12.75px;
+    box-shadow: 0px 3px 8px rgba(0,0,0,0.06);
+    padding: 20px;
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    transition: transform 0.2s;
+    height: 100%;
+}
+
+    .card.h-100:hover {
+        transform: translateY(-3px);
+    }
+
+/* Header de cada tarjeta: título y icono */
+.card-body > .d-flex {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    margin-bottom: 8px;
+}
+
+    /* Título de la tarjeta (DISPONIBLES, OCUPADAS...) */
+    .card-body > .d-flex > span {
+        font-size: 12.3px; /* similar al heading-4 de Figma */
+        font-weight: 600;
+        color: #0a0a0a;
+        line-height: 17.5px;
+        display: flex;
+        align-items: center;
+    }
+
+    /* Iconos */
+    .card-body > .d-flex > i {
+        font-size: 1.2rem;
+    }
+
+/* Número grande dentro de la tarjeta */
+.card-body h2 {
+    font-size: 21px;
+    font-weight: 700;
+    line-height: 28px;
+    margin-top: 8px;
+    margin-bottom: 0;
+    display: flex;
+    align-items: center;
+}
+
+/* Colores por tipo */
+.text-success {
+    color: #00a63e !important; /* verde Figma */
+}
+
+.text-danger {
+    color: #e7000b !important; /* rojo Figma */
+}
+
+.text-primary {
+    color: #155dfc !important; /* azul Figma */
+}
+
+.text-secondary {
+    color: #717182 !important; /* gris Figma */
+}
+
+.text-total {
+    color: #9810fa !important; /* violeta Figma */
+}
+
