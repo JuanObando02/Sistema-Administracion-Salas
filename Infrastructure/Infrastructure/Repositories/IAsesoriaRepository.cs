@@ -14,5 +14,11 @@ namespace Infrastructure.Repositories
         Task<IList<Asesoria>> GetAsesoriasActivas();
         Task Update(Asesoria asesoria);
         Task<Asesoria> GetAsesoria(Guid id);
+        Task<(IList<Asesoria> Items, int TotalCount)> GetHistorialConFiltros(
+            string? busqueda,
+            Domain.Enums.EstadoAsesoria? estado,
+            DateTime? fecha,
+            int pagina,
+            int pageSize);
     }
 }

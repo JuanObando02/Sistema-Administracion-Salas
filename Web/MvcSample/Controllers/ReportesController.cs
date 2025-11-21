@@ -115,7 +115,6 @@ namespace MvcSample.Controllers
             return RedirectToAction("Gestionar");
         }
 
-        // POST: /Reportes/Cerrar
         [HttpPost]
         [Authorize(Roles = "Coordinador, Admin")]
         [ValidateAntiForgeryToken]
@@ -131,6 +130,32 @@ namespace MvcSample.Controllers
                 TempData["Error"] = ex.Message;
             }
             return RedirectToAction("Gestionar");
+        }
+        
+        [HttpGet]
+        [Authorize(Roles = "Coordinador, Admin")]
+        public async Task<IActionResult> Pendientes()
+        {
+            var lista = await _reporteService.GetReportesPendientes();
+            return View(lista);
+        }
+
+        [HttpPost]
+        [Authorize(Roles = "Coordinador, Admin")]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> Rechazar(Guid id)
+        {
+            try
+            {
+                await _reporteService.RechazarReporte(id);
+                TempData["Mensaje"] = "Reporte rechazado.";
+            }
+            catch (Exception ex)
+            {
+                TempData["Error"] = ex.Message;
+            }
+            // Volvemos a la lista de pendientes
+            return RedirectToAction("Pendientes");
         }
     }
 }

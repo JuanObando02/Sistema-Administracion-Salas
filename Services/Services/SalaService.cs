@@ -42,26 +42,44 @@ namespace Services
         }
         public async Task UpdateSala(EditarSalaModel model)
         {
+            // 1. Validación de Número Único (Tu código actual)
             var salaConEseNumero = await _salaRepository.GetSalaPorNumero(model.Numero);
             if (salaConEseNumero != null && salaConEseNumero.Id != model.Id)
             {
                 throw new InvalidOperationException($"El número de sala '{model.Numero}' ya está en uso por otra sala.");
             }
 
+            // 2. Obtener la sala actual (Tu código actual)
             var salaExistente = await _salaRepository.GetSalaConEquipos(model.Id); //
             if (salaExistente == null)
             {
                 throw new Exception("La sala que intenta actualizar no existe.");
             }
 
+            bool cambiandoANoDisponible = model.Estado != EstadoSala.Disponible && model.Estado != salaExistente.Estado;
+
+            if (cambiandoANoDisponible)
+            {
+                bool tieneReservas = await _reservaRepository.TieneReservasFuturasPorSala(model.Id);
+
+                if (tieneReservas)
+                {
+                    throw new InvalidOperationException(
+                        $"No se puede cambiar el estado a '{model.Estado}' porque la sala tiene reservas activas o futuras. " +
+                        "Por favor, reasigne o cancele las reservas primero.");
+                }
+            }
+            // ---------------------------------------------
+
+            // 4. Validación de Capacidad (Tu código actual)
             if (model.Capacidad < salaExistente.Equipos.Count)
             {
                 throw new InvalidOperationException($"Error: No se puede reducir la capacidad a {model.Capacidad} porque la sala ya tiene {salaExistente.Equipos.Count} equipos asignados."); //
             }
 
+            // 5. Mapear y Guardar
             _mapper.Map(model, salaExistente);
-            await _salaRepository.Update(salaExistente); ;
-            
+            await _salaRepository.Update(salaExistente);
         }
         public async Task DeleteSala(Guid id)
         {
@@ -85,10 +103,41 @@ namespace Services
         }
         public async Task<IList<SalaIndexModel>> GetSalas(int? numero = null)
         {
-            // Pasamos el número al repositorio
-            var salasList = await _salaRepository.GetSalas(numero);
 
-            return _mapper.Map<IList<SalaIndexModel>>(salasList);
+            var salasList = await _salaRepository.GetSalas(numero);
+            var reservasActivas = await _reservaRepository.GetReservasActivasEnHorario(DateTime.Now);
+
+            // Creamos un conjunto de IDs de salas ocupadas para buscar
+            var idsSalasOcupadas = reservasActivas
+                .Where(r => r.SalaId.HasValue && r.Tipo == TipoReserva.Sala)
+                .Select(r => r.SalaId.Value)
+                .ToHashSet();
+
+            // 3. Mapear a la lista de vista
+            var listaModelos = _mapper.Map<List<SalaIndexModel>>(salasList);
+
+            // AJUSTE VISUAL DE ESTADO
+            foreach (var modelo in listaModelos)
+            {
+                // Si la sala está físicamente "Disponible", verificamos si hay clase ahora
+                if (modelo.Estado == EstadoSala.Disponible)
+                {
+                    // CASO A: Sala de Clase (Profesor)
+                    if (modelo.Tipo == TipoSala.Clase_Completa)
+                    {
+                        if (idsSalasOcupadas.Contains(modelo.Id))
+                        {
+                            modelo.Estado = EstadoSala.Ocupada; // Visualmente ocupada
+                        }
+                    }
+
+                    // CASO B: Sala Individual (Equipos)
+                    // (Opcional: Podrías calcular si está llena, pero requiere más consultas.
+                    //  Para la vista de gestión, a veces basta con saber si el estado físico está bien).
+                }
+            }
+
+            return listaModelos;
         }
         public async Task<IList<EstadoSalaViewModel>> GetEstadoActualSalas()
         {
@@ -165,6 +214,7 @@ namespace Services
 
             return listaEstados;
         }
+        
     }
 
 }

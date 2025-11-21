@@ -101,17 +101,16 @@ namespace MvcSample
 
             app.Run();
         }
-
-
         static async Task SeedRolesAndAdminUser(IServiceProvider serviceProvider)
         {
             var userManager = serviceProvider.GetRequiredService<UserManager<AppUser>>();
             var roleManager = serviceProvider.GetRequiredService<RoleManager<IdentityRole>>();
             var configuration = serviceProvider.GetRequiredService<IConfiguration>();
 
-            // 1. Crear roles si no existen
-            string[] roles = { "Admin", "User", "Master" };
+            // 1. Definir los roles CORRECTOS del proyecto
+            string[] roles = { "Admin", "Coordinador", "Profesor", "Estudiante" };
 
+            // 2. Crear roles si no existen
             foreach (var roleName in roles)
             {
                 var roleExist = await roleManager.RoleExistsAsync(roleName);
@@ -121,40 +120,35 @@ namespace MvcSample
                 }
             }
 
-            // 2. Crear usuario admin si no existe
-            var adminEmail = configuration["AdminUser:Email"] ?? "admin@example.com";
-            var adminPassword = configuration["AdminUser:Password"] ?? "Admin123!";
-
+            // 3. Crear usuario ADMIN por defecto
+            // (Intenta leer del appsettings.json, si no usa estos valores por defecto)
+            var adminEmail = configuration["AdminUser:Email"] ?? "admin@universidad.edu";
+            var adminPassword = configuration["AdminUser:Password"] ?? "Admin123*";
             var adminUser = await userManager.FindByEmailAsync(adminEmail);
+
             if (adminUser == null)
             {
                 adminUser = new AppUser
                 {
                     UserName = adminEmail,
                     Email = adminEmail,
-                    Name = "Administrador",
-                    LastName = "Del Sistema",
-                    DocumentNumber = "1000593423",
-                    EmailConfirmed = true
+                    Name = "Super",
+                    LastName = "Administrador",
+                    DocumentNumber = "0000000000", // Un número ficticio
+                    EmailConfirmed = true,
+                    FechaRegistro = DateTime.UtcNow
                 };
 
                 var createUser = await userManager.CreateAsync(adminUser, adminPassword);
+
                 if (createUser.Succeeded)
                 {
-                    await userManager.AddToRolesAsync(adminUser, roles);
-                }
-            }
-            else
-            {
-                // Asegurar que tenga los roles
-                var userRoles = await userManager.GetRolesAsync(adminUser);
-                foreach (var role in roles.Where(role => !userRoles.Contains(role)))
-                {
-                    await userManager.AddToRoleAsync(adminUser, role);
+                    // Le asignamos SOLO el rol de Administrador (y quizás Coordinador si quieres que haga todo)
+                    await userManager.AddToRoleAsync(adminUser, "Admin");
+                    await userManager.AddToRoleAsync(adminUser, "Coordinador");
                 }
             }
         }
-
 
     }
 }

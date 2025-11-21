@@ -67,7 +67,6 @@ namespace MvcSample.Controllers
             var lista = await _asesoriaService.GetAsesoriasGestionar();
             return View(lista);
         }
-
         
         [HttpPost]
         [Authorize(Roles = "Coordinador, Admin")]
@@ -112,6 +111,27 @@ namespace MvcSample.Controllers
             }
             catch (Exception ex) { TempData["Error"] = ex.Message; }
             return RedirectToAction("Gestionar");
+        }
+        [HttpGet]
+        [Authorize(Roles = "Coordinador, Admin")]
+        public async Task<IActionResult> Historial(string? busqueda,Domain.Enums.EstadoAsesoria? estado,DateTime? fecha,int pagina = 1)
+        {
+            var filtro = new FiltroAsesoriaModel
+            {
+                Busqueda = busqueda,
+                Estado = estado,
+                Fecha = fecha,
+                Pagina = pagina
+            };
+
+            var listaPaginada = await _asesoriaService.GetHistorialAsesorias(filtro);
+
+            // Guardar estado de filtros para la vista
+            ViewData["BusquedaActual"] = busqueda;
+            ViewData["EstadoActual"] = estado;
+            ViewData["FechaActual"] = fecha?.ToString("yyyy-MM-dd");
+
+            return View(listaPaginada);
         }
     }
 }

@@ -15,7 +15,6 @@ namespace Infrastructure.Repositories
         public ReporteRepository(AppDbContext context) : base(context)
         {
         }
-
         public async Task Save(Reporte reporte)
         {
             try
@@ -41,11 +40,11 @@ namespace Infrastructure.Repositories
                 .ToListAsync();
         }
         public async Task<(IList<Reporte> Items, int TotalCount)> GetReportesConFiltros(
-    string? busqueda,
-    Domain.Enums.EstadoReporte? estado,
-    DateTime? fecha,
-    int pagina,
-    int pageSize)
+            string? busqueda,
+            Domain.Enums.EstadoReporte? estado,
+            DateTime? fecha,
+            int pagina,
+            int pageSize)
         {
             var query = context.Reportes
                 .Include(r => r.SalaReportada)
@@ -75,7 +74,6 @@ namespace Infrastructure.Repositories
 
             return (items, total);
         }
-
         public async Task Update(Reporte reporte)
         {
             try { await Beguin(); context.Reportes.Update(reporte); await Save(); await Comit(); }
@@ -84,6 +82,16 @@ namespace Infrastructure.Repositories
         public async Task<Reporte> GetReportePorId(Guid id)
         {
             return await context.Reportes.FindAsync(id);
+        }
+        public async Task<IList<Reporte>> GetReportesPendientes()
+        {
+            return await context.Reportes
+                .Where(r => r.Estado == Domain.Enums.EstadoReporte.Pendiente)
+                .Include(r => r.SalaReportada)
+                .Include(r => r.EquipoReportado)
+                .Include(r => r.UsuarioCreador)
+                .OrderBy(r => r.FechaCreacion) // Los más viejos primero (FIFO)
+                .ToListAsync();
         }
 
     }

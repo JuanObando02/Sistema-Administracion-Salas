@@ -19,5 +19,6 @@ namespace Infrastructure.Repositories
             int pageSize);
         Task Update(Reporte reporte);
         Task<Reporte> GetReportePorId(Guid id);
+        Task<IList<Reporte>> GetReportesPendientes();
     }
 }

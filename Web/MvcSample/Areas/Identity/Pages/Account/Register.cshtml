@@ -30,7 +30,15 @@
                 <label asp-for="Input.DocumentNumber">Documento</label>
                 <span asp-validation-for="Input.DocumentNumber" class="text-danger"></span>
             </div>
-
+            <div class="form-floating mb-3">
+                <select asp-for="Input.RoleName" class="form-select" aria-required="true">
+                    <option value="">-- Seleccione su Perfil --</option>
+                    <option value="Estudiante">Estudiante (Reserva Equipos)</option>
+                    <option value="Profesor">Profesor (Reserva Salas)</option>
+                </select>
+                <label asp-for="Input.RoleName">Soy</label>
+                <span asp-validation-for="Input.RoleName" class="text-danger"></span>
+            </div>
             <div class="form-floating mb-3">
                 <input asp-for="Input.Email" class="form-control" autocomplete="username" aria-required="true" placeholder="name@example.com" />
                 <label asp-for="Input.Email">Email</label>

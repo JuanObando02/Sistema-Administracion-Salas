@@ -5,7 +5,7 @@
     ViewData["Title"] = "Gestión de Asesorías";
 }
 
-<h1>@ViewData["Title"]</h1>
+
 
 @if (TempData["Mensaje"] != null)
 {
@@ -18,6 +18,12 @@
 
 @if (!Model.Any())
 {
+    <div class="d-flex justify-content-between align-items-center mb-3">
+        <h1>@ViewData["Title"]</h1>
+        <a asp-action="Historial" class="btn btn-outline-secondary">
+            <i class="bi bi-archive"></i> Ver Historial Completo
+        </a>
+    </div>
     <div class="alert alert-success text-center mt-4">
         <i class="bi bi-check-circle-fill h3"></i>
         <p class="mb-0">No hay solicitudes de asesoría pendientes.</p>
@@ -25,6 +31,12 @@
 }
 else
 {
+    <div class="d-flex justify-content-between align-items-center mb-3">
+        <h1>@ViewData["Title"]</h1>
+        <a asp-action="Historial" class="btn btn-outline-secondary">
+            <i class="bi bi-archive"></i> Ver Historial Completo
+        </a>
+    </div>
     <table class="table table-hover mt-4 align-middle">
         <thead class="table-dark">
             <tr>

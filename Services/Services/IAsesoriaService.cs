@@ -1,4 +1,5 @@
 ﻿using Services.Models.AsesoriaModels;
+using Services.Models.Shared;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -16,5 +17,6 @@ namespace Services
         Task MarcarEnProceso(Guid id, string coordinadorId);
         Task FinalizarAsesoria(Guid id, string coordinadorId, string? observaciones);
         Task DescartarAsesoria(Guid id, string coordinadorId, string? observaciones);
+        Task<PaginatedList<AsesoriaIndexModel>> GetHistorialAsesorias(FiltroAsesoriaModel filtro);
     }
 }

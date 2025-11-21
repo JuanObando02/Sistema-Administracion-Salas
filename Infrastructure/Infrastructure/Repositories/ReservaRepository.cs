@@ -236,5 +236,15 @@ namespace Infrastructure.Repositories
                 .OrderBy(r => r.FechaInicio) // Las más próximas primero (urgencia)
                 .ToListAsync();
         }
+        public async Task<bool> TieneReservasFuturasPorSala(Guid salaId)
+        {
+            // Retorna TRUE si hay reservas activas que terminen en el futuro
+            return await context.Reservas.AnyAsync(r =>
+                r.SalaId == salaId &&
+                r.FechaFin > DateTime.Now && // Que no haya terminado
+                (r.Estado == Domain.Enums.EstadoReserva.Aprobada ||
+                 r.Estado == Domain.Enums.EstadoReserva.EnUso)
+            );
+        }
     }
 }

@@ -204,5 +204,23 @@ namespace Services
             // (Opcional) Si era un equipo dañado, aquí podrías preguntar si quieres volverlo a poner "Disponible"
             // if (reporte.EquipoId.HasValue) { ... lógica para reactivar equipo ... }
         }
+        public async Task<IList<ReporteAdminIndexModel>> GetReportesPendientes()
+        {
+            var reportes = await _reporteRepository.GetReportesPendientes();
+            return _mapper.Map<IList<ReporteAdminIndexModel>>(reportes);
+        }
+        public async Task RechazarReporte(Guid id)
+        {
+            var reporte = await _reporteRepository.GetReportePorId(id);
+            if (reporte == null) throw new Exception("Reporte no encontrado.");
+
+            if (reporte.Estado != EstadoReporte.Pendiente)
+            {
+                throw new InvalidOperationException("Solo se pueden rechazar reportes pendientes.");
+            }
+
+            reporte.Estado = EstadoReporte.Rechazado;
+            await _reporteRepository.Update(reporte);
+        }
     }
 }

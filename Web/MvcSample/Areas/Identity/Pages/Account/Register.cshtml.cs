@@ -92,6 +92,12 @@ namespace MvcSample.Areas.Identity.Pages.Account
             [Display(Name = "Email")]
             public string Email { get; set; }
 
+            // --- NUEVO: CAMPO PARA EL ROL ---
+            [Required(ErrorMessage = "Debe seleccionar un rol (Estudiante o Profesor).")]
+            [Display(Name = "Soy")]
+            public string RoleName { get; set; }
+            // -------------------------------
+
             /// <summary>
             ///     This API supports the ASP.NET Core Identity default UI infrastructure and is not intended to be used
             ///     directly from your code. This API may change or be removed in future releases.
@@ -129,6 +135,7 @@ namespace MvcSample.Areas.Identity.Pages.Account
                 user.Name = Input.Name;
                 user.LastName = Input.LastName;
                 user.DocumentNumber = Input.DocumentNumber;
+                user.FechaRegistro = DateTime.UtcNow;
 
                 await _userStore.SetUserNameAsync(user, Input.Email, CancellationToken.None);
                 await _emailStore.SetEmailAsync(user, Input.Email, CancellationToken.None);
@@ -136,8 +143,16 @@ namespace MvcSample.Areas.Identity.Pages.Account
 
                 if (result.Succeeded)
                 {
-                    await _userManager.AddToRoleAsync(user, "Estudiante");
                     _logger.LogInformation("User created a new account with password.");
+                    
+                    string rolAAsignar = "Estudiante"; // Por defecto
+
+                    if (Input.RoleName == "Profesor")
+                    {
+                        rolAAsignar = "Profesor";
+                    }
+                    await _userManager.AddToRoleAsync(user, rolAAsignar);
+                    
 
                     var userId = await _userManager.GetUserIdAsync(user);
                     var code = await _userManager.GenerateEmailConfirmationTokenAsync(user);

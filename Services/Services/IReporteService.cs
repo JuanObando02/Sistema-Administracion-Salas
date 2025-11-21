@@ -19,5 +19,7 @@ namespace Services
         Task<PaginatedList<ReporteAdminIndexModel>> GetReportesGestionar(FiltroReporteModel filtro);
         Task AtenderReporte(Guid id); // Pasa a EnProceso
         Task CerrarReporte(Guid id, string observaciones); // Pasa a Cerrado
+        Task<IList<ReporteAdminIndexModel>> GetReportesPendientes();
+        Task RechazarReporte(Guid id);
     }
 }
