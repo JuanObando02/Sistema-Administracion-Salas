@@ -1,0 +1,48 @@
+﻿@model Services.Models.EquipoModels.EditarEquipoModel
+@using Domain.Enums;
+
+@{
+    ViewData["Title"] = "Editar Equipo";
+}
+
+<h2>Editar Equipo: @Model.Serial</h2>
+<hr />
+
+<div class="row">
+    <div class="col-md-6">
+        <form asp-action="Editar" method="post">
+            <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+            <input type="hidden" asp-for="Id" />
+
+            <div class="mb-3">
+                <label asp-for="Serial" class="form-label"></label>
+                <input asp-for="Serial" class="form-control" />
+                <span asp-validation-for="Serial" class="text-danger"></span>
+            </div>
+
+            <div class="mb-3">
+                <label asp-for="SalaId" class="form-label"></label>
+                <select asp-for="SalaId" asp-items="Model.SalasDisponibles" class="form-control">
+                    <option value="">-- Seleccione una Sala --</option>
+                </select>
+                <span asp-validation-for="SalaId" class="text-danger"></span>
+            </div>
+
+            <div class="mb-3">
+                <label asp-for="Estado" class="form-label"></label>
+                <select asp-for="Estado" asp-items="Html.GetEnumSelectList<EstadoEquipo>()" class="form-control"></select>
+                <span asp-validation-for="Estado" class="text-danger"></span>
+            </div>
+
+            <div class="form-group">
+                <input type="submit" value="Guardar Cambios" class="btn btn-primary" />
+            </div>
+        </form>
+    </div>
+</div>
+
+@section Scripts {
+    @{
+        await Html.RenderPartialAsync("_ValidationScriptsPartial");
+    }
+}

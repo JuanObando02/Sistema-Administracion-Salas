@@ -1,0 +1,131 @@
+﻿@model Services.Models.ReporteModels.CrearReporteModel
+@using Domain.Enums
+
+@{
+    ViewData["Title"] = "Reportar Daño";
+}
+
+<h2>@ViewData["Title"]</h2>
+<hr />
+
+<div class="row">
+    <div class="col-md-6">
+        <form asp-action="Registrar" method="post">
+            <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+
+            @* 1. TIPO DE REPORTE *@
+            <div class="mb-3">
+                <label asp-for="Tipo" class="form-label"></label>
+                <select asp-for="Tipo" asp-items="Html.GetEnumSelectList<TipoReporte>()" class="form-control" id="ddlTipo">
+                    <option value="">-- Seleccione --</option>
+                </select>
+                <span asp-validation-for="Tipo" class="text-danger"></span>
+            </div>
+
+            @* 2. SALA (Siempre visible) *@
+            <div class="mb-3" id="divSala">
+                <label asp-for="SalaId" class="form-label">Sala</label>
+                <select asp-for="SalaId" asp-items="Model.SalasDisponibles" class="form-control" id="ddlSala">
+                    <option value="">-- Seleccione Sala --</option>
+                </select>
+                <span asp-validation-for="SalaId" class="text-danger"></span>
+            </div>
+
+            @* 3. EQUIPO (Solo visible si Tipo == Equipo) *@
+            <div class="mb-3" id="divEquipo" style="display:none;">
+                <label asp-for="EquipoId" class="form-label">Equipo Afectado</label>
+                <select asp-for="EquipoId"
+                        class="form-control"
+                        id="ddlEquipo"
+                        asp-items="Model.EquiposDisponibles">
+                    <option value="">-- Seleccione Equipo --</option>
+                </select>
+                <span asp-validation-for="EquipoId" class="text-danger"></span>
+            </div>
+
+            @* 4. DESCRIPCIÓN *@
+            <div class="mb-3">
+                <label asp-for="Descripcion" class="form-label"></label>
+                <textarea asp-for="Descripcion" class="form-control" rows="4"></textarea>
+                <span asp-validation-for="Descripcion" class="text-danger"></span>
+            </div>
+
+            <div class="form-group">
+                <input type="submit" value="Enviar Reporte" class="btn btn-danger" />
+                <a asp-controller="Home" asp-action="Index" class="btn btn-secondary">Cancelar</a>
+            </div>
+        </form>
+    </div>
+</div>
+
+@section Scripts {
+    @{
+        await Html.RenderPartialAsync("_ValidationScriptsPartial");
+    }
+
+    <script>
+        $(document).ready(function () {
+
+            // --- 1. LÓGICA VISUAL (Mostrar/Ocultar campos) ---
+
+            function toggleCampos() {
+                // Obtenemos el texto de la opción seleccionada (ej. "Sala", "Equipo", "Otro")
+                var tipoTexto = $('#ddlTipo option:selected').text();
+
+                // Referencias a los divs que contienen los dropdowns
+                var divSala = $('#divSala');
+                var divEquipo = $('#divEquipo');
+
+                // REGLAS DE NEGOCIO:
+                if (tipoTexto === 'Equipo') {
+                    // Caso Equipo: Necesita Sala Y Equipo
+                    divSala.show();
+                    divEquipo.show();
+                }
+                else if (tipoTexto === 'Sala') {
+                    // Caso Sala: Solo necesita Sala
+                    divSala.show();
+                    divEquipo.hide();
+                }
+                else {
+                    // Caso Otro (o "Seleccione"): No necesita nada, solo descripción
+                    divSala.hide();
+                    divEquipo.hide();
+                }
+            }
+
+            // Ejecutar cuando el usuario cambie el tipo
+            $('#ddlTipo').change(function () {
+                toggleCampos();
+            });
+
+            // Ejecutar al cargar la página (por si viene un error y hay que mantener el estado)
+            toggleCampos();
+
+
+            // --- 2. LÓGICA DE DATOS (Cargar equipos con AJAX) ---
+
+            $('#ddlSala').change(function () {
+                var salaId = $(this).val();
+                var ddlEquipo = $('#ddlEquipo');
+
+                // Limpiar dropdown
+                ddlEquipo.empty();
+                ddlEquipo.append('<option value="">Cargando equipos...</option>');
+
+                if (salaId) {
+                    $.getJSON('/Reportes/GetEquiposPorSala', { salaId: salaId }, function (data) {
+                        ddlEquipo.empty();
+                        ddlEquipo.append('<option value="">-- Seleccione Equipo --</option>');
+                        $.each(data, function (index, item) {
+                            ddlEquipo.append('<option value="' + item.value + '">' + item.text + '</option>');
+                        });
+                    });
+                } else {
+                    ddlEquipo.empty();
+                    ddlEquipo.append('<option value="">-- Seleccione primero una Sala --</option>');
+                }
+            });
+        });
+    </script>
+}

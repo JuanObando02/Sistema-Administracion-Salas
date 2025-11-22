@@ -13,6 +13,11 @@ namespace Domain.Enums
         Cerrada,        // El problema fue resuelto
         NoAplica        // El coordinador la cierra sin acción
     }
+    public enum TipoSala
+    {
+        Individual, // Para préstamo de equipos uno por uno
+        Clase_Completa // Para reserva de profesor
+    }
     public enum EstadoEquipo
     {
         Disponible,

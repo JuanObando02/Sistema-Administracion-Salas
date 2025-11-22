@@ -1,0 +1,69 @@
+﻿@model Services.Models.UsuarioModels.RegistrarUsuarioModel
+@{
+    ViewData["Title"] = "Registrar Usuario";
+}
+
+<h2>Registrar Nuevo Usuario</h2>
+<hr />
+
+<div class="row">
+    <div class="col-md-6">
+        <form asp-action="Registrar" method="post">
+
+            <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+
+            <h4>Datos de Cuenta</h4>
+            <hr />
+            <div class="mb-3">
+                <label asp-for="Email" class="form-label"></label>
+                <input asp-for="Email" class="form-control" />
+                <span asp-validation-for="Email" class="text-danger"></span>
+            </div>
+            <div class="mb-3">
+                <label asp-for="Password" class="form-label"></label>
+                <input asp-for="Password" class="form-control" />
+                <span asp-validation-for="Password" class="text-danger"></span>
+            </div>
+            <div class="mb-3">
+                <label asp-for="ConfirmPassword" class="form-label"></label>
+                <input asp-for="ConfirmPassword" class="form-control" />
+                <span asp-validation-for="ConfirmPassword" class="text-danger"></span>
+            </div>
+            <div class="mb-3">
+                <label asp-for="RolSeleccionado" class="form-label"></label>
+                <select asp-for="RolSeleccionado" asp-items="Model.RolesDisponibles" class="form-control">
+                    <option value="">-- Seleccione un Rol --</option>
+                </select>
+                <span asp-validation-for="RolSeleccionado" class="text-danger"></span>
+            </div>
+
+            <h4 class="mt-4">Datos Personales</h4>
+            <hr />
+            <div class="mb-3">
+                <label asp-for="Name" class="form-label"></label>
+                <input asp-for="Name" class="form-control" />
+                <span asp-validation-for="Name" class="text-danger"></span>
+            </div>
+            <div class="mb-3">
+                <label asp-for="LastName" class="form-label"></label>
+                <input asp-for="LastName" class="form-control" />
+                <span asp-validation-for="LastName" class="text-danger"></span>
+            </div>
+            <div class="mb-3">
+                <label asp-for="DocumentNumber" class="form-label"></label>
+                <input asp-for="DocumentNumber" class="form-control" />
+                <span asp-validation-for="DocumentNumber" class="text-danger"></span>
+            </div>
+
+            <div class="form-group mt-3">
+                <input type="submit" value="Registrar" class="btn btn-primary" />
+            </div>
+        </form>
+    </div>
+</div>
+
+@section Scripts {
+    @{
+        await Html.RenderPartialAsync("_ValidationScriptsPartial");
+    }
+}

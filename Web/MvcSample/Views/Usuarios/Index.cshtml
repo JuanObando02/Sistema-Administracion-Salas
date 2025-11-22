@@ -1,0 +1,48 @@
+﻿@model IEnumerable<Services.Models.UsuarioModels.UsuarioIndexModel>
+@{
+    ViewData["Title"] = "Gestión de Usuarios";
+}
+
+<h1>@ViewData["Title"]</h1>
+
+<p>
+    <a asp-action="Registrar" class="btn btn-primary">Registrar Nuevo Usuario</a>
+</p>
+
+<table class="table table-striped">
+    @* Agregué table-striped para que se vea mejor *@
+    <thead>
+        <tr>
+            <th>Email</th>
+            <th>Nombre Completo</th>
+            <th>Documento</th>
+            <th>Roles</th>
+            <th>Opciones</th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var item in Model)
+        {
+            <tr>
+                <td>@item.Email</td>
+                <td>@item.NombreCompleto</td>
+                <td>@item.Documento</td>
+                <td>
+                    <span class="badge bg-secondary">@item.Roles</span>
+                </td>
+                <td>
+                    <a asp-action="Editar"
+                       asp-route-id="@item.Id"
+                       class="btn btn-sm btn-warning">
+                        Editar Roles
+                    </a>
+                    <a asp-action="Eliminar"
+                       asp-route-id="@item.Id"
+                       class="btn btn-sm btn-danger">
+                        Eliminar
+                    </a>
+                </td>
+            </tr>
+        }
+    </tbody>
+</table>

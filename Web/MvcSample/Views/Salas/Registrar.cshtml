@@ -1,0 +1,46 @@
+﻿@* Define el modelo que esta vista espera recibir *@
+@model Services.Models.SalaModels.RegistrarSalaModel
+
+@{
+    ViewData["Title"] = "Registrar Nueva Sala";
+}
+
+<h2>@ViewData["Title"]</h2>
+<hr />
+
+<div class="row">
+    <div class="col-md-6">
+
+        @* Este formulario enviará los datos a la acción "Registrar" [POST] del SalasController *@
+        <form asp-action="Registrar" method="post">
+
+            @* Muestra cualquier error que no esté asociado a un campo específico (como el error de "Exception") *@
+            <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+
+            <div class="mb-3">
+                <label asp-for="Numero" class="form-label"></label>
+                <input asp-for="Numero" class="form-control" />
+                @* Muestra el mensaje de error si el campo "Numero" falla la validación *@
+                <span asp-validation-for="Numero" class="text-danger"></span>
+            </div>
+
+            <div class="mb-3">
+                <label asp-for="Capacidad" class="form-label"></label>
+                <input asp-for="Capacidad" class="form-control" type="number" />
+                @* Muestra el mensaje de error si el campo "Capacidad" falla la validación *@
+                <span asp-validation-for="Capacidad" class="text-danger"></span>
+            </div>
+
+            <div class="form-group">
+                <input type="submit" value="Registrar Sala" class="btn btn-primary" />
+            </div>
+        </form>
+    </div>
+</div>
+
+@* Esta sección es crucial para que la validación del lado del cliente (JavaScript) funcione *@
+@section Scripts {
+    @{
+        await Html.RenderPartialAsync("_ValidationScriptsPartial");
+    }
+}

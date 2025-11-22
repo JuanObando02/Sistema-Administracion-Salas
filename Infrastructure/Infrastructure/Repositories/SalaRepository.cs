@@ -14,6 +14,26 @@ namespace Infrastructure.Repositories
         {
             Console.WriteLine("Se crea un repositorio de salas");
         }
+        public async Task<IList<Sala>> GetSalasClaseCompleta()
+        {
+            return await context.Salas
+                .Where(s => s.Tipo == Domain.Enums.TipoSala.Clase_Completa) // salas de clase completa
+                .OrderBy(s => s.Numero)
+                .ToListAsync();
+        }
+        public async Task<IList<Sala>> GetSalasIndividuales()
+        {
+            return await context.Salas
+                .Where(s => s.Tipo == Domain.Enums.TipoSala.Individual) // salas individuales
+                .OrderBy(s => s.Numero)
+                .ToListAsync();
+        }
+        public async Task<Sala> GetSalaPorNumero(int numero)
+        {
+            // Busca la primera sala que coincida con ese número
+            return await context.Salas
+                .FirstOrDefaultAsync(s => s.Numero == numero);
+        }
         public async Task Save(Sala sala)
         {
             try
@@ -23,10 +43,9 @@ namespace Infrastructure.Repositories
                 await Save(); // guardo los cambios
                 await Comit();
             }
-            catch (Exception ex)
+            catch (Exception)
             {
                 await RollBack();
-                throw ex;
             }
         }
         public async Task<Sala> GetSala(Guid id)
@@ -42,10 +61,9 @@ namespace Infrastructure.Repositories
                 await Save(); // guardo los cambios
                 await Comit();
             }
-            catch (Exception ex)
+            catch (Exception)
             {
                 await RollBack();
-                throw ex;
             }
         }
         public async Task<Sala> GetSalaConEquipos(Guid id)
@@ -70,10 +88,18 @@ namespace Infrastructure.Repositories
                 throw ex;
             }
         }
-        public async Task<IList<Sala>> GetSalas()
+        public async Task<IList<Sala>> GetSalas(int? numero = null)
         {
-            return await context.Salas
-                .OrderBy(sala => sala.Numero)
+            var query = context.Salas.AsQueryable();
+
+            if (numero.HasValue)
+            {
+                query = query.Where(s => s.Numero == numero.Value);
+            }
+
+            // 3. Ejecutamos la consulta final
+            return await query
+                .OrderBy(s => s.Numero)
                 .ToListAsync();
         }
     }

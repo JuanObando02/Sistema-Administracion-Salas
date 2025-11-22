@@ -1,0 +1,22 @@
+﻿using Microsoft.AspNetCore.Identity;
+using Microsoft.AspNetCore.Mvc.Rendering;
+using Services.Models.UsuarioModels;
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text;
+using System.Threading.Tasks;
+
+namespace Services
+{
+    public interface IUsuarioService
+    {
+        Task<IList<UsuarioIndexModel>> GetUsuarios();
+        Task<RegistrarUsuarioModel> GetDatosParaRegistrar();
+        Task<IdentityResult> RegistrarUsuario(RegistrarUsuarioModel model);
+        Task<EditarUsuarioRolesModel> GetUsuarioParaEditarRoles(string id);
+        Task ActualizarRolesUsuario(EditarUsuarioRolesModel model);
+        Task EliminarUsuario(string id);
+        Task<IEnumerable<SelectListItem>> GetUsuariosParaDropdown();
+    }
+}

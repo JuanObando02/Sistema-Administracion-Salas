@@ -1,0 +1,54 @@
+﻿@{
+    ViewData["Title"] = "Bienvenido";
+}
+
+<div class="px-4 py-5 my-5 text-center">
+    @* Icono o Logo grande *@
+    <i class="bi bi-building-fill display-1 text-primary mb-4"></i>
+
+    <h1 class="display-5 fw-bold">Sistema de Gestión de Salas</h1>
+    <div class="col-lg-6 mx-auto">
+        <p class="lead mb-4">
+            Administre eficientemente los laboratorios de cómputo y salas de clase de la universidad.
+            Reserve equipos, gestione espacios y consulte la disponibilidad en tiempo real.
+        </p>
+
+        <div class="d-grid gap-2 d-sm-flex justify-content-sm-center">
+            @* Botones de Acción *@
+            <a asp-area="Identity" asp-page="/Account/Login" class="btn btn-primary btn-lg px-4 gap-3">
+                Iniciar Sesión
+            </a>
+            <a asp-area="Identity" asp-page="/Account/Register" class="btn btn-outline-secondary btn-lg px-4">Registrarse</a> 
+        </div>
+    </div>
+</div>
+
+<div class="row mt-5">
+    <div class="col-md-4 text-center">
+        <div class="card border-0">
+            <div class="card-body">
+                <i class="bi bi-pc-display h1 text-info"></i>
+                <h3 class="mt-2">Préstamo de Equipos</h3>
+                <p>Estudiantes pueden reservar equipos individuales según disponibilidad.</p>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-4 text-center">
+        <div class="card border-0">
+            <div class="card-body">
+                <i class="bi bi-calendar-check h1 text-success"></i>
+                <h3 class="mt-2">Reserva de Aulas</h3>
+                <p>Docentes pueden solicitar aulas completas para sus clases.</p>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-4 text-center">
+        <div class="card border-0">
+            <div class="card-body">
+                <i class="bi bi-speedometer2 h1 text-warning"></i>
+                <h3 class="mt-2">Tiempo Real</h3>
+                <p>Visualice el estado de ocupación de cada sala al instante.</p>
+            </div>
+        </div>
+    </div>
+</div>

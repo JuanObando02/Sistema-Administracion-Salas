@@ -1,0 +1,124 @@
+﻿@model Services.Models.ReservaModels.EditarReservaAdminModel
+@using Domain.Enums
+
+@{
+    ViewData["Title"] = "Modificar Reserva";
+}
+
+<h2>Modificar Reserva</h2>
+<div asp-validation-summary="ModelOnly" class="text-danger"></div>
+<form asp-action="EditarAdmin" method="post">
+    <input type="hidden" asp-for="Id" />
+    <input type="hidden" asp-for="Tipo" />
+
+    <div class="row">
+        <div class="col-md-6">
+            @* Fechas *@
+            <div class="mb-3">
+                <label asp-for="FechaInicio" class="form-label"></label>
+                <input asp-for="FechaInicio" class="form-control" type="datetime-local" step="1800" />
+            </div>
+            <div class="mb-3">
+                <label asp-for="FechaFin" class="form-label"></label>
+                <input asp-for="FechaFin" class="form-control" type="datetime-local" step="1800" />
+            </div>
+
+            @* Selección de Recurso *@
+            <div class="mb-3">
+                <label asp-for="SalaId" class="form-label">Sala</label>
+                <select asp-for="SalaId"
+                        asp-items="Model.SalasDisponibles"
+                        class="form-control"
+                        id="ddlSala">
+                </select>
+            </div>
+
+            @if (Model.Tipo == TipoReserva.Equipo)
+            {
+                <div class="mb-3">
+                    <label asp-for="EquipoId" class="form-label">Equipo</label>
+                    <select asp-for="EquipoId"
+                            asp-items="Model.EquiposDisponibles"
+                            class="form-control"
+                            id="ddlEquipo">
+                        <option value="">-- Seleccione Equipo --</option>
+                    </select>
+                    <div class="form-text">Si cambia la sala, guarde para refrescar equipos o use JS.</div>
+                </div>
+            }
+        </div>
+    </div>
+
+    <button type="submit" class="btn btn-primary">Guardar Cambios</button>
+    <a asp-action="Gestionar" class="btn btn-secondary">Cancelar</a>
+</form>
+
+@section Scripts {
+    @{
+        await Html.RenderPartialAsync("_ValidationScriptsPartial");
+    }
+
+    <script>
+        $(document).ready(function () {
+
+            // Función para cargar equipos
+            function cargarEquipos() {
+                var salaId = $('#ddlSala').val();
+                var fechaInicio = $('#FechaInicio').val();
+                var fechaFin = $('#FechaFin').val();
+
+                // Obtenemos el ID de la reserva actual (está en el input hidden)
+                var reservaId = $('#Id').val();
+
+                var ddlEquipo = $('#ddlEquipo');
+
+                if (!salaId) {
+                    ddlEquipo.empty().append('<option value="">-- Seleccione Sala Primero --</option>');
+                    return;
+                }
+
+                if (!fechaInicio || !fechaFin) {
+                    ddlEquipo.empty().append('<option value="">-- Seleccione Fechas Primero --</option>');
+                    return;
+                }
+
+                ddlEquipo.empty().append('<option value="">Buscando disponibles...</option>');
+
+                $.ajax({
+                    url: '/Reservas/GetEquiposPorSalaJson',
+                    type: 'GET',
+                    data: {
+                        salaId: salaId,
+                        inicio: fechaInicio,
+                        fin: fechaFin,
+                        reservaId: reservaId // Enviamos el ID para excluir la propia reserva
+                    },
+                    success: function (data) {
+                        ddlEquipo.empty();
+
+                        if (data.length === 0) {
+                            ddlEquipo.append('<option value="">-- No hay equipos disponibles en este horario --</option>');
+                        } else {
+                            ddlEquipo.append('<option value="">-- Seleccione Equipo --</option>');
+                            $.each(data, function (index, item) {
+                                ddlEquipo.append('<option value="' + item.value + '">' + item.text + '</option>');
+                            });
+                        }
+                    },
+                    error: function () {
+                        ddlEquipo.empty().append('<option value="">Error al cargar</option>');
+                    }
+                });
+            }
+
+            // Ejecutar la función cuando cambie CUALQUIERA de estos campos
+            $('#ddlSala, #FechaInicio, #FechaFin').change(function () {
+                cargarEquipos();
+            });
+
+            // Ejecutar al iniciar (por si ya vienen datos cargados)
+            // (Opcional: Puedes comentarlo si prefieres que el usuario toque algo primero)
+            // cargarEquipos();
+        });
+    </script>
+}

@@ -14,6 +14,9 @@ namespace Domain
         public Guid Id { get; set; }
 
         [Required]
+        public TipoSala Tipo { get; set; }
+
+        [Required]
         public int Numero { get; set; }
 
         [Required]

@@ -122,6 +122,9 @@ namespace Infrastructure.Migrations
                     b.Property<DateTime>("FechaSolicitud")
                         .HasColumnType("datetime2");
 
+                    b.Property<Guid?>("SalaId")
+                        .HasColumnType("uniqueidentifier");
+
                     b.Property<string>("UsuarioId")
                         .IsRequired()
                         .HasColumnType("nvarchar(450)");
@@ -129,6 +132,8 @@ namespace Infrastructure.Migrations
                     b.HasKey("Id");
 
                     b.HasIndex("CoordinadorId");
+
+                    b.HasIndex("SalaId");
 
                     b.HasIndex("UsuarioId");
 
@@ -169,11 +174,14 @@ namespace Infrastructure.Migrations
 
                     b.Property<string>("Serial")
                         .IsRequired()
-                        .HasColumnType("nvarchar(max)");
+                        .HasColumnType("nvarchar(450)");
 
                     b.HasKey("Id");
 
                     b.HasIndex("SalaId");
+
+                    b.HasIndex("Serial")
+                        .IsUnique();
 
                     b.ToTable("Equipos");
                 });
@@ -322,7 +330,13 @@ namespace Infrastructure.Migrations
                     b.Property<int>("Numero")
                         .HasColumnType("int");
 
+                    b.Property<int>("Tipo")
+                        .HasColumnType("int");
+
                     b.HasKey("Id");
+
+                    b.HasIndex("Numero")
+                        .IsUnique();
 
                     b.ToTable("Salas");
                 });
@@ -467,6 +481,10 @@ namespace Infrastructure.Migrations
                         .HasForeignKey("CoordinadorId")
                         .OnDelete(DeleteBehavior.Restrict);
 
+                    b.HasOne("Domain.Sala", "Sala")
+                        .WithMany()
+                        .HasForeignKey("SalaId");
+
                     b.HasOne("Domain.AppUser", "UsuarioSolicitante")
                         .WithMany("AsesoriasSolicitadas")
                         .HasForeignKey("UsuarioId")
@@ -474,6 +492,8 @@ namespace Infrastructure.Migrations
                         .IsRequired();
 
                     b.Navigation("CoordinadorAsignado");
+
+                    b.Navigation("Sala");
 
                     b.Navigation("UsuarioSolicitante");
                 });
