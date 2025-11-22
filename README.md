@@ -3,7 +3,7 @@
 Una aplicación web robusta desarrollada en **ASP.NET Core MVC** para la gestión integral de laboratorios de cómputo, préstamos de equipos y asistencia técnica en un entorno universitario.
 
 ![Status](https://img.shields.io/badge/Status-En%20Desarrollo-yellow)
-![.NET](https://img.shields.io/badge/.NET-8.0-purple)
+![.NET](https://img.shields.io/badge/.NET-9.0-purple)
 ![EF Core](https://img.shields.io/badge/Entity%20Framework-Core-blue)
 
 ## 📋 Descripción
