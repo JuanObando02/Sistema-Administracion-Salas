@@ -4,6 +4,7 @@ using Domain;
 using Infrastructure;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore;
 using Services;
 using Services.Automapper;
 
@@ -94,6 +95,16 @@ namespace MvcSample
             {
 
                 var services = scope.ServiceProvider;
+                try
+                {
+                    var context = services.GetRequiredService<AppDbContext>();
+                    context.Database.Migrate();
+                    Console.WriteLine("Migraciones aplicadas con éxito.");
+                }
+                catch (Exception ex)
+                {
+                    Console.WriteLine("Error al aplicar migraciones: " + ex.Message);
+                }
                 SeedRolesAndAdminUser(services).Wait();
 
             }
