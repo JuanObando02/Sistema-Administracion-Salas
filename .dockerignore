@@ -1,0 +1,13 @@
+**/.git
+**/.github
+**/.vs
+**/.vscode
+**/bin
+**/obj
+**/out
+**/*.user
+**/*.suo
+**/*.db
+**/*.sqlite
+**/Dockerfile
+**/.dockerignore
